@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>实时语音通讯</title>
+    <script type="text/javascript">
+        var ws;
+        function startRealTimeSpeech() {
+            // 创建WebSocket连接
+            ws = new WebSocket('wss://vop.baidu.com/realtime_asr?sn=1234-1234-1234-123'); // 这里应该是你的API Key和Secret Key生成的连接
+ 
+            // 连接打开时的回调
+            ws.onopen = function() {
+                console.log('连接已打开。');
+            };
+ 
+            // 接收到消息的回调
+            ws.onmessage = function(event) {
+                console.log('收到消息: ' + event.data);
+                let result = JSON.parse(event.data.replace('\n', ''))
+                document.querySelector(".textBox").innerHTML = result.result;
+            };
+ 
+            // 连接关闭时的回调
+            ws.onclose = function() {
+                console.log('连接已关闭。');
+            };
+ 
+            // 发送语音数据
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    var mediaRecorder = new MediaRecorder(stream);
+                    ws.send(JSON.stringify({
+                        "type": "START",
+                        "data": {
+                            "appid": 78719506,
+                            "appkey": "7K0wKEFcc6UxT3iZDxhDFqll",
+                            "dev_pid": 15372, 
+                            "cuid": "cuid-1", 
+                            "format": "pcm",
+                            "sample": 16000   
+                        }
+                    }))
+                    mediaRecorder.start(500); // 10ms间隔
+                    
+                    mediaRecorder.addEventListener('dataavailable', function(event) {
+                        if (event.data && event.data.size > 0) {
+                            var audioChunk = event.data;
+                            console.log(audioChunk);
+                            // 发送语音数据到WebSocket服务器
+                            ws.send(audioChunk);
+                        }
+                    });
+                })
+                .catch(function(err) {
+                    console.log(err);
+                });
+        }
+    </script>
+</head>
+<body>
+    <button onclick="startRealTimeSpeech()">开始实时语音</button>
+    <div class="textBox"></div>
+</body>
+</html>
