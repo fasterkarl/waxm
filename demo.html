@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Speech to Text</title>
+</head>
+<body>
+ 
+<div>
+  <button id="start-button">开始录音</button>
+  <button id="stop-button" disabled>停止录音</button>
+  <textarea id="transcript" disabled cols="30" rows="10"></textarea>
+</div>
+<script>
+  try {
+    
+  } catch (error) {
+    
+  }
+const startButton = document.getElementById('start-button');
+const stopButton = document.getElementById('stop-button');
+const transcript = document.getElementById('transcript');
+let recognition = new webkitSpeechRecognition() || new SpeechRecognition();
+
+setTimeout(() => {
+  var ssu = new window.SpeechSynthesisUtterance('Hi，girl！');
+  window.speechSynthesis.speak(ssu);
+}, 3000);
+ 
+startButton.addEventListener('click', () => {
+  recognition.continuous = true;
+  console.log(recognition);
+  recognition.onresult = (event) => {
+    let result = event.results[event.results.length-1][0].transcript;
+    transcript.value += result;
+    console.log('You said: ' + result);
+  };
+ 
+  recognition.start();
+  startButton.disabled = true;
+  stopButton.disabled = false;
+});
+ 
+stopButton.addEventListener('click', () => {
+  recognition.stop();
+  transcript.value = '';
+  startButton.disabled = false;
+  stopButton.disabled = true;
+});
+</script>
+ 
+</body>
+</html>
