@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>智能心理测评系统 - 微信小程序原型</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- 微信小程序模拟容器 -->
+    <div class="wechat-container">
+      <!-- 顶部状态栏 -->
+      <div
+        class="status-bar"
+        style="justify-content: center; color: rgb(99, 36, 158)"
+      >
+        <div class="title" style="text-align: center">
+          <strong>AI心理学家设计原型</strong>
+        </div>
+        <!-- <div class="time">16:08</div>
+        <div class="battery">84%</div> -->
+      </div>
+
+      <!-- 页面内容区域 -->
+      <div class="page-content" id="pageContent">
+        <!-- 首页 -->
+        <div id="home" class="page">
+          <div class="page-header">
+            <div class="welcome-card">
+              <div class="user-info">
+                <div class="avatar">👤</div>
+                <div>
+                  <h2>张老师，下午好</h2>
+                  <p>阳光小学 · 心理教师</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="page-content">
+            <!-- 快捷入口 -->
+            <div class="grid-4">
+              <div
+                class="quick-access-card highlight"
+                onclick="navigateTo('assessment-list')"
+              >
+                <div class="quick-access-icon">📊</div>
+                <div>开始测评</div>
+              </div>
+              <div
+                class="quick-access-card"
+                onclick="navigateTo('case-filter')"
+              >
+                <div class="quick-access-icon">🔍</div>
+                <div>案例检索</div>
+              </div>
+              <div
+                class="quick-access-card"
+                onclick="navigateTo('my-collections')"
+              >
+                <div class="quick-access-icon">⭐</div>
+                <div>我的收藏</div>
+              </div>
+              <div
+                class="quick-access-card"
+                onclick="navigateTo('home-visit-outline')"
+              >
+                <div class="quick-access-icon">📋</div>
+                <div>家访大纲</div>
+              </div>
+            </div>
+
+            <!-- 数据看板 -->
+            <div class="stats-card">
+              <div class="stats-number">3</div>
+              <div class="stats-label">待处理测评</div>
+            </div>
+
+            <!-- 近期任务 -->
+            <div class="card">
+              <h3>近期任务提醒</h3>
+              <div class="task-item">
+                <div class="task-checkbox"></div>
+                <div class="task-content">
+                  <div class="task-title">李明 - 情绪测评分析</div>
+                  <div class="task-time">今天 14:30</div>
+                </div>
+              </div>
+              <div class="task-item">
+                <div class="task-checkbox"></div>
+                <div class="task-content">
+                  <div class="task-title">王小红 - 家访准备</div>
+                  <div class="task-time">明天 09:00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 案例筛选页面 -->
+        <div id="case-filter" class="page" style="display: none">
+          <div class="page-header">
+            <h2>案例筛选</h2>
+            <p>根据学生情况匹配相似案例</p>
+          </div>
+          <div class="page-content">
+            <div class="card">
+              <div class="filter-section">
+                <h3 class="filter-section-title">学生基础信息</h3>
+                <div class="filter-group">
+                  <div>
+                    <label>年龄</label>
+                    <input
+                      type="number"
+                      class="input-field"
+                      placeholder="请输入年龄"
+                      id="student-age"
+                    />
+                  </div>
+                  <div>
+                    <label>性别</label>
+                    <div class="radio-group">
+                      <label class="radio-option">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="male"
+                          class="radio-input"
+                        />
+                        <span class="radio-label">男</span>
+                      </label>
+                      <label class="radio-option">
+                        <input
+                          type="radio"
+                          name="gender"
+                          value="female"
+                          class="radio-input"
+                        />
+                        <span class="radio-label">女</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <label>身高 (cm)</label>
+                    <input
+                      type="number"
+                      class="input-field"
+                      placeholder="请输入身高"
+                      id="student-height"
+                    />
+                  </div>
+                  <div>
+                    <label>体重 (kg)</label>
+                    <input
+                      type="number"
+                      class="input-field"
+                      placeholder="请输入体重"
+                      id="student-weight"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-section">
+                <h3 class="filter-section-title">心理问题维度</h3>
+                <div class="filter-group">
+                  <div>
+                    <label>问题关键词</label>
+                    <input
+                      type="text"
+                      class="input-field"
+                      placeholder="如：考前焦虑、亲子沟通障碍"
+                      id="problem-keywords"
+                    />
+                  </div>
+                  <div>
+                    <label>问题严重程度</label>
+                    <div class="radio-group">
+                      <label class="radio-option">
+                        <input
+                          type="radio"
+                          name="severity"
+                          value="mild"
+                          class="radio-input"
+                        />
+                        <span class="radio-label">轻度</span>
+                      </label>
+                      <label class="radio-option">
+                        <input
+                          type="radio"
+                          name="severity"
+                          value="moderate"
+                          class="radio-input"
+                        />
+                        <span class="radio-label">中度</span>
+                      </label>
+                      <label class="radio-option">
+                        <input
+                          type="radio"
+                          name="severity"
+                          value="severe"
+                          class="radio-input"
+                        />
+                        <span class="radio-label">重度</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div>
+                    <label>学生学段</label>
+                    <select class="select-field" id="student-grade">
+                      <option value="">请选择学段</option>
+                      <option value="primary">小学</option>
+                      <option value="middle">初中</option>
+                      <option value="high">高中</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="filter-section">
+                <h3 class="filter-section-title">具体情况描述</h3>
+                <textarea
+                  class="input-field"
+                  placeholder="请详细描述学生的具体情况..."
+                  rows="4"
+                  id="case-description"
+                ></textarea>
+              </div>
+
+              <div class="filter-actions">
+                <button class="btn btn-reset" onclick="resetFilters()">
+                  重置条件
+                </button>
+                <button
+                  class="btn btn-primary btn-search"
+                  onclick="searchCases()"
+                >
+                  查询案例
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 案例库页面 -->
+        <div id="case-library" class="page" style="display: none">
+          <div class="page-header">
+            <h2>案例列表</h2>
+            <div class="case-list-header">
+              <div class="filter-tags" id="filter-tags">
+                <!-- 筛选标签将通过JavaScript动态生成 -->
+              </div>
+              <button
+                class="btn btn-secondary btn-small"
+                onclick="backToFilter()"
+              >
+                修改筛选
+              </button>
+            </div>
+          </div>
+          <div class="page-content">
+            <div id="case-list">
+              <!-- 案例列表将通过JavaScript动态生成 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 其他页面内容... -->
+      </div>
+
+      <!-- 底部Tab导航 -->
+      <div class="tab-bar">
+        <div class="tab-item active" data-page="home">
+          <div class="tab-icon">🏠</div>
+          <div class="tab-text">首页</div>
+        </div>
+        <div class="tab-item" data-page="assessment">
+          <div class="tab-icon">📊</div>
+          <div class="tab-text">测评</div>
+        </div>
+        <div class="tab-item" data-page="cases" data-page="caseslist">
+          <div class="tab-icon">📚</div>
+          <div class="tab-text">案例库</div>
+        </div>
+        <div class="tab-item" data-page="profile">
+          <div class="tab-icon">👤</div>
+          <div class="tab-text">我的</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
