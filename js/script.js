@@ -191,7 +191,7 @@ class WeChatMiniProgram {
                     <div class="quick-access-icon">🔍</div>
                     <div>案例检索</div>
                 </div>
-                <div class="quick-access-card" data-action="my-collections">
+                <div class="quick-access-card" data-action="跳转到聊天页面">
                     <div class="quick-access-icon">🧠</div>
                     <div>智能助手</div>
                 </div>
@@ -444,7 +444,7 @@ class WeChatMiniProgram {
                 <div class="tag">家访场景</div>
                 <div class="tag">个体辅导</div>
                 <div class="tag">班级活动</div>
-               <div class="tag" style="background: var(--primary-blue); color: white;">自定义</div>
+               <div class="tag" style="background: var(--primary-blue); color: white;">收藏后可以自定义分类</div>
             </div>
 
             <!-- 案例列表 -->
@@ -469,7 +469,7 @@ class WeChatMiniProgram {
                     <div class="tag">家访场景</div>
                     <div class="tag">匹配度 85%</div>
                     <div class="tag">⭐ 256收藏</div>
-                    <div class="tag" style="background: var(--primary-blue); color: white;">调整分类</div>
+                    <div class="tag" style="background: var(--primary-blue); color: white;">收藏后可以调整分类</div>
                 </div>
             </div>
 
@@ -503,7 +503,7 @@ class WeChatMiniProgram {
                         <span style="font-size: 24px;">👤</span>
                     </div>
                     <div>
-                        <div style="font-weight: 500; font-size: 18px; margin-bottom: 4px;">张老师</div>
+                        <div style="font-weight: 500; font-size: 18px; margin-bottom: 4px;">张老师<span class="tag" style="background: var(--primary-blue); color: white;">修改资料</span></div>
                         <div style="color: var(--text-secondary);">北京市第一中学 - 心理教师</div>
                     </div>
                 </div>
