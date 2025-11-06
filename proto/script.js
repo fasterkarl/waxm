@@ -1000,7 +1000,7 @@ class WeChatMiniProgram {
     `;
 
     this.addAIMessage(
-      `我在数据库中找到了<strong>${student.name}</strong>的记录：`,
+      `我在您的数据库中找到了<strong>${student.name}</strong>的记录：`,
       confirmCard
     );
 
@@ -1046,7 +1046,7 @@ class WeChatMiniProgram {
     selectionCard += `</div>`;
 
     this.addAIMessage(
-      `我在数据库中找到了<strong>${students.length}位</strong>名叫"${students[0].name}"的学生：`,
+      `我在您的个案库中找到了<strong>${students.length}位</strong>名叫"${students[0].name}"的学生：`,
       selectionCard
     );
   }
