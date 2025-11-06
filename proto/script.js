@@ -1,70 +1,66 @@
-// 微信小程序原型交互逻辑
+// 智能体聊天交互逻辑
 
 class WeChatMiniProgram {
   constructor() {
     this.currentPage = "home";
-    this.favorites = new Set();
-    this.annotations = {};
-    this.caseLinks = {};
-    this.myCases = [
-      {
-        id: 101,
-        name: "张小明",
-        age: 12,
-        gender: "男",
-        problem: "学习压力大，注意力不集中",
-      },
-      {
-        id: 102,
-        name: "李华",
-        age: 15,
-        gender: "男",
-        problem: "青春期叛逆，与父母沟通困难",
-      },
-      {
-        id: 103,
-        name: "王芳",
-        age: 14,
-        gender: "女",
-        problem: "社交焦虑，不敢在课堂发言",
-      },
-    ];
-    this.records = [
-      {
-        id: 201,
-        student: {
-          name: "张小明",
+    this.chatMessages = [];
+    this.conversationState = null; // 对话状态
+    this.collectedData = {}; // 收集的数据
+    this.mockDatabase = this.initMockDatabase(); // 模拟数据库
+    this.init();
+  }
+
+  // 初始化模拟数据库
+  initMockDatabase() {
+    return {
+      students: [
+        {
+          id: 1,
+          name: "张三",
           age: 14,
           gender: "男",
-          clazz: "初二（3）班",
+          grade: "初二",
+          lastAssessment: "2024-10-01",
         },
-        date: "2025-10-01",
-        assessment: "中学生情绪稳定性测评",
-        status: "已完成",
-        score: 78,
-      },
-      {
-        id: 202,
-        student: { name: "李华", age: 15, gender: "男", clazz: "初三（1）班" },
-        date: "2025-09-28",
-        assessment: "学习适应性测评",
-        status: "进行中",
-        progress: "12/20",
-      },
-      {
-        id: 203,
-        student: { name: "王芳", age: 14, gender: "女", clazz: "初二（5）班" },
-        date: "2025-09-20",
-        assessment: "社交能力评估量表",
-        status: "未开始",
-      },
-    ];
-    this.init();
+        {
+          id: 2,
+          name: "张三",
+          age: 16,
+          gender: "女",
+          grade: "高一",
+          lastAssessment: "2024-09-28",
+        },
+        {
+          id: 3,
+          name: "李四",
+          age: 13,
+          gender: "男",
+          grade: "初一",
+          lastAssessment: "2024-10-05",
+        },
+        {
+          id: 4,
+          name: "王小明",
+          age: 15,
+          gender: "男",
+          grade: "初三",
+          lastAssessment: "2024-10-03",
+        },
+      ],
+    };
+  }
+
+  // 根据姓名查询学生
+  queryStudentsByName(name) {
+    return this.mockDatabase.students.filter(
+      (student) => student.name === name
+    );
   }
 
   init() {
     this.bindEvents();
-    this.loadPage("home");
+    // this.loadPage('home');
+    this.initChatInterface();
   }
 
   bindEvents() {
@@ -81,14 +77,1068 @@ class WeChatMiniProgram {
     pageContent.addEventListener("scroll", this.handleScroll.bind(this));
   }
 
+  // 初始化聊天界面
+  initChatInterface() {
+    const sendBtn = document.getElementById("sendBtn");
+    const chatInput = document.getElementById("chatInput");
+
+    if (sendBtn) {
+      sendBtn.addEventListener("click", () => this.sendMessage());
+    }
+
+    if (chatInput) {
+      chatInput.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          this.sendMessage();
+        }
+      });
+    }
+
+    // 功能菜单项点击事件
+    document.querySelectorAll(".feature-menu-item-compact").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        const page = e.currentTarget.dataset.page;
+        this.navigateToPage(page);
+      });
+    });
+
+    // 视频卡片点击事件
+    document.querySelectorAll(".video-card").forEach((card) => {
+      card.addEventListener("click", (e) => {
+        const videoId = e.currentTarget.dataset.videoId;
+        this.showVideoDetail(videoId);
+      });
+    });
+  }
+
+  // 导航到指定页面
+  navigateToPage(pageName) {
+    // 隐藏所有页面
+    document.querySelectorAll(".page").forEach((page) => {
+      page.style.display = "none";
+    });
+
+    // 显示目标页面
+    const targetPage = document.getElementById(pageName);
+    if (targetPage) {
+      targetPage.style.display = "block";
+      this.currentPage = pageName;
+    }
+  }
+
+  // 返回首页
+  navigateToHome() {
+    this.navigateToPage("home");
+  }
+
+  // 发送消息
+  sendMessage() {
+    const chatInput = document.getElementById("chatInput");
+    const message = chatInput.value.trim();
+
+    if (!message) return;
+
+    // 添加用户消息
+    this.addUserMessage(message);
+    chatInput.value = "";
+
+    // 显示打字动画
+    this.showTypingIndicator();
+
+    // 模拟AI回复
+    setTimeout(() => {
+      this.hideTypingIndicator();
+      this.handleUserIntent(message);
+    }, 1500);
+  }
+
+  // 添加用户消息
+  addUserMessage(message) {
+    const chatMessages = document.getElementById("chatMessages");
+    const messageHTML = `
+            <div class="message-group user-message">
+                <div class="message-avatar">👤</div>
+                <div class="message-content">
+                    <div class="message-bubble">${this.escapeHtml(
+                      message
+                    )}</div>
+                </div>
+            </div>
+        `;
+    chatMessages.insertAdjacentHTML("beforeend", messageHTML);
+    this.scrollToBottom();
+  }
+
+  // 添加AI消息
+  addAIMessage(message, includeCard = null) {
+    const chatMessages = document.getElementById("chatMessages");
+    const messageHTML = `
+            <div class="message-group ai-message">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="message-bubble">${message}</div>
+                    ${includeCard || ""}
+                </div>
+            </div>
+        `;
+    chatMessages.insertAdjacentHTML("beforeend", messageHTML);
+    this.scrollToBottom();
+
+    // 绑定卡片内的事件
+    if (includeCard) {
+      // 延迟绑定，确保DOM已更新
+      setTimeout(() => {
+        this.bindAssessmentItemEvents();
+      }, 50);
+    }
+  }
+
+  // 显示打字动画
+  showTypingIndicator() {
+    const chatMessages = document.getElementById("chatMessages");
+    const typingHTML = `
+            <div class="message-group ai-message typing-indicator-group">
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        <div class="typing-indicator">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    chatMessages.insertAdjacentHTML("beforeend", typingHTML);
+    this.scrollToBottom();
+  }
+
+  // 隐藏打字动画
+  hideTypingIndicator() {
+    const typingIndicator = document.querySelector(".typing-indicator-group");
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+  }
+
+  // 处理用户意图
+  handleUserIntent(message) {
+    // 如果在对话流程中，继续处理对话
+    if (this.conversationState) {
+      this.handleConversationFlow(message);
+      return;
+    }
+
+    const lowerMessage = message.toLowerCase();
+
+    // 测评相关 - 启动对话流程
+    if (lowerMessage.includes("测评") || lowerMessage.includes("想测评")) {
+      this.startAssessmentConversation();
+    }
+    // 智能评估相关 - 启动对话流程
+    else if (
+      lowerMessage.includes("智能评估") ||
+      lowerMessage.includes("评估") ||
+      lowerMessage.includes("辅导建议")
+    ) {
+      this.startSmartAssessmentConversation();
+    }
+    // 案例检索相关 - 启动对话流程
+    else if (
+      lowerMessage.includes("案例") ||
+      lowerMessage.includes("检索") ||
+      lowerMessage.includes("查找")
+    ) {
+      this.startCaseSearchConversation();
+    }
+    // 导师36计相关
+    else if (
+      lowerMessage.includes("导师") ||
+      lowerMessage.includes("36计") ||
+      lowerMessage.includes("课程") ||
+      lowerMessage.includes("视频")
+    ) {
+      this.addAIMessage("好的，正在为您打开导师36计页面...");
+      setTimeout(() => {
+        this.navigateToPage("mentor-36");
+      }, 800);
+    }
+    // 默认回复
+    else {
+      this.addAIMessage(
+        '我理解您的需求了。您可以：<br><br>• 输入"我想测评"开始心理测评<br>• 输入"智能评估"获取评估建议<br>• 输入"案例检索"查找相似案例<br>• 输入"导师36计"学习辅导技巧<br><br>我会引导您完成操作 😊'
+      );
+    }
+  }
+
+  // 启动测评对话流程
+  startAssessmentConversation() {
+    this.conversationState = {
+      type: "assessment",
+      step: "name",
+      data: {},
+    };
+    this.addAIMessage(
+      "好的！我来帮您进行心理测评。<br><br>首先，请告诉我<strong>被测评人的姓名</strong>？"
+    );
+  }
+
+  // 启动智能评估对话流程
+  startSmartAssessmentConversation() {
+    this.conversationState = {
+      type: "smart-assessment",
+      step: "name",
+      data: {},
+    };
+    this.addAIMessage(
+      "好的！我来为您提供智能评估服务。<br><br>首先，请告诉我<strong>学生的姓名</strong>？"
+    );
+  }
+
+  // 启动案例检索对话流程
+  startCaseSearchConversation() {
+    this.conversationState = {
+      type: "case-search",
+      step: "name",
+      data: {},
+    };
+    this.addAIMessage(
+      "好的！我来帮您检索相似案例。<br><br>首先，请告诉我<strong>学生的姓名</strong>？"
+    );
+  }
+
+  // 处理对话流程
+  handleConversationFlow(message) {
+    const state = this.conversationState;
+
+    if (state.type === "assessment") {
+      this.handleAssessmentFlow(message);
+    } else if (state.type === "smart-assessment") {
+      this.handleSmartAssessmentFlow(message);
+    } else if (state.type === "case-search") {
+      this.handleCaseSearchFlow(message);
+    }
+  }
+
+  // 处理测评对话流程
+  handleAssessmentFlow(message) {
+    const state = this.conversationState;
+
+    switch (state.step) {
+      case "name":
+        // 查询数据库中是否存在该姓名
+        const students = this.queryStudentsByName(message);
+
+        if (students.length === 0) {
+          // 没有找到，继续询问
+          state.data.name = message;
+          state.step = "age";
+          this.addAIMessage(
+            `好的，${message}。<br><br>请问<strong>年龄</strong>是多少？`
+          );
+        } else if (students.length === 1) {
+          // 找到唯一记录，显示确认
+          state.data.possibleStudents = students;
+          state.step = "confirm-student";
+          this.showStudentConfirmation(students[0]);
+        } else {
+          // 找到多个记录，让用户选择
+          state.data.possibleStudents = students;
+          state.step = "select-student";
+          this.showStudentSelection(students);
+        }
+        break;
+
+      case "confirm-student":
+        const lowerMsg = message.toLowerCase();
+        if (
+          lowerMsg.includes("是") ||
+          lowerMsg.includes("对") ||
+          lowerMsg.includes("确认")
+        ) {
+          // 用户确认，使用已有数据
+          const student = state.data.possibleStudents[0];
+          state.data.name = student.name;
+          state.data.age = student.age;
+          state.data.gender = student.gender;
+          state.data.studentId = student.id;
+          state.step = "direction";
+          this.addAIMessage(
+            `太好了！已为您加载${student.name}的信息。<br><br>请问主要想测评哪个方向？<br><br>• 情绪稳定性<br>• 学习适应性<br>• 社交能力<br>• 综合测评<br><br>请直接输入方向名称`
+          );
+        } else {
+          // 用户不确认，重新输入
+          state.step = "name";
+          state.data.possibleStudents = null;
+          this.addAIMessage(
+            "好的，那请重新输入<strong>被测评人的姓名</strong>："
+          );
+        }
+        break;
+
+      case "select-student":
+        const selectedIndex = parseInt(message);
+        if (
+          isNaN(selectedIndex) ||
+          selectedIndex < 1 ||
+          selectedIndex > state.data.possibleStudents.length
+        ) {
+          this.addAIMessage(
+            `请输入有效的序号（1-${state.data.possibleStudents.length}）`
+          );
+          return;
+        }
+        // 用户选择了某个学生
+        const selectedStudent = state.data.possibleStudents[selectedIndex - 1];
+        state.data.name = selectedStudent.name;
+        state.data.age = selectedStudent.age;
+        state.data.gender = selectedStudent.gender;
+        state.data.studentId = selectedStudent.id;
+        state.step = "direction";
+        this.addAIMessage(
+          `好的！已选择${selectedStudent.name}（${selectedStudent.age}岁，${selectedStudent.gender}，${selectedStudent.grade}）。<br><br>请问主要想测评哪个方向？<br><br>• 情绪稳定性<br>• 学习适应性<br>• 社交能力<br>• 综合测评<br><br>请直接输入方向名称`
+        );
+        break;
+
+      case "age":
+        const age = parseInt(message);
+        if (isNaN(age) || age < 6 || age > 18) {
+          this.addAIMessage("抱歉，请输入有效的年龄（6-18岁之间的数字）");
+          return;
+        }
+        state.data.age = age;
+        state.step = "gender";
+        this.addAIMessage(
+          "明白了。<br><br>请问<strong>性别</strong>是？（男/女）"
+        );
+        break;
+
+      case "gender":
+        const gender = message.includes("男")
+          ? "男"
+          : message.includes("女")
+          ? "女"
+          : null;
+        if (!gender) {
+          this.addAIMessage('请输入"男"或"女"');
+          return;
+        }
+        state.data.gender = gender;
+        state.step = "direction";
+        this.addAIMessage(
+          `好的。<br><br>请问主要想测评哪个方向？<br><br>• 情绪稳定性<br>• 学习适应性<br>• 社交能力<br>• 综合测评<br><br>请直接输入方向名称`
+        );
+        break;
+
+      case "direction":
+        state.data.direction = message;
+        state.step = "complete";
+        this.showAssessmentSummaryAndRecommend();
+        break;
+    }
+  }
+
+  // 处理智能评估对话流程
+  handleSmartAssessmentFlow(message) {
+    const state = this.conversationState;
+
+    switch (state.step) {
+      case "name":
+        // 查询数据库中是否存在该姓名
+        const students = this.queryStudentsByName(message);
+
+        if (students.length === 0) {
+          // 没有找到，继续询问
+          state.data.name = message;
+          state.step = "age";
+          this.addAIMessage(
+            `好的，${message}。<br><br>请问<strong>年龄</strong>是多少？`
+          );
+        } else if (students.length === 1) {
+          // 找到唯一记录，显示确认
+          state.data.possibleStudents = students;
+          state.step = "confirm-student";
+          this.showStudentConfirmation(students[0]);
+        } else {
+          // 找到多个记录，让用户选择
+          state.data.possibleStudents = students;
+          state.step = "select-student";
+          this.showStudentSelection(students);
+        }
+        break;
+
+      case "confirm-student":
+        const lowerMsg = message.toLowerCase();
+        if (
+          lowerMsg.includes("是") ||
+          lowerMsg.includes("对") ||
+          lowerMsg.includes("确认")
+        ) {
+          // 用户确认，使用已有数据
+          const student = state.data.possibleStudents[0];
+          state.data.name = student.name;
+          state.data.age = student.age;
+          state.data.gender = student.gender;
+          state.data.studentId = student.id;
+          state.step = "problem";
+          this.addAIMessage(
+            `太好了！已为您加载${student.name}的信息。<br><br>请<strong>详细描述</strong>学生的心理问题或行为表现：<br><br>• 具体的问题表现<br>• 持续时间<br>• 影响程度<br>• 家庭背景（可选）`
+          );
+        } else {
+          // 用户不确认，重新输入
+          state.step = "name";
+          state.data.possibleStudents = null;
+          this.addAIMessage("好的，那请重新输入<strong>学生的姓名</strong>：");
+        }
+        break;
+
+      case "select-student":
+        const selectedIndex = parseInt(message);
+        if (
+          isNaN(selectedIndex) ||
+          selectedIndex < 1 ||
+          selectedIndex > state.data.possibleStudents.length
+        ) {
+          this.addAIMessage(
+            `请输入有效的序号（1-${state.data.possibleStudents.length}）`
+          );
+          return;
+        }
+        // 用户选择了某个学生
+        const selectedStudent = state.data.possibleStudents[selectedIndex - 1];
+        state.data.name = selectedStudent.name;
+        state.data.age = selectedStudent.age;
+        state.data.gender = selectedStudent.gender;
+        state.data.studentId = selectedStudent.id;
+        state.step = "problem";
+        this.addAIMessage(
+          `好的！已选择${selectedStudent.name}（${selectedStudent.age}岁，${selectedStudent.gender}，${selectedStudent.grade}）。<br><br>请<strong>详细描述</strong>学生的心理问题或行为表现：<br><br>• 具体的问题表现<br>• 持续时间<br>• 影响程度<br>• 家庭背景（可选）`
+        );
+        break;
+
+      case "age":
+        const age = parseInt(message);
+        if (isNaN(age) || age < 6 || age > 18) {
+          this.addAIMessage("抱歉，请输入有效的年龄（6-18岁之间的数字）");
+          return;
+        }
+        state.data.age = age;
+        state.step = "gender";
+        this.addAIMessage(
+          "明白了。<br><br>请问<strong>性别</strong>是？（男/女）"
+        );
+        break;
+
+      case "gender":
+        const gender = message.includes("男")
+          ? "男"
+          : message.includes("女")
+          ? "女"
+          : null;
+        if (!gender) {
+          this.addAIMessage('请输入"男"或"女"');
+          return;
+        }
+        state.data.gender = gender;
+        state.step = "problem";
+        this.addAIMessage(
+          `好的。<br><br>请<strong>详细描述</strong>学生的心理问题或行为表现：<br><br>• 具体的问题表现<br>• 持续时间<br>• 影响程度<br>• 家庭背景（可选）`
+        );
+        break;
+
+      case "problem":
+        if (message.length < 10) {
+          this.addAIMessage(
+            "请提供更详细的描述（至少10个字），这样我才能给出更准确的评估建议。"
+          );
+          return;
+        }
+        state.data.problem = message;
+        state.step = "complete";
+        this.generateSmartAssessment();
+        break;
+    }
+  }
+
+  // 显示测评总结并推荐量表
+  showAssessmentSummaryAndRecommend() {
+    const data = this.conversationState.data;
+
+    // 显示收集的信息
+    this.addAIMessage(
+      `非常好！我已经收集到以下信息：<br><br>` +
+        `👤 <strong>姓名</strong>：${data.name}<br>` +
+        `🎂 <strong>年龄</strong>：${data.age}岁<br>` +
+        `⚧ <strong>性别</strong>：${data.gender}<br>` +
+        `🎯 <strong>测评方向</strong>：${data.direction}<br><br>` +
+        `正在为您匹配合适的测评量表...`
+    );
+
+    // 延迟显示推荐量表
+    setTimeout(() => {
+      this.showRecommendedAssessments(data);
+      // 重置对话状态
+      this.conversationState = null;
+    }, 1500);
+  }
+
+  // 显示推荐的测评量表
+  showRecommendedAssessments(data) {
+    const assessmentCard = `
+      <div class="assessment-list-card">
+        <div class="assessment-list-header">
+          <div class="assessment-list-title">📊 为${data.name}推荐的测评量表</div>
+        </div>
+        <div class="assessment-item clickable-item" data-assessment-id="1" data-name="${data.name}">
+          <div class="assessment-item-title">中学生情绪稳定性测评</div>
+          <div class="assessment-item-meta">
+            <span>⏱ 15分钟</span>
+            <span>🔘 单选题</span>
+            <span>⭐ 推荐</span>
+          </div>
+        </div>
+        <div class="assessment-item clickable-item" data-assessment-id="2" data-name="${data.name}">
+          <div class="assessment-item-title">学习适应性测评量表</div>
+          <div class="assessment-item-meta">
+            <span>⏱ 20分钟</span>
+            <span>☑ 多选题</span>
+            <span>🔄 常用</span>
+          </div>
+        </div>
+        <div class="assessment-item clickable-item" data-assessment-id="3" data-name="${data.name}">
+          <div class="assessment-item-title">社交能力评估量表</div>
+          <div class="assessment-item-meta">
+            <span>⏱ 25分钟</span>
+            <span>📊 滑动评分</span>
+            <span>📈 专业版</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage(
+      `根据您提供的信息，我为<strong>${data.name}</strong>（${data.age}岁，${data.gender}）推荐以下测评量表：`,
+      assessmentCard
+    );
+
+    // 绑定点击事件
+    setTimeout(() => {
+      this.bindAssessmentItemEvents();
+    }, 100);
+  }
+
+  // 绑定测评项点击事件
+  bindAssessmentItemEvents() {
+    // 移除旧的事件监听器，避免重复绑定
+    document.querySelectorAll(".clickable-item").forEach((item) => {
+      // 克隆节点来移除所有事件监听器
+      const newItem = item.cloneNode(true);
+      item.parentNode.replaceChild(newItem, item);
+    });
+
+    // 重新绑定事件
+    document.querySelectorAll(".clickable-item").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const assessmentId = e.currentTarget.dataset.assessmentId;
+        const caseId = e.currentTarget.dataset.caseId;
+        const name = e.currentTarget.dataset.name;
+
+        if (assessmentId) {
+          this.openAssessmentDetail(assessmentId, name);
+        } else if (caseId) {
+          this.openCaseDetail(caseId, name);
+        }
+      });
+    });
+  }
+
+  // 处理案例检索对话流程
+  handleCaseSearchFlow(message) {
+    const state = this.conversationState;
+
+    switch (state.step) {
+      case "name":
+        // 查询数据库中是否存在该姓名
+        const students = this.queryStudentsByName(message);
+
+        if (students.length === 0) {
+          // 没有找到，继续询问
+          state.data.name = message;
+          state.step = "age";
+          this.addAIMessage(
+            `好的，${message}。<br><br>请问<strong>年龄</strong>是多少？`
+          );
+        } else if (students.length === 1) {
+          // 找到唯一记录，显示确认
+          state.data.possibleStudents = students;
+          state.step = "confirm-student";
+          this.showStudentConfirmation(students[0]);
+        } else {
+          // 找到多个记录，让用户选择
+          state.data.possibleStudents = students;
+          state.step = "select-student";
+          this.showStudentSelection(students);
+        }
+        break;
+
+      case "confirm-student":
+        const lowerMsg = message.toLowerCase();
+        if (
+          lowerMsg.includes("是") ||
+          lowerMsg.includes("对") ||
+          lowerMsg.includes("确认")
+        ) {
+          // 用户确认，使用已有数据
+          const student = state.data.possibleStudents[0];
+          state.data.name = student.name;
+          state.data.age = student.age;
+          state.data.gender = student.gender;
+          state.data.studentId = student.id;
+          state.step = "problem";
+          this.addAIMessage(
+            `太好了！已为您加载${student.name}的信息。<br><br>请<strong>简要描述</strong>学生的问题或需要检索的案例类型：<br><br>• 问题关键词（如：考前焦虑、厌学等）<br>• 问题严重程度<br>• 其他相关信息`
+          );
+        } else {
+          // 用户不确认，重新输入
+          state.step = "name";
+          state.data.possibleStudents = null;
+          this.addAIMessage("好的，那请重新输入<strong>学生的姓名</strong>：");
+        }
+        break;
+
+      case "select-student":
+        const selectedIndex = parseInt(message);
+        if (
+          isNaN(selectedIndex) ||
+          selectedIndex < 1 ||
+          selectedIndex > state.data.possibleStudents.length
+        ) {
+          this.addAIMessage(
+            `请输入有效的序号（1-${state.data.possibleStudents.length}）`
+          );
+          return;
+        }
+        // 用户选择了某个学生
+        const selectedStudent = state.data.possibleStudents[selectedIndex - 1];
+        state.data.name = selectedStudent.name;
+        state.data.age = selectedStudent.age;
+        state.data.gender = selectedStudent.gender;
+        state.data.studentId = selectedStudent.id;
+        state.step = "problem";
+        this.addAIMessage(
+          `好的！已选择${selectedStudent.name}（${selectedStudent.age}岁，${selectedStudent.gender}，${selectedStudent.grade}）。<br><br>请<strong>简要描述</strong>学生的问题或需要检索的案例类型：<br><br>• 问题关键词（如：考前焦虑、厌学等）<br>• 问题严重程度<br>• 其他相关信息`
+        );
+        break;
+
+      case "age":
+        const age = parseInt(message);
+        if (isNaN(age) || age < 6 || age > 18) {
+          this.addAIMessage("抱歉，请输入有效的年龄（6-18岁之间的数字）");
+          return;
+        }
+        state.data.age = age;
+        state.step = "gender";
+        this.addAIMessage(
+          "明白了。<br><br>请问<strong>性别</strong>是？（男/女）"
+        );
+        break;
+
+      case "gender":
+        const gender = message.includes("男")
+          ? "男"
+          : message.includes("女")
+          ? "女"
+          : null;
+        if (!gender) {
+          this.addAIMessage('请输入"男"或"女"');
+          return;
+        }
+        state.data.gender = gender;
+        state.step = "problem";
+        this.addAIMessage(
+          `好的。<br><br>请<strong>简要描述</strong>学生的问题或需要检索的案例类型：<br><br>• 问题关键词（如：考前焦虑、厌学等）<br>• 问题严重程度<br>• 其他相关信息`
+        );
+        break;
+
+      case "problem":
+        if (message.length < 5) {
+          this.addAIMessage(
+            "请提供更详细的描述（至少5个字），这样我才能为您匹配更准确的案例。"
+          );
+          return;
+        }
+        state.data.problem = message;
+        state.step = "complete";
+        this.searchAndShowCases();
+        break;
+    }
+  }
+
+  // 搜索并显示案例
+  searchAndShowCases() {
+    const data = this.conversationState.data;
+
+    // 显示收集的信息
+    this.addAIMessage(
+      `好的，我已经收集到以下信息：<br><br>` +
+        `👤 <strong>姓名</strong>：${data.name}<br>` +
+        `🎂 <strong>年龄</strong>：${data.age}岁<br>` +
+        `⚧ <strong>性别</strong>：${data.gender}<br>` +
+        `📝 <strong>问题描述</strong>：${data.problem}<br><br>` +
+        `正在为您匹配相似案例...`
+    );
+
+    // 延迟显示案例结果
+    setTimeout(() => {
+      this.showMatchedCases(data);
+      // 重置对话状态
+      this.conversationState = null;
+    }, 1500);
+  }
+
+  // 显示匹配的案例
+  showMatchedCases(data) {
+    const casesCard = `
+      <div class="assessment-list-card">
+        <div class="assessment-list-header">
+          <div class="assessment-list-title">🔍 为${data.name}匹配的相似案例</div>
+        </div>
+        <div class="case-match-info">
+          <div class="match-label">匹配度</div>
+          <div class="match-tags">
+            <span class="match-tag high">年龄相近</span>
+            <span class="match-tag high">性别相同</span>
+            <span class="match-tag medium">问题相似</span>
+          </div>
+        </div>
+        <div class="assessment-item clickable-item" data-case-id="1" data-name="${data.name}">
+          <div class="assessment-item-title">考前焦虑疏导方案</div>
+          <div class="assessment-item-meta">
+            <span>初中</span>
+            <span>中度</span>
+            <span>成功率 85%</span>
+            <span>⭐ 128收藏</span>
+          </div>
+        </div>
+        <div class="assessment-item clickable-item" data-case-id="2" data-name="${data.name}">
+          <div class="assessment-item-title">学习动力不足干预案例</div>
+          <div class="assessment-item-meta">
+            <span>初中</span>
+            <span>中度</span>
+            <span>成功率 78%</span>
+            <span>⭐ 95收藏</span>
+          </div>
+        </div>
+        <div class="assessment-item clickable-item" data-case-id="3" data-name="${data.name}">
+          <div class="assessment-item-title">家庭沟通障碍解决方案</div>
+          <div class="assessment-item-meta">
+            <span>全学段</span>
+            <span>轻度</span>
+            <span>成功率 92%</span>
+            <span>⭐ 156收藏</span>
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage(
+      `✅ 已为<strong>${data.name}</strong>（${data.age}岁，${data.gender}）匹配到以下相似案例：`,
+      casesCard
+    );
+
+    // 绑定点击事件
+    setTimeout(() => {
+      this.bindCaseItemEvents();
+    }, 100);
+  }
+
+  // 绑定案例项点击事件（统一使用bindAssessmentItemEvents）
+  bindCaseItemEvents() {
+    this.bindAssessmentItemEvents();
+  }
+
+  // 打开案例详情
+  openCaseDetail(id, name) {
+    this.showToast(`正在为${name}打开案例详情...`);
+    setTimeout(() => {
+      this.addAIMessage(
+        `案例详情页功能开发中...<br><br>您选择了案例：<strong>案例${id}</strong><br><br>实际应用中，这里会显示：<br>• 案例背景<br>• 问题分析<br>• 解决方案<br>• 实施步骤<br>• 效果评估`
+      );
+    }, 1000);
+  }
+
+  // 生成智能评估
+  generateSmartAssessment() {
+    const data = this.conversationState.data;
+
+    // 显示收集的信息
+    this.addAIMessage(
+      `好的，我已经收集到以下信息：<br><br>` +
+        `👤 <strong>姓名</strong>：${data.name}<br>` +
+        `🎂 <strong>年龄</strong>：${data.age}岁<br>` +
+        `⚧ <strong>性别</strong>：${data.gender}<br>` +
+        `📝 <strong>问题描述</strong>：${data.problem.substring(
+          0,
+          50
+        )}...<br><br>` +
+        `正在生成智能评估报告...`
+    );
+
+    // 延迟显示评估结果
+    setTimeout(() => {
+      this.showSmartAssessmentResult(data);
+      // 重置对话状态
+      this.conversationState = null;
+    }, 2000);
+  }
+
+  // 显示智能评估结果
+  showSmartAssessmentResult(data) {
+    const assessmentResult = `
+      <div class="assessment-result-card">
+        <div class="result-section">
+          <div class="result-section-title">📋 评估意见</div>
+          <div class="result-content">
+            根据您提供的信息，${data.name}（${data.age}岁，${data.gender}）目前表现出的问题需要关注。建议从以下几个方面进行干预：
+            <br><br>
+            <strong>1. 心理状态评估</strong><br>
+            学生可能处于心理压力较大的状态，需要及时疏导。
+            <br><br>
+            <strong>2. 行为观察</strong><br>
+            建议持续观察学生的日常行为变化，记录异常表现。
+            <br><br>
+            <strong>3. 风险等级</strong><br>
+            <span style="color: var(--warning-orange);">⚠️ 中度关注</span>
+          </div>
+        </div>
+        
+        <div class="result-section">
+          <div class="result-section-title">💡 辅导建议</div>
+          <div class="result-content">
+            <strong>短期措施（1-2周）：</strong><br>
+            • 建立信任关系，多倾听学生的想法<br>
+            • 创造安全的表达环境<br>
+            • 适当减轻学业压力<br>
+            <br>
+            <strong>中期措施（1-2个月）：</strong><br>
+            • 定期心理辅导（每周1-2次）<br>
+            • 家校配合，共同关注<br>
+            • 培养积极的兴趣爱好<br>
+            <br>
+            <strong>长期措施：</strong><br>
+            • 建立健康的心理调节机制<br>
+            • 提升抗压能力和情绪管理能力<br>
+            • 必要时寻求专业心理咨询
+          </div>
+        </div>
+        
+        <div class="result-section">
+          <div class="result-section-title">🏠 家访大纲</div>
+          <div class="result-content">
+            <strong>访前准备：</strong><br>
+            • 了解家庭基本情况<br>
+            • 准备学生在校表现材料<br>
+            • 预约合适的时间<br>
+            <br>
+            <strong>访中沟通要点：</strong><br>
+            1. 肯定学生的优点和进步<br>
+            2. 客观描述需要关注的问题<br>
+            3. 了解家庭教育方式和亲子关系<br>
+            4. 共同制定改进计划<br>
+            5. 建立后续沟通机制<br>
+            <br>
+            <strong>访后跟进：</strong><br>
+            • 记录家访内容<br>
+            • 定期反馈学生进展<br>
+            • 调整辅导策略
+          </div>
+        </div>
+        
+        <div class="result-actions">
+          <button class="btn btn-secondary" onclick="app.showToast('评估报告已保存')">💾 保存报告</button>
+          <button class="btn btn-primary" onclick="app.showToast('正在导出PDF...')">📄 导出PDF</button>
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage(
+      `✅ 智能评估报告已生成！<br><br>为<strong>${data.name}</strong>提供以下专业建议：`,
+      assessmentResult
+    );
+  }
+
+  // 显示学生确认信息
+  showStudentConfirmation(student) {
+    const confirmCard = `
+      <div class="student-confirm-card">
+        <div class="confirm-title">📋 找到以下学生信息</div>
+        <div class="student-info-item">
+          <span class="info-label">姓名：</span>
+          <span class="info-value">${student.name}</span>
+        </div>
+        <div class="student-info-item">
+          <span class="info-label">年龄：</span>
+          <span class="info-value">${student.age}岁</span>
+        </div>
+        <div class="student-info-item">
+          <span class="info-label">性别：</span>
+          <span class="info-value">${student.gender}</span>
+        </div>
+        <div class="student-info-item">
+          <span class="info-label">年级：</span>
+          <span class="info-value">${student.grade}</span>
+        </div>
+        <div class="student-info-item">
+          <span class="info-label">上次测评：</span>
+          <span class="info-value">${student.lastAssessment}</span>
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage(
+      `我在数据库中找到了<strong>${student.name}</strong>的记录：`,
+      confirmCard
+    );
+
+    setTimeout(() => {
+      this.addAIMessage(
+        '请确认是否是这位学生？<br><br>• 回复"是"或"确认"继续<br>• 回复"否"重新输入'
+      );
+    }, 500);
+  }
+
+  // 显示学生选择列表
+  showStudentSelection(students) {
+    let selectionCard = `
+      <div class="student-selection-card">
+        <div class="selection-title">📋 找到${students.length}位同名学生</div>
+    `;
+
+    students.forEach((student, index) => {
+      selectionCard += `
+        <div class="student-option" data-index="${index + 1}">
+          <div class="option-number">${index + 1}</div>
+          <div class="option-info">
+            <div class="option-name">${student.name}</div>
+            <div class="option-details">
+              ${student.age}岁 · ${student.gender} · ${student.grade}<br>
+              上次测评：${student.lastAssessment}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    selectionCard += `
+      <div class="input-hint-card">
+        <div class="hint-icon">💡</div>
+        <div class="hint-content">
+          <div class="hint-title">如何选择？</div>
+          <div class="hint-text">请在输入框中输入序号（1-${students.length}），然后发送</div>
+        </div>
+      </div>
+    `;
+
+    selectionCard += `</div>`;
+
+    this.addAIMessage(
+      `我在数据库中找到了<strong>${students.length}位</strong>名叫"${students[0].name}"的学生：`,
+      selectionCard
+    );
+  }
+
+  // 打开测评详情
+  openAssessmentDetail(id, name) {
+    this.showToast(`正在为${name}打开测评详情...`);
+    // 这里可以跳转到测评详情页
+    setTimeout(() => {
+      this.addAIMessage(
+        `测评详情页功能开发中...<br><br>您选择了：<strong>${name}</strong> 的测评项目<br><br>实际应用中，这里会跳转到完整的测评问卷页面。`
+      );
+    }, 1000);
+  }
+
+  // 显示视频详情
+  showVideoDetail(videoId) {
+    this.navigateToPage("video-detail");
+    // 这里可以根据videoId加载不同的视频内容
+  }
+
+  // 快捷操作处理（保留用于其他地方调用）
+  handleQuickAction(action) {
+    switch (action) {
+      case "assessment":
+        this.navigateToPage("assessment");
+        break;
+      case "case-search":
+        this.navigateToPage("case-filter");
+        break;
+      case "visit-plan":
+        this.navigateToPage("visit-plan");
+        break;
+      case "collections":
+        this.navigateToPage("collections");
+        break;
+    }
+  }
+
+  // Toast提示
+  showToast(message) {
+    // 移除已存在的toast
+    const existingToast = document.querySelector(".toast-message");
+    if (existingToast) {
+      existingToast.remove();
+    }
+
+    // 创建新toast
+    const toast = document.createElement("div");
+    toast.className = "toast-message";
+    toast.textContent = message;
+    document.body.appendChild(toast);
+
+    // 显示动画
+    setTimeout(() => {
+      toast.classList.add("show");
+    }, 10);
+
+    // 3秒后隐藏
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  // 滚动到底部
+  scrollToBottom() {
+    const chatMessages = document.getElementById("chatMessages");
+    if (chatMessages) {
+      setTimeout(() => {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 100);
+    }
+  }
+
+  // HTML转义
+  escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   switchPage(page) {
-    // if (this.currentPage === page) return;
+    if (this.currentPage === page) return;
 
     // 更新Tab状态
     document.querySelectorAll(".tab-item").forEach((tab) => {
       tab.classList.remove("active");
     });
-    // document.querySelector(`[data-page="${page}"]`).classList.add('active');
+    // document.querySelector(`[data-page="${page}"]`)s.classList.add('active');
 
     this.currentPage = page;
     this.loadPage(page);
@@ -152,20 +1202,72 @@ class WeChatMiniProgram {
       assessment: this.getAssessmentHTML(),
       cases: this.getCasesHTML(),
       caseslist: this.getCaseListHTML(),
-      records: this.getRecordsHTML(),
-      mycases: this.getMyCasesHTML(),
-      annotlist: this.getAnnotationListHTML(),
       profile: this.getProfileHTML(),
     };
 
     return pages[page] || '<div class="card">页面加载中...</div>';
   }
-
   getHomeHTML() {
+    setTimeout(() => {
+        this.initChatInterface();
+    }, 2000);
+    return `
+    <!-- 聊天消息区域 -->
+    <div class="chat-messages" id="chatMessages">
+        <!-- 欢迎消息 -->
+        <div class="message-group ai-message">
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <div class="message-bubble welcome-bubble">
+                    <div class="welcome-header">
+                        <span class="wave-emoji">👋</span>
+                        <strong>张老师，下午好！</strong>
+                    </div>
+                    <p class="welcome-intro">我是您的智能心理辅导助手，可以帮您：</p>
+                    <div class="feature-menu-grid">
+                        <div class="feature-menu-item-compact" data-page="assessment">
+                            <div class="feature-icon-compact">📊</div>
+                            <div class="feature-title-compact">心理测评</div>
+                        </div>
+                        <div class="feature-menu-item-compact" data-page="case-filter">
+                            <div class="feature-icon-compact">🔍</div>
+                            <div class="feature-title-compact">案例检索</div>
+                        </div>
+                        <div class="feature-menu-item-compact" data-page="smart-assessment">
+                            <div class="feature-icon-compact">🧠</div>
+                            <div class="feature-title-compact">智能评估</div>
+                        </div>
+                        <div class="feature-menu-item-compact" data-page="mentor-36">
+                            <div class="feature-icon-compact">🎓</div>
+                            <div class="feature-title-compact">导师36计</div>
+                        </div>
+                    </div>
+                    <p class="hint-text">💬 也可以直接输入您的需求，我会智能识别并帮助您</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 聊天输入区域（固定在顶部） -->
+    <div class="chat-input-container-fixed">
+        <div class="chat-input-wrapper">
+            <button class="voice-btn" title="语音输入">🎤</button>
+            <input type="text" class="chat-input" id="chatInput" placeholder="输入您的问题或需求...">
+            <button class="send-btn" id="sendBtn">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M2 10L18 2L10 18L8 11L2 10Z" fill="currentColor"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+        `;
+  }
+  getHomeHTML2() {
     return `
             <!-- 搜索框 -->
             <div class="search-bar">
-                <input type="text" placeholder="AI心理学家哪吒Banner图片区域">
+                <span>🔍</span>
+                <input type="text" placeholder="搜索测评量表、案例...">
             </div>
 
             <!-- 欢迎区域 -->
@@ -191,24 +1293,24 @@ class WeChatMiniProgram {
                     <div class="quick-access-icon">🔍</div>
                     <div>案例检索</div>
                 </div>
-                <div class="quick-access-card" data-action="跳转到聊天页面">
-                    <div class="quick-access-icon">🧠</div>
-                    <div>智能助手</div>
+                <div class="quick-access-card" data-action="my-collections">
+                    <div class="quick-access-icon">⭐</div>
+                    <div>我的收藏</div>
                 </div>
                 <div class="quick-access-card" data-action="visit-outline">
                     <div class="quick-access-icon">🏠</div>
-                    <div>工作台</div>
+                    <div>家访大纲</div>
                 </div>
             </div>
 
             <!-- 数据看板 -->
             <div class="stats-card">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                    <div data-action="records" style="cursor: pointer;">
+                    <div>
                         <div class="stats-number">3</div>
-                        <div class="stats-label">已完成测评</div>
+                        <div class="stats-label">待处理测评</div>
                     </div>
-                    <div data-action="caseslist" style="cursor: pointer;">
+                    <div>
                         <div class="stats-number">12</div>
                         <div class="stats-label">收藏案例</div>
                     </div>
@@ -217,35 +1319,26 @@ class WeChatMiniProgram {
 
             <!-- 近期任务提醒 -->
             <div class="card">
-                <div style="font-weight: 500; margin-bottom: 16px;">📋 热门量表推荐</div>
-                <!-- 测评列表 -->
-                <div class="list-item" data-action="assessment-detail" data-id="1">
-                    <div class="list-title">中学生情绪稳定性测评</div>
-                    <div class="list-description">评估学生情绪调节能力和抗压能力</div>
-                    <div class="list-tags">
-                        <div class="tag">⏱ 15道题</div>
-                        <div class="tag">🔘 单选</div>
-                        <div class="tag">⭐ 常用</div>
+                <div style="font-weight: 500; margin-bottom: 16px;">📋 近期任务提醒</div>
+                <div class="task-item">
+                    <div class="task-checkbox checked"></div>
+                    <div class="task-content">
+                        <div class="task-title">李同学家访准备</div>
+                        <div class="task-time">今天 14:00</div>
                     </div>
                 </div>
-
-                <div class="list-item" data-action="assessment-detail" data-id="2">
-                    <div class="list-title">学习适应性测评</div>
-                    <div class="list-description">检测学习习惯和课堂适应能力</div>
-                    <div class="list-tags">
-                        <div class="tag">⏱ 20道题</div>
-                        <div class="tag">☑ 多选</div>
-                        <div class="tag">🔄 最近使用</div>
+                <div class="task-item">
+                    <div class="task-checkbox"></div>
+                    <div class="task-content">
+                        <div class="task-title">王同学测评报告</div>
+                        <div class="task-time">明天 10:00</div>
                     </div>
                 </div>
-
-                <div class="list-item" data-action="assessment-detail" data-id="3">
-                    <div class="list-title">社交能力评估量表</div>
-                    <div class="list-description">测量学生人际交往和团队协作能力</div>
-                    <div class="list-tags">
-                        <div class="tag">⏱ 25道题</div>
-                        <div class="tag">📊 滑动评分</div>
-                        <div class="tag">📈 专业版</div>
+                <div class="task-item">
+                    <div class="task-checkbox"></div>
+                    <div class="task-content">
+                        <div class="task-title">班级心理活动策划</div>
+                        <div class="task-time">10月12日 15:00</div>
                     </div>
                 </div>
             </div>
@@ -275,7 +1368,7 @@ class WeChatMiniProgram {
                 <div class="list-title">中学生情绪稳定性测评</div>
                 <div class="list-description">评估学生情绪调节能力和抗压能力</div>
                 <div class="list-tags">
-                    <div class="tag">⏱ 15道题</div>
+                    <div class="tag">⏱ 15分钟</div>
                     <div class="tag">🔘 单选</div>
                     <div class="tag">⭐ 常用</div>
                 </div>
@@ -285,7 +1378,7 @@ class WeChatMiniProgram {
                 <div class="list-title">学习适应性测评</div>
                 <div class="list-description">检测学习习惯和课堂适应能力</div>
                 <div class="list-tags">
-                    <div class="tag">⏱ 20道题</div>
+                    <div class="tag">⏱ 20分钟</div>
                     <div class="tag">☑ 多选</div>
                     <div class="tag">🔄 最近使用</div>
                 </div>
@@ -295,14 +1388,14 @@ class WeChatMiniProgram {
                 <div class="list-title">社交能力评估量表</div>
                 <div class="list-description">测量学生人际交往和团队协作能力</div>
                 <div class="list-tags">
-                    <div class="tag">⏱ 25道题</div>
+                    <div class="tag">⏱ 25分钟</div>
                     <div class="tag">📊 滑动评分</div>
                     <div class="tag">📈 专业版</div>
                 </div>
             </div>
 
             <!-- 继续未完成测评 -->
-            <div style="position: fixed; bottom: 80px; right: 20px; display: none;">
+            <div style="position: fixed; bottom: 80px; right: 20px;">
                 <div class="btn btn-primary" style="border-radius: 50%; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
                     🔄
                 </div>
@@ -319,28 +1412,9 @@ class WeChatMiniProgram {
             <div class="card">
                 <div style="text-align: center; margin-bottom: 20px;">
                     <div style="font-weight: 500; font-size: 18px; margin-bottom: 8px;">案例条件筛选</div>
-                    <div style="color: var(--text-secondary);">请填写学生信息<br>或选择已有个案进行精准匹配</div>
+                    <div style="color: var(--text-secondary);">请填写学生信息进行精准匹配</div>
                 </div>
-                <button id="selectCaseBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 24px;">🔍 选择个案</button>
-                
-                <!-- 个案列表弹窗 -->
-                <div id="caseListModal" class="modal" style="display: none;">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h3>个案列表</h3>
-                      <span id="closeModal" class="close-btn">&times;</span>
-                    </div>
-                    <div class="modal-body">
-                      <div class="search-bar">
-                        <input type="text" placeholder="搜索姓名..." id="caseSearchInput">
-                      </div>
-                      <div class="case-list" id="caseListContainer">
-                        <!-- 个案列表将在这里动态生成 -->
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
+
                 <!-- 学生基础信息 -->
                 <div style="margin-bottom: 24px;">
                     <div style="font-weight: 500; margin-bottom: 12px; color: var(--primary-blue);">👤 学生基础信息</div>
@@ -432,9 +1506,7 @@ class WeChatMiniProgram {
             </div>
         `;
   }
-  //  <div class="tag">轻度</div>
-  //                 <div class="tag">中度</div>
-  //                 <div class="tag">重度</div>
+
   getCaseListHTML() {
     return `
             <!-- 搜索和筛选 -->
@@ -444,7 +1516,9 @@ class WeChatMiniProgram {
                 <div class="tag">家访场景</div>
                 <div class="tag">个体辅导</div>
                 <div class="tag">班级活动</div>
-               <div class="tag" style="background: var(--primary-blue); color: white;">收藏后可以自定义分类</div>
+                <div class="tag">轻度</div>
+                <div class="tag">中度</div>
+                <div class="tag">重度</div>
             </div>
 
             <!-- 案例列表 -->
@@ -455,7 +1529,7 @@ class WeChatMiniProgram {
                     <div class="tag">初中</div>
                     <div class="tag">中度</div>
                     <div class="tag">个体辅导</div>
-                    <div class="tag">匹配度 95%</div>
+                    <div class="tag">成功率 85%</div>
                     <div class="tag">⭐ 128收藏</div>
                 </div>
             </div>
@@ -467,9 +1541,8 @@ class WeChatMiniProgram {
                     <div class="tag">全学段</div>
                     <div class="tag">通用</div>
                     <div class="tag">家访场景</div>
-                    <div class="tag">匹配度 85%</div>
+                    <div class="tag">成功率 92%</div>
                     <div class="tag">⭐ 256收藏</div>
-                    <div class="tag" style="background: var(--primary-blue); color: white;">收藏后可以调整分类</div>
                 </div>
             </div>
 
@@ -480,7 +1553,7 @@ class WeChatMiniProgram {
                     <div class="tag">高中</div>
                     <div class="tag">中度</div>
                     <div class="tag">班级活动</div>
-                    <div class="tag">匹配度 78%</div>
+                    <div class="tag">成功率 78%</div>
                     <div class="tag">⭐ 89收藏</div>
                 </div>
             </div>
@@ -498,359 +1571,73 @@ class WeChatMiniProgram {
     return `
             <!-- 用户信息 -->
             <div class="card">
+            <div style="text-align: right">算力积分： 99</div>
                 <div style="display: flex; align-items: center; margin-bottom: 20px;">
                     <div style="width: 64px; height: 64px; background: #E0E6ED; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
                         <span style="font-size: 24px;">👤</span>
                     </div>
                     <div>
-                        <div style="font-weight: 500; font-size: 18px; margin-bottom: 4px;">张老师<span class="tag" style="background: var(--primary-blue); color: white;">修改资料</span></div>
+                        <div style="font-weight: 500; font-size: 18px; margin-bottom: 4px;">张老师</div>
                         <div style="color: var(--text-secondary);">北京市第一中学 - 心理教师</div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 12px;">
-                    <div style="flex: 1; text-align: center; cursor: pointer;" data-action="records">
+                    <div style="flex: 1; text-align: center;">
                         <div style="font-weight: 500; font-size: 16px;">23</div>
                         <div style="color: var(--text-secondary); font-size: 14px;">测评记录</div>
                     </div>
-                    <div style="flex: 1; text-align: center; cursor: pointer;" data-action="caseslist">
+                    <div style="flex: 1; text-align: center;">
                         <div style="font-weight: 500; font-size: 16px;">12</div>
                         <div style="color: var(--text-secondary); font-size: 14px;">收藏案例</div>
                     </div>
-                    <div style="flex: 1; text-align: center; cursor: pointer;" data-action="annot-list">
+                    <div style="flex: 1; text-align: center;">
                         <div style="font-weight: 500; font-size: 16px;">8</div>
-                        <div style="color: var(--text-secondary); font-size: 14px;">批注历史</div>
+                        <div style="color: var(--text-secondary); font-size: 14px;">评估记录</div>
                     </div>
                 </div>
             </div>
 
             <!-- 功能菜单 -->
             <div class="card">
-                
-                <div class="list-item" data-action="my-cases">
+                <div class="list-item" data-action="settings">
                     <div style="display: flex; align-items: center;">
-                        <span style="font-size: 20px; margin-right: 12px;">ℹ️</span>
+                        <span style="font-size: 20px; margin-right: 12px;">🎛️</span>
                         <div>我的个案</div>
                     </div>
                 </div>
-                <div class="list-item" data-action="暂无页面">
+                <div class="list-item" data-action="settings">
                     <div style="display: flex; align-items: center;">
-                        <span style="font-size: 20px; margin-right: 12px;">ℹ️</span>
-                        <div>关于我们</div>
+                        <span style="font-size: 20px; margin-right: 12px;">🛡️</span>
+                        <div>我的工作台</div>
                     </div>
                 </div>
-                <div class="list-item" data-action="暂无页面">
+                <div class="list-item" data-action="notifications">
                     <div style="display: flex; align-items: center;">
-                        <span style="font-size: 20px; margin-right: 12px;">ℹ️</span>
+                        <span style="font-size: 20px; margin-right: 12px;">💡</span>
+                        <div>积分充值</div>
+                    </div>
+                </div>
+                <div class="list-item" data-action="security">
+                    <div style="display: flex; align-items: center;">
+                        <span style="font-size: 20px; margin-right: 12px;">📋</span>
+                        <div>订单中心</div>
+                    </div>
+                </div>
+                <div class="list-item" data-action="about">
+                    <div style="display: flex; align-items: center;">
+                        <span style="font-size: 20px; margin-right: 12px;">📖</span>
                         <div>意见反馈</div>
                     </div>
                 </div>
-                <div class="list-item" data-action="暂无页面">
+                <div class="list-item" data-action="about">
                     <div style="display: flex; align-items: center;">
-                        <span style="font-size: 20px; margin-right: 12px;">⚙️</span>
-                        <div>FAQ常见问题解答</div>
+                        <span style="font-size: 20px; margin-right: 12px;">ℹ️</span>
+                        <div>退出</div>
                     </div>
                 </div>
-                
             </div>
 
-            <!-- 同步状态 -->
-            <div class="card">
-                <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <div>
-                        <div style="color: var(--success-green); font-size: 14px;">用户隐私协议及政策</div>
-                    </div>
-                    <div class="btn btn-secondary btn-small">退出</div>
-                </div>
-            </div>
         `;
-  }
-
-  getRecordsHTML() {
-    const items =
-      (this.records || [])
-        .map(
-          (r) => `
-      <div class="card list-item" data-action="record-detail" data-id="${r.id}">
-        <div style="display:flex; align-items:center; justify-content: space-between;">
-          <div>
-            <div style="font-weight:500;">${r.student.name}（${
-            r.student.gender
-          }，${r.student.age}岁）</div>
-            <div style="color: var(--text-secondary); font-size: 14px;">班级：${
-              r.student.clazz
-            }</div>
-          </div>
-          <div class="tag">${r.date}</div>
-        </div>
-        <div style="margin-top:8px;">
-          <div style="color: var(--primary-blue); font-weight: 500;">测评名称：${
-            r.assessment
-          }</div>
-          <div style="color: var(--text-secondary); font-size: 14px;">
-            进度：${r.status}${
-            r.score != null
-              ? " | 得分：" + r.score
-              : r.progress
-              ? " | 已答：" + r.progress
-              : ""
-          }
-          </div>
-        </div>
-      </div>
-    `
-        )
-        .join("") ||
-      '<div class="card"><div style="color:var(--text-secondary);">暂无测评记录</div></div>';
-
-    return `
-      <div style="position: relative;">
-        <div style="position: absolute; left: 0; top: 0; padding: 16px; cursor: pointer;" onclick="app.switchPage('profile')">← 返回</div>
-        <div style="text-align: center; padding: 20px 0;">
-          <div style="font-weight: 500; font-size: 18px; margin-bottom: 8px;">测评记录</div>
-          <div style="color: var(--text-secondary);">点击查看测评结果详情与AI解读</div>
-        </div>
-      </div>
-      ${items}
-    `;
-  }
-
-  showRecordDetail(id) {
-    const recId = Number(id);
-    const r = (this.records || []).find((x) => x.id === recId);
-    if (!r) {
-      this.showToast("未找到该测评记录");
-      setTimeout(() => this.switchPage("records"), 300);
-      return;
-    }
-
-    const infoLine =
-      r.score != null
-        ? `进度：${r.status} | 得分：${r.score}`
-        : r.progress
-        ? `进度：${r.status} | 已答：${r.progress}`
-        : `进度：${r.status}`;
-
-    const detailHTML = `
-      <div style="position: relative;">
-        <div style="position: absolute; left: 0; top: 0; padding: 16px; cursor: pointer;" onclick="app.switchPage('records')">← 返回</div>
-        <div style="text-align: center; padding: 20px 0;">
-          <div style="font-weight: 500; font-size: 18px; margin-bottom: 8px;">测评结果详情</div>
-          <div style="color: var(--text-secondary);">${r.assessment} · ${r.date}</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:500; margin-bottom:8px;">学生信息</div>
-        <div style="color: var(--text-secondary); line-height:1.6;">
-          姓名：${r.student.name}（${r.student.gender}，${r.student.age}岁）<br>
-          班级：${r.student.clazz}<br>
-          ${infoLine}
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:500; margin-bottom:8px;">结果概览</div>
-        <div style="color: var(--text-secondary); line-height:1.6;">
-          • 情绪稳定性：中等偏上<br>
-          • 压力耐受：中等<br>
-          • 自我调节：一般
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="display:flex; gap:12px; align-items:center; justify-content: space-between;">
-          <div style="font-weight:500;">智能解读</div>
-          <button class="btn btn-primary btn-small" data-action="ai-interpret" data-id="${recId}">🧠 一键AI智能解读</button>
-        </div>
-        <div id="aiInterpretation" style="margin-top:8px; color: var(--text-secondary); line-height:1.7;">
-          点击上方按钮，生成个性化解读与建议
-        </div>
-      </div>
-    `;
-    document.getElementById("pageContent").innerHTML = detailHTML;
-    this.bindPageEvents(this.currentPage);
-  }
-
-  aiInterpret(recId) {
-    const target = document.getElementById("aiInterpretation");
-    if (!target) return;
-    const r = (this.records || []).find((x) => x.id === recId);
-    target.style.color = "var(--text-secondary)";
-    target.innerHTML = "正在生成AI解读，请稍候...";
-    setTimeout(() => {
-      const summary =
-        r?.score != null
-          ? `整体得分为 ${r.score} 分，处于同年龄段的中等水平。`
-          : `当前进度为「${
-              r?.status || "未知"
-            }」。建议尽快完成以获得完整分析。`;
-      const advice = `
-        1) 认知调节：记录焦虑触发点，进行自我对话与积极重评。<br>
-        2) 生理放松：每天10分钟呼吸放松/正念练习，连续7天。<br>
-        3) 情境演练：模拟考试场景，逐步暴露，增强掌控感。<br>
-        4) 家校协同：与家长沟通减压策略，避免过度外在评价。`;
-      target.style.color = "var(--text-secondary)";
-      target.innerHTML = `
-        <div style="color: var(--primary-blue); font-weight:500; margin-bottom:6px;">AI 解读</div>
-        ${summary}<br><br>
-        风险提示：如持续出现睡眠问题或显著躯体化，应考虑进一步专业评估。<br><br>
-        <div style="color: var(--primary-blue); font-weight:500; margin:8px 0 6px;">建议方案</div>
-        ${advice}
-      `;
-    }, 800);
-  }
-
-  getAnnotationListHTML() {
-    let entries = Object.entries(this.annotations || {})
-      .map(([id, v]) => {
-        const caseId = Number(id);
-        if (v && typeof v === "object") {
-          return {
-            caseId,
-            text: v.text || "",
-            updatedAt: Number(v.updatedAt) || 0,
-          };
-        }
-        return { caseId, text: String(v || ""), updatedAt: 0 };
-      })
-      .filter((e) => e.text);
-
-    entries.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
-    if (!entries.length) {
-      const now = Date.now();
-      entries = [
-        {
-          caseId: 1,
-          text: "示例批注：关注考前焦虑情绪。",
-          updatedAt: now - 1 * 3600 * 1000,
-        },
-        {
-          caseId: 2,
-          text: "示例批注：家访后家校配合良好。",
-          updatedAt: now - 2 * 3600 * 1000,
-        },
-        {
-          caseId: 3,
-          text: "示例批注：班级冲突已缓解。",
-          updatedAt: now - 24 * 3600 * 1000,
-        },
-      ];
-    }
-
-    const titleMap = {
-      1: "考前焦虑疏导方案",
-      2: "家访沟通技巧指南",
-      3: "班级冲突调解方案",
-    };
-    const fmt = (ts) => (ts ? new Date(ts).toLocaleString() : "-");
-
-    const items =
-      entries
-        .map(
-          (e) => `
-      <div class="list-item" data-action="case-detail" data-id="${e.caseId}">
-        <div class="list-title">${
-          titleMap[e.caseId] || "案例 " + e.caseId
-        }</div>
-        <div class="list-description">最后批注时间：${fmt(e.updatedAt)}</div>
-      </div>
-    `
-        )
-        .join("") ||
-      '<div class="card"><div style="color:var(--text-secondary);">暂无批注</div></div>';
-
-    return `
-      <div style="position: relative;">
-        <div style="position: absolute; left: 0; top: 0; padding: 16px; cursor: pointer;" onclick="app.switchPage('profile')">← 返回</div>
-        <div style="text-align: center; padding: 20px 0;">
-          <div style="font-weight: 500; font-size: 18px; margin-bottom: 8px;">批注历史</div>
-          <div style="color: var(--text-secondary);">按最后批注时间倒序展示</div>
-        </div>
-      </div>
-      <div class="card">${items}</div>
-    `;
-  }
-
-  getMyCasesHTML() {
-    const items = (this.myCases || [])
-      .map(
-        (c) => `
-      <div class="list-item" data-action="mycase-detail" data-id="${c.id}">
-        <div style="display:flex; justify-content: space-between; align-items:center;">
-          <div>
-            <div class="list-title">${c.name}（${c.gender}，${c.age}岁）</div>
-            <div class="list-description">主要问题：${c.problem}</div>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-secondary btn-small" data-action="mycase-edit" data-id="${c.id}">编辑</button>
-            <button class="btn btn-secondary btn-small" data-action="mycase-delete" data-id="${c.id}">删除</button>
-          </div>
-        </div>
-      </div>
-    `
-      )
-      .join("");
-
-    return `
-      <div style="position: relative;">
-        <div style="position: absolute; left: 0; top: 0; padding: 16px; cursor: pointer;" onclick="app.switchPage('profile')">← 返回</div>
-        <div style="text-align: center; padding: 20px 0;">
-          <div style="font-weight: 500; font-size: 18px; margin-bottom: 8px;">我的个案</div>
-          <div style="color: var(--text-secondary);">管理学生个案，支持新增、修改、删除</div>
-        </div>
-      </div>
-
-      <div style="margin-bottom:12px;">
-        <button class="btn btn-primary" data-action="mycase-add" style="width:100%;">➕ 新增个案</button>
-      </div>
-
-      <div class="card">
-        ${items || '<div style="color:var(--text-secondary);">暂无个案</div>'}
-      </div>
-    `;
-  }
-
-  showMyCaseDetail(id) {
-    const caseId = Number(id);
-    const c = (this.myCases || []).find((x) => x.id === caseId);
-    if (!c) {
-      this.showToast("未找到该个案");
-      setTimeout(() => this.switchPage("mycases"), 500);
-      return;
-    }
-
-    const detailHTML = `
-      <div style="position: relative;">
-        <div style="position: absolute; left: 0; top: 0; padding: 16px; cursor: pointer;" onclick="app.switchPage('mycases')">← 返回</div>
-        <div style="text-align: center; padding: 20px 0;">
-          <div style="font-weight: 500; font-size: 18px; margin-bottom: 8px;">${c.name} 的个案</div>
-          <div style="color: var(--text-secondary);">${c.gender}，${c.age}岁</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div style="font-weight: 500; margin-bottom: 8px;">基本信息</div>
-        <div style="color: var(--text-secondary); line-height:1.6;">
-          姓名：${c.name}<br>
-          年龄：${c.age}<br>
-          性别：${c.gender}
-        </div>
-
-        <div style="font-weight: 500; margin:16px 0 8px;">主要心理问题</div>
-        <div style="color: var(--text-secondary); line-height:1.6;">
-          ${c.problem}
-        </div>
-
-        <div style="display:flex; gap:12px; margin-top:16px;">
-          <button class="btn btn-secondary" data-action="mycase-edit" data-id="${c.id}">编辑</button>
-          <button class="btn btn-secondary" data-action="mycase-delete" data-id="${c.id}">删除</button>
-        </div>
-      </div>
-    `;
-    document.getElementById("pageContent").innerHTML = detailHTML;
-    this.bindPageEvents(this.currentPage);
-    this.ensureCaseModals(caseId);
-    this.bindPageEvents(this.currentPage);
   }
 
   bindPageEvents(page) {
@@ -860,7 +1647,6 @@ class WeChatMiniProgram {
     // 快捷入口点击事件
     pageContent.querySelectorAll("[data-action]").forEach((element) => {
       element.addEventListener("click", (e) => {
-        e.stopPropagation();
         const action = e.currentTarget.dataset.action;
         this.handleAction(action, e.currentTarget.dataset);
       });
@@ -876,217 +1662,7 @@ class WeChatMiniProgram {
     // 案例筛选页面特殊事件
     if (page === "cases") {
       this.bindCaseFilterEvents();
-
-      // 绑定选择个案按钮事件
-      const selectCaseBtn = document.getElementById("selectCaseBtn");
-      if (selectCaseBtn) {
-        selectCaseBtn.addEventListener(
-          "click",
-          this.showCaseListModal.bind(this)
-        );
-      }
-
-      // 绑定关闭弹窗事件
-      const closeModal = document.getElementById("closeModal");
-      if (closeModal) {
-        closeModal.addEventListener("click", this.hideCaseListModal.bind(this));
-      }
-
-      // 绑定搜索事件
-      const searchInput = document.getElementById("caseSearchInput");
-      if (searchInput) {
-        searchInput.addEventListener("input", this.filterCaseList.bind(this));
-      }
     }
-  }
-
-  // 显示个案列表弹窗
-  showCaseListModal() {
-    const modal = document.getElementById("caseListModal");
-    if (modal) {
-      modal.style.display = "flex";
-      // 添加show类以触发动画
-      setTimeout(() => {
-        modal.classList.add("show");
-      }, 10);
-      this.renderCaseList();
-
-      // 自动聚焦搜索框
-      const searchInput = document.getElementById("caseSearchInput");
-      if (searchInput) {
-        searchInput.focus();
-      }
-    }
-  }
-
-  // 隐藏个案列表弹窗
-  hideCaseListModal() {
-    const modal = document.getElementById("caseListModal");
-    if (modal) {
-      // 移除show类以触发动画
-      modal.classList.remove("show");
-      // 等待动画完成后隐藏
-      setTimeout(() => {
-        modal.style.display = "none";
-      }, 300);
-    }
-  }
-
-  // 渲染个案列表
-  renderCaseList(filterText = "") {
-    const caseListContainer = document.getElementById("caseListContainer");
-    if (!caseListContainer) return;
-
-    const cases = [
-      {
-        id: 1,
-        name: "张小明",
-        age: 12,
-        gender: "男",
-        problem: "学习压力大，注意力不集中",
-      },
-      {
-        id: 2,
-        name: "李华",
-        age: 15,
-        gender: "男",
-        problem: "青春期叛逆，与父母沟通困难",
-      },
-      {
-        id: 3,
-        name: "王芳",
-        age: 14,
-        gender: "女",
-        problem: "社交焦虑，不敢在课堂发言",
-      },
-      {
-        id: 4,
-        name: "赵敏",
-        age: 13,
-        gender: "女",
-        problem: "自卑心理，缺乏自信",
-      },
-      {
-        id: 5,
-        name: "刘伟",
-        age: 16,
-        gender: "男",
-        problem: "网络成瘾，学习成绩下滑",
-      },
-      {
-        id: 6,
-        name: "陈静",
-        age: 11,
-        gender: "女",
-        problem: "适应新环境困难，转学焦虑",
-      },
-    ];
-
-    let filteredCases = cases;
-
-    // 如果有搜索文本，进行过滤
-    if (filterText) {
-      filteredCases = cases.filter((caseItem) =>
-        caseItem.name.includes(filterText)
-      );
-    }
-
-    // 清空容器
-    caseListContainer.innerHTML = "";
-
-    // 添加个案项
-    if (filteredCases.length === 0) {
-      caseListContainer.innerHTML =
-        '<div class="no-results">没有找到匹配的个案</div>';
-    } else {
-      filteredCases.forEach((caseItem) => {
-        const caseElement = document.createElement("div");
-        caseElement.className = "case-item";
-        caseElement.dataset.caseId = caseItem.id;
-
-        caseElement.innerHTML = `
-          <div class="case-item-header">
-            <span class="case-item-name">${caseItem.name}</span>
-            <span>${caseItem.age}岁 | ${caseItem.gender}</span>
-          </div>
-          <div class="case-item-info">
-            主要问题: ${caseItem.problem}
-          </div>
-        `;
-
-        // 添加点击事件
-        caseElement.addEventListener("click", () => this.selectCase(caseItem));
-
-        caseListContainer.appendChild(caseElement);
-      });
-    }
-  }
-
-  // 过滤个案列表
-  filterCaseList(event) {
-    const filterText = event.target.value;
-    this.renderCaseList(filterText);
-  }
-
-  // 选择个案
-  selectCase(caseItem) {
-    // 填充学生信息到表单
-    const nameInput = document.querySelector('input[placeholder="姓名"]');
-    const ageInput = document.querySelector('input[placeholder="年龄"]');
-    const genderSelect = document.querySelector('select[name="gender"]');
-
-    if (nameInput) nameInput.value = caseItem.name;
-    if (ageInput) ageInput.value = caseItem.age;
-    if (genderSelect) {
-      const option = Array.from(genderSelect.options).find(
-        (opt) => opt.text === caseItem.gender
-      );
-      if (option) genderSelect.value = option.value;
-    }
-
-    // 关闭弹窗
-    this.hideCaseListModal();
-
-    // 显示选择成功提示
-    this.showToast(`已选择 ${caseItem.name} 的个案`);
-    setTimeout(() => {
-      this.switchPage("caseslist");
-    }, 800);
-  }
-
-  // 显示提示信息
-  showToast(message, duration = 2000) {
-    // 创建toast元素
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.textContent = message;
-    toast.style.position = "fixed";
-    toast.style.bottom = "80px";
-    toast.style.left = "50%";
-    toast.style.transform = "translateX(-50%)";
-    toast.style.backgroundColor = "rgba(0,0,0,0.7)";
-    toast.style.color = "#fff";
-    toast.style.padding = "8px 16px";
-    toast.style.borderRadius = "4px";
-    toast.style.zIndex = "1001";
-    toast.style.opacity = "0";
-    toast.style.transition = "opacity 0.3s";
-
-    // 添加到页面
-    document.body.appendChild(toast);
-
-    // 显示动画
-    setTimeout(() => {
-      toast.style.opacity = "1";
-    }, 10);
-
-    // 自动隐藏
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      setTimeout(() => {
-        document.body.removeChild(toast);
-      }, 300);
-    }, duration);
   }
 
   bindCaseFilterEvents() {
@@ -1137,238 +1713,6 @@ class WeChatMiniProgram {
         setTimeout(() => this.switchPage("assessment"), 1000);
         break;
 
-      case "my-collections":
-        this.showToast("打开案例收藏列表");
-        setTimeout(() => this.switchPage("caseslist"), 300);
-        break;
-
-      case "my-cases":
-        this.showToast("打开我的个案列表");
-        setTimeout(() => this.switchPage("mycases"), 300);
-        break;
-
-      case "mycase-detail":
-        this.showMyCaseDetail(data.id);
-        break;
-
-      case "mycase-add": {
-        // 动态创建悬浮弹窗（如不存在）
-        let modal = document.getElementById("myCaseAddModal");
-        if (!modal) {
-          modal = document.createElement("div");
-          modal.id = "myCaseAddModal";
-          modal.className = "modal";
-          modal.style.cssText = "display:none; opacity:1; visibility: initial; position: absolute; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 2000;";
-          modal.innerHTML = `
-            <div class="modal-content" style="background:#fff; padding:16px; border-radius:8px; width: 90%; max-width: 420px;">
-              <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:8px;">
-                <div style="font-weight:500;">新增个案</div>
-                <span style="cursor:pointer;" data-action="mycase-add-cancel">✖</span>
-              </div>
-              <div style="display:grid; gap:12px;">
-                <div>
-                  <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">姓名</div>
-                  <input id="addCaseName" class="input-field" placeholder="请输入姓名">
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                  <div>
-                    <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">年龄</div>
-                    <input id="addCaseAge" type="number" class="input-field" placeholder="年龄" min="1">
-                  </div>
-                  <div>
-                    <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">性别</div>
-                    <select id="addCaseGender" class="input-field">
-                      <option value="男">男</option>
-                      <option value="女">女</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">主要心理问题</div>
-                  <textarea id="addCaseProblem" class="input-field" placeholder="请填写主要心理问题..." style="height:80px;"></textarea>
-                </div>
-                <div style="display:flex; gap:12px; margin-top:8px;">
-                  <button class="btn btn-secondary" data-action="mycase-add-cancel">取消</button>
-                  <button class="btn btn-primary" data-action="mycase-add-save">保存</button>
-                </div>
-              </div>
-            </div>
-          `;
-          const pageContent = document.getElementById("pageContent"); 
-          pageContent.appendChild(modal);
-        }
-        // 显示弹窗
-        modal.style.display = "flex";
-        // body级事件委托（若尚未绑定）
-        if (!this._modalDelegationBound) {
-          document.body.addEventListener("click", (e) => {
-            const target = e.target && e.target.closest && e.target.closest("[data-action]");
-            if (!target) return;
-            const action = target.getAttribute("data-action");
-            const dataset = Object.assign({}, target.dataset);
-            this.handleAction(action, dataset);
-          });
-          this._modalDelegationBound = true;
-        }
-        break;
-      }
-
-      case "mycase-add-save": {
-        const nameEl = document.getElementById("addCaseName");
-        const ageEl = document.getElementById("addCaseAge");
-        const genderEl = document.getElementById("addCaseGender");
-        const problemEl = document.getElementById("addCaseProblem");
-        const name = (nameEl && nameEl.value.trim()) || "";
-        const age = Number((ageEl && ageEl.value) || 0);
-        const gender = (genderEl && genderEl.value) || "男";
-        const problem = (problemEl && problemEl.value.trim()) || "";
-        if (!name) { this.showToast("请输入姓名"); break; }
-        if (!age || age <= 0) { this.showToast("年龄无效"); break; }
-        const maxId = (this.myCases || []).reduce((m, x) => Math.max(m, x.id), 0);
-        if (!this.myCases) this.myCases = [];
-        this.myCases.push({ id: maxId + 1, name, age, gender, problem });
-        const modal = document.getElementById("myCaseAddModal");
-        if (modal) modal.style.display = "none";
-        this.showToast("已新增个案");
-        setTimeout(() => this.switchPage("mycases"), 200);
-        break;
-      }
-
-      case "mycase-add-cancel": {
-        const modal = document.getElementById("myCaseAddModal");
-        if (modal) modal.style.display = "none";
-        break;
-      }
-
-      case "mycase-edit": {
-        const id = Number(data.id);
-        const idx = this.myCases.findIndex((x) => x.id === id);
-        if (idx < 0) {
-          this.showToast("未找到该个案");
-          break;
-        }
-        const cur = this.myCases[idx];
-
-        // 动态创建编辑悬浮弹窗（如不存在）
-        let modal = document.getElementById("myCaseEditModal");
-        if (!modal) {
-          modal = document.createElement("div");
-          modal.id = "myCaseEditModal";
-          modal.className = "modal";
-          modal.style.cssText = "display:none; opacity:1; visibility: initial; position: absolute;  inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 2000;";
-          modal.innerHTML = `
-            <div class="modal-content" style="background:#fff; padding:16px; border-radius:8px; width: 90%; max-width: 420px;">
-              <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:8px;">
-                <div style="font-weight:500;">编辑个案</div>
-                <span style="cursor:pointer;" data-action="mycase-edit-cancel">✖</span>
-              </div>
-              <div style="display:grid; gap:12px;">
-                <div>
-                  <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">姓名</div>
-                  <input id="editCaseName" class="input-field" placeholder="请输入姓名">
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-                  <div>
-                    <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">年龄</div>
-                    <input id="editCaseAge" type="number" class="input-field" placeholder="年龄" min="1">
-                  </div>
-                  <div>
-                    <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">性别</div>
-                    <select id="editCaseGender" class="input-field">
-                      <option value="男">男</option>
-                      <option value="女">女</option>
-                    </select>
-                  </div>
-                </div>
-                <div>
-                  <div style="font-size:14px; color: var(--text-secondary); margin-bottom:4px;">主要心理问题</div>
-                  <textarea id="editCaseProblem" class="input-field" placeholder="请填写主要心理问题..." style="height:80px;"></textarea>
-                </div>
-                <div style="display:flex; gap:12px; margin-top:8px;">
-                  <button class="btn btn-secondary" data-action="mycase-edit-cancel">取消</button>
-                  <button class="btn btn-primary" data-action="mycase-edit-save" data-id="${id}">保存</button>
-                </div>
-              </div>
-            </div>
-          `;
-          const pageContent = document.getElementById("pageContent"); 
-          pageContent.appendChild(modal);
-        }
-        // 预填当前值
-        const nameEl = document.getElementById("editCaseName");
-        const ageEl = document.getElementById("editCaseAge");
-        const genderEl = document.getElementById("editCaseGender");
-        const problemEl = document.getElementById("editCaseProblem");
-        if (nameEl) nameEl.value = cur.name || "";
-        if (ageEl) ageEl.value = String(cur.age || "");
-        if (genderEl) genderEl.value = cur.gender || "男";
-        if (problemEl) problemEl.value = cur.problem || "";
-
-        // 显示弹窗
-        modal.style.display = "flex";
-
-        // body级事件委托（若尚未绑定）
-        if (!this._modalDelegationBound) {
-          document.body.addEventListener("click", (e) => {
-            const target = e.target && e.target.closest && e.target.closest("[data-action]");
-            if (!target) return;
-            const action = target.getAttribute("data-action");
-            const dataset = Object.assign({}, target.dataset);
-            this.handleAction(action, dataset);
-          });
-          this._modalDelegationBound = true;
-        }
-        break;
-      }
-
-      case "mycase-edit-save": {
-        const id = Number(data.id);
-        const idx = this.myCases.findIndex((x) => x.id === id);
-        if (idx < 0) { this.showToast("未找到该个案"); break; }
-        const cur = this.myCases[idx];
-
-        const nameEl = document.getElementById("editCaseName");
-        const ageEl = document.getElementById("editCaseAge");
-        const genderEl = document.getElementById("editCaseGender");
-        const problemEl = document.getElementById("editCaseProblem");
-        const name = (nameEl && nameEl.value.trim()) || "";
-        const age = Number((ageEl && ageEl.value) || 0);
-        const gender = (genderEl && genderEl.value) || "男";
-        const problem = (problemEl && problemEl.value.trim()) || "";
-
-        if (!name) { this.showToast("请输入姓名"); break; }
-        if (!age || age <= 0) { this.showToast("年龄无效"); break; }
-
-        this.myCases[idx] = { ...cur, name, age, gender, problem };
-
-        const modal = document.getElementById("myCaseEditModal");
-        if (modal) modal.style.display = "none";
-        this.showToast("已保存修改");
-        setTimeout(() => this.switchPage("mycases"), 200);
-        break;
-      }
-
-      case "mycase-edit-cancel": {
-        const modal = document.getElementById("myCaseEditModal");
-        if (modal) modal.style.display = "none";
-        break;
-      }
-
-      case "mycase-delete": {
-        const id = Number(data.id);
-        const idx = this.myCases.findIndex((x) => x.id === id);
-        if (idx < 0) {
-          this.showToast("未找到该个案");
-          break;
-        }
-        if (confirm("确定删除该个案吗？")) {
-          this.myCases.splice(idx, 1);
-          this.showToast("已删除");
-          setTimeout(() => this.switchPage("mycases"), 200);
-        }
-        break;
-      }
-
       case "search-cases":
         this.showToast("跳转到案例检索");
         setTimeout(() => this.switchPage("cases"), 500);
@@ -1382,97 +1726,9 @@ class WeChatMiniProgram {
         this.showCaseDetail(data.id);
         break;
 
-      case "toggle-favorite": {
-        const id = Number(data.id);
-        if (!this.favorites) this.favorites = new Set();
-        if (this.favorites.has(id)) {
-          this.favorites.delete(id);
-          this.showToast("已取消收藏");
-        } else {
-          this.favorites.add(id);
-          this.showToast("已收藏");
-        }
-        this.showCaseDetail(id);
-        break;
-      }
-
-      case "annotate": {
-        const caseId = Number(data.id);
-        const modal = document.getElementById("annotateModal");
-        const textarea = document.getElementById("annotateText");
-        if (textarea && this.annotations && this.annotations[caseId]) {
-          const ann = this.annotations[caseId];
-          textarea.value =
-            ann && typeof ann === "object" ? ann.text || "" : ann;
-        }
-        if (modal) modal.style.display = "flex";
-        break;
-      }
-
-      case "link-case": {
-        this.showToast("关联个案成功");
-        return;
-        const modal = document.getElementById("linkCaseModal");
-        const list = document.getElementById("linkCaseList");
-        const caseId = Number(data.id);
-        if (list) {
-          list.innerHTML = (this.myCases || [])
-            .map(
-              (c) =>
-                `<div class="list-item" data-action="select-linkcase" data-id="${caseId}" data-target="${c.id}">
-              <div class="list-title">${c.name}（${c.gender}，${c.age}岁）</div>
-              <div class="list-description">主要问题：${c.problem}</div>
-            </div>`
-            )
-            .join("");
-        }
-        if (modal) modal.style.display = "flex";
-        break;
-      }
-
-      case "save-annotate": {
-        const caseId = Number(data.id);
-        const textarea = document.getElementById("annotateText");
-        const val = textarea ? textarea.value.trim() : "";
-        if (!this.annotations) this.annotations = {};
-        this.annotations[caseId] = { text: val, updatedAt: Date.now() };
-        const modal = document.getElementById("annotateModal");
-        if (modal) modal.style.display = "none";
-        this.showToast("已保存批注");
-        break;
-      }
-
-      case "close-annotate": {
-        const modal = document.getElementById("annotateModal");
-        if (modal) modal.style.display = "none";
-        break;
-      }
-
-      case "select-linkcase": {
-        const caseId = Number(data.id);
-        const targetId = Number(data.target);
-        if (!this.caseLinks) this.caseLinks = {};
-        this.caseLinks[caseId] = targetId;
-        const modal = document.getElementById("linkCaseModal");
-        if (modal) modal.style.display = "none";
-        this.showToast("已关联个案");
-        break;
-      }
-
-      case "close-linkcase": {
-        const modal = document.getElementById("linkCaseModal");
-        if (modal) modal.style.display = "none";
-        break;
-      }
-
       case "cases-results":
         this.showToast("跳转到案例结果列表");
         setTimeout(() => this.switchPage("caseslist"), 500);
-        break;
-
-      case "caseslist":
-        this.showToast("打开收藏案例列表");
-        setTimeout(() => this.switchPage("caseslist"), 300);
         break;
 
       case "reset-filter":
@@ -1480,27 +1736,9 @@ class WeChatMiniProgram {
         break;
 
       case "back-to-filter":
-        setTimeout(() => this.switchPage("cases"), 500);
+        this.showCaseFilter();
         break;
 
-      case "records":
-        this.showToast("打开测评记录列表");
-        setTimeout(() => this.switchPage("records"), 300);
-        break;
-      case "annot-list":
-        this.showToast("打开批注历史");
-        setTimeout(() => this.switchPage("annotlist"), 200);
-        break;
-      case "visit-outline":
-        this.showToast("后续跳转到H5高关爱平台");
-        break;
-
-      case "record-detail":
-        this.showRecordDetail(data.id);
-        break;
-      case "ai-interpret":
-        this.aiInterpret(Number(data.id));
-        break;
       default:
         this.showToast(`执行操作: ${action}`);
     }
@@ -1551,19 +1789,15 @@ class WeChatMiniProgram {
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <button class="btn btn-secondary">上一题</button>
-                    <button class="btn btn-primary" data-action="record-detail"  data-id="201">下一题</button>
+                    <button class="btn btn-primary">下一题</button>
                 </div>
             </div>
         `;
 
     document.getElementById("pageContent").innerHTML = detailHTML;
-    this.bindPageEvents(this.currentPage);
   }
 
   showCaseDetail(id) {
-    const caseId = Number(id) || 1;
-    if (!this.favorites) this.favorites = new Set();
-    const isFav = this.favorites.has(caseId);
     const detailHTML = `
             <div style="position: relative;">
                 <div style="position: absolute; left: 0; top: 0; padding: 16px; cursor: pointer;" onclick="app.switchPage('cases')">
@@ -1571,7 +1805,7 @@ class WeChatMiniProgram {
                 </div>
                 <div style="text-align: center; padding: 20px 0;">
                     <div style="font-weight: 500; font-size: 18px; margin-bottom: 8px;">考前焦虑疏导方案</div>
-                    <div style="color: var(--text-secondary);">初中 | 中度 | 个体辅导 | 匹配度85%</div>
+                    <div style="color: var(--text-secondary);">初中 | 中度 | 个体辅导 | 成功率85%</div>
                 </div>
             </div>
 
@@ -1596,124 +1830,15 @@ class WeChatMiniProgram {
                     避免过度施压，关注学生心理承受能力，及时调整干预强度。
                 </div>
             </div>
-            <div style="font-weight:500; margin-bottom:8px;">📝 批注</div>
-            <textarea id="annotateText" readonly class="input-field" placeholder="请输入批注内容..." style="height:100px;">我是批注内容</textarea>
-            <div style="font-weight:400; margin:8px 0;">批注时间：2025-10-10 10:00:00</div>
 
-            <div style="display: grid; grid-template-columns: ${
-              isFav ? "1fr 1fr 1fr" : "1fr"
-            }; gap: 12px; margin-top: 20px;">
-                <button class="btn btn-secondary" data-action="toggle-favorite" data-id="${caseId}">${
-      isFav ? "⭐ 取消收藏" : "⭐ 收藏"
-    }</button>
-                ${
-                  isFav
-                    ? '<button class="btn btn-secondary" data-action="annotate" data-id="' +
-                      caseId +
-                      '">📝 批注</button>'
-                    : ""
-                }
-                ${
-                  isFav
-                    ? '<button class="btn btn-primary" data-action="link-case" data-id="' +
-                      caseId +
-                      '">🚀 关联个案</button>'
-                    : ""
-                }
-            </div>
-
-            <!-- 批注弹窗 -->
-            <div id="annotateModal" class="modal" style="display:none; opacity:1; visibility: initial; position: absolute; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 1000;">
-              <div class="modal-content" style="background:#fff; padding:16px; border-radius:8px; width: 90%; max-width: 420px;">
-                <div style="font-weight:500; margin-bottom:8px;">📝 批注</div>
-                <textarea id="annotateText" class="input-field" placeholder="请输入批注内容..." style="height:100px;"></textarea>
-                <div style="display:flex; gap:12px; margin-top:12px;">
-                  <button class="btn btn-secondary" data-action="close-annotate">取消</button>
-                  <button class="btn btn-primary" data-action="save-annotate" data-id="${caseId}">保存</button>
-                </div>
-              </div>
-            </div>
-
-            <!-- 关联个案弹窗 -->
-            <div id="linkCaseModal" class="modal" style="display:none; position: absolute; opacity:1; visibility: initial; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 1000;">
-              <div class="modal-content" style="background:#fff; padding:16px; border-radius:8px; width: 90%; max-width: 420px; max-height: 70vh; overflow:auto;">
-                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:8px;">
-                  <div style="font-weight:500;">关联个案</div>
-                  <span style="cursor:pointer;" data-action="close-linkcase">✖</span>
-                </div>
-                <div id="linkCaseList"><!-- 动态填充 --></div>
-              </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-secondary">⭐ 收藏</button>
+                <button class="btn btn-secondary">📝 批注</button>
+                <button class="btn btn-primary">🚀 立即使用</button>
             </div>
         `;
 
     document.getElementById("pageContent").innerHTML = detailHTML;
-    this.bindPageEvents(this.currentPage);
-  }
-
-  ensureCaseModals(caseId) {
-    // 批注弹窗
-    if (!document.getElementById("annotateModal")) {
-      const modal = document.createElement("div");
-      modal.id = "annotateModal";
-      modal.style.cssText =
-        "display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; z-index:2001;";
-      modal.innerHTML = `
-        <div class="modal-content" style="background:#fff; padding:16px; border-radius:8px; width:90%; max-width:420px;">
-          <div style="font-weight:500; margin-bottom:8px;">📝 批注</div>
-          <textarea id="annotateText" class="input-field" placeholder="请输入批注内容..." style="height:100px;"></textarea>
-          <div style="display:flex; gap:12px; margin-top:12px;">
-            <button class="btn btn-secondary" data-action="close-annotate">取消</button>
-            <button class="btn btn-primary" data-action="save-annotate" data-id="${caseId}">保存</button>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    } else {
-      // 同步当前caseId到保存按钮，确保保存到正确的案例
-      const saveBtn = document.querySelector(
-        '#annotateModal [data-action="save-annotate"]'
-      );
-      if (saveBtn) saveBtn.setAttribute("data-id", String(caseId));
-      const textarea = document.getElementById("annotateText");
-      if (textarea) {
-        const val =
-          this.annotations && this.annotations[caseId]
-            ? this.annotations[caseId]
-            : "";
-        textarea.value = val;
-      }
-    }
-
-    // 关联个案弹窗
-    if (!document.getElementById("linkCaseModal")) {
-      const modal = document.createElement("div");
-      modal.id = "linkCaseModal";
-      modal.style.cssText =
-        "display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); align-items:center; justify-content:center; z-index:2001;";
-      modal.innerHTML = `
-        <div class="modal-content" style="background:#fff; padding:16px; border-radius:8px; width:90%; max-width:420px; max-height:70vh; overflow:auto;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div style="font-weight:500;">关联个案</div>
-            <span style="cursor:pointer;" data-action="close-linkcase">✖</span>
-          </div>
-          <div id="linkCaseList"></div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-    // 为 body 级弹窗补充一次事件绑定（与页面绑定不冲突）
-    // 使用事件委托，保证动态按钮生效
-    if (!this._modalDelegationBound) {
-      document.body.addEventListener("click", (e) => {
-        const target = e.target.closest("[data-action]");
-        if (!target) return;
-        const action = target.getAttribute("data-action");
-        const dataset = Object.assign({}, target.dataset);
-        // 转发到统一的处理逻辑
-        this.handleAction(action, dataset);
-      });
-      this._modalDelegationBound = true;
-    }
   }
 
   showToast(message) {
@@ -1728,7 +1853,7 @@ class WeChatMiniProgram {
             color: white;
             padding: 12px 20px;
             border-radius: 8px;
-            z-index: 2000;
+            z-index: 1000;
             font-size: 14px;
         `;
     toast.textContent = message;
