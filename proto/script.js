@@ -517,19 +517,19 @@ class WeChatMiniProgram {
       psychologist: {
         name: "心理老师",
         icon: "👨‍⚕️",
-        greeting: "老师",
+        greeting: "张老师",
         description: "专注学生心理健康，提供专业心理辅导",
       },
       headteacher: {
         name: "班主任",
         icon: "👨‍🏫",
-        greeting: "老师",
+        greeting: "张老师",
         description: "管理班级事务，关注学生全面发展",
       },
       principal: {
         name: "校领导",
         icon: "👔",
-        greeting: "领导",
+        greeting: "张老师",
         description: "统筹学校工作，把握教育方向",
       },
     };
@@ -713,7 +713,7 @@ class WeChatMiniProgram {
       greetingText.textContent = `${currentRole.greeting}，${timeGreeting}！`;
     } else {
       // 没有身份，显示通用问候
-      greetingText.textContent = `您好，${timeGreeting}！`;
+      greetingText.textContent = `张老师，${timeGreeting}！`;
     }
   }
 
