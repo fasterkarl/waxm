@@ -7,6 +7,8 @@ class WeChatMiniProgram {
     this.conversationState = null; // 对话状态
     this.collectedData = {}; // 收集的数据
     this.mockDatabase = this.initMockDatabase(); // 模拟数据库
+    this.userRole = null; // 用户身份
+    this.membershipStatus = null; // 会员状态
     this.init();
   }
 
@@ -20,7 +22,7 @@ class WeChatMiniProgram {
           age: 14,
           gender: "男",
           grade: "初二",
-          lastAssessment: "2024-10-01",
+          lastAssessment: "2025-10-01",
         },
         {
           id: 2,
@@ -28,7 +30,7 @@ class WeChatMiniProgram {
           age: 16,
           gender: "女",
           grade: "高一",
-          lastAssessment: "2024-09-28",
+          lastAssessment: "2025-09-28",
         },
         {
           id: 3,
@@ -36,7 +38,7 @@ class WeChatMiniProgram {
           age: 13,
           gender: "男",
           grade: "初一",
-          lastAssessment: "2024-10-05",
+          lastAssessment: "2025-10-05",
         },
         {
           id: 4,
@@ -44,7 +46,7 @@ class WeChatMiniProgram {
           age: 15,
           gender: "男",
           grade: "初三",
-          lastAssessment: "2024-10-03",
+          lastAssessment: "2025-10-03",
         },
       ],
     };
@@ -59,28 +61,1013 @@ class WeChatMiniProgram {
 
   init() {
     this.bindEvents();
-    // this.loadPage('home');
     this.initChatInterface();
+    this.initMenu();
+    this.initWelcomeMessage();
+    this.initMembership();
+  }
+
+  // 初始化会员状态
+  initMembership() {
+    // 从localStorage读取会员状态，默认为待激活
+    const savedStatus = localStorage.getItem("membershipStatus");
+    this.membershipStatus = savedStatus || "inactive";
+
+    // 如果在个人中心页面，更新会员显示
+    if (this.currentPage === "profile") {
+      this.updateMembershipDisplay();
+    }
+  }
+
+  // 获取会员配置
+  getMembershipConfig() {
+    return {
+      "care-annual": {
+        name: "高关爱年卡",
+        status: "生效中",
+        color: "#ff6b6b",
+        icon: "❤️",
+        gradient: "linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)",
+        features: [
+          "无限次心理测评",
+          "专属心理咨询",
+          "优先案例推荐",
+          "全年数据报告",
+          "高关爱平台使用",
+        ],
+        price: "¥3,999/年",
+        validUntil: "2025-12-31",
+        activatedDate: "2025-01-01",
+      },
+      "pro-monthly": {
+        name: "专业版月卡",
+        status: "生效中",
+        color: "#4f6b95",
+        icon: "💎",
+        gradient: "linear-gradient(135deg, #4f6b95 0%, #2a73e9 100%)",
+        features: [
+          "每月50次测评",
+          "智能评估报告",
+          "案例库访问",
+          "月度数据分析",
+        ],
+        price: "¥299/月",
+        validUntil: "2025-12-15",
+        activatedDate: "2025-11-15",
+      },
+      "pro-annual": {
+        name: "专业版年卡",
+        status: "生效中",
+        color: "#2bbe70",
+        icon: "🌟",
+        gradient: "linear-gradient(135deg, #2bbe70 0%, #1ea55a 100%)",
+        features: [
+          "无限次测评",
+          "高级评估功能",
+          "全部案例库",
+          "年度深度报告",
+          "专属客服",
+        ],
+        price: "¥2,999/年",
+        validUntil: "2025-11-10",
+        activatedDate: "2025-11-10",
+      },
+      inactive: {
+        name: "专业版",
+        status: "待激活",
+        color: "#999999",
+        icon: "🔒",
+        gradient: "linear-gradient(135deg, #e0e6ed 0%, #c8d0d9 100%)",
+        features: ["解锁全部功能", "享受专业服务"],
+        monthlyPrice: "¥299/月",
+        annualPrice: "¥2,999/年",
+      },
+    };
+  }
+
+  // 更新会员显示
+  updateMembershipDisplay() {
+    const membershipBadge = document.getElementById("membershipBadge");
+    if (!membershipBadge) {
+      console.log("membershipBadge element not found");
+      return;
+    }
+
+    const config = this.getMembershipConfig();
+    const currentMembership = config[this.membershipStatus];
+
+    if (!currentMembership) {
+      console.log(
+        "currentMembership not found for status:",
+        this.membershipStatus
+      );
+      return;
+    }
+
+    const badgeHTML = `
+      <div class="membership-badge ${this.membershipStatus}" id="membershipBadgeCard">
+        <div class="membership-badge-icon">${currentMembership.icon}</div>
+        <div class="membership-badge-content">
+          <div class="membership-badge-name">${currentMembership.name}</div>
+          <div class="membership-badge-status">${currentMembership.status}</div>
+        </div>
+        <div class="membership-badge-arrow">›</div>
+      </div>
+    `;
+
+    membershipBadge.innerHTML = badgeHTML;
+
+    // 使用requestAnimationFrame确保DOM已更新后再绑定事件
+    requestAnimationFrame(() => {
+      const badgeCard = document.getElementById("membershipBadgeCard");
+      if (badgeCard) {
+        console.log("Binding click event to badge card");
+        // 移除可能存在的旧事件监听器（通过克隆节点）
+        const newBadgeCard = badgeCard.cloneNode(true);
+        badgeCard.parentNode.replaceChild(newBadgeCard, badgeCard);
+
+        // 绑定新的点击事件
+        newBadgeCard.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log("Badge card clicked, status:", this.membershipStatus);
+          this.handleMembershipClick();
+        });
+        console.log("Click event bound successfully");
+      } else {
+        console.log("membershipBadgeCard element not found");
+      }
+    });
+  }
+
+  // 初始化会员图标点击事件（只绑定一次）
+  initMembershipIconClick() {
+    const membershipIcon = document.querySelector(".membership-icon");
+    if (membershipIcon && !membershipIcon.dataset.bound) {
+      membershipIcon.dataset.bound = "true";
+      membershipIcon.addEventListener("click", (e) => {
+        e.stopPropagation();
+        console.log("Icon clicked, current status:", this.membershipStatus);
+        this.cycleMembershipStatus();
+      });
+      console.log("Membership icon click event bound");
+    }
+  }
+
+  // 循环切换会员状态（用于演示）
+  cycleMembershipStatus() {
+    console.log("cycleMembershipStatus called");
+    const statusOrder = [
+      "inactive",
+      "pro-monthly",
+      "pro-annual",
+      "care-annual",
+    ];
+    const currentIndex = statusOrder.indexOf(this.membershipStatus);
+    console.log(
+      "Current index:",
+      currentIndex,
+      "Current status:",
+      this.membershipStatus
+    );
+
+    const nextIndex = (currentIndex + 1) % statusOrder.length;
+    const nextStatus = statusOrder[nextIndex];
+
+    console.log("Next index:", nextIndex, "Next status:", nextStatus);
+
+    this.membershipStatus = nextStatus;
+    localStorage.setItem("membershipStatus", nextStatus);
+
+    // 更新显示
+    this.updateMembershipDisplay();
+
+    // 显示提示
+    const config = this.getMembershipConfig();
+    const newMembership = config[this.membershipStatus];
+    console.log("New membership:", newMembership);
+
+    this.showToast(`已切换到：${newMembership.name}`);
+  }
+
+  // 处理会员点击
+  handleMembershipClick() {
+    console.log("handleMembershipClick called, status:", this.membershipStatus);
+    const config = this.getMembershipConfig();
+    const currentMembership = config[this.membershipStatus];
+
+    if (this.membershipStatus === "inactive") {
+      // 待激活状态，显示付费介绍
+      console.log("Showing payment options");
+      this.showPaymentOptionsModal();
+    } else {
+      // 生效中状态，显示详情
+      console.log("Showing membership details");
+      this.showMembershipDetailsModal(currentMembership);
+    }
+  }
+
+  // 创建模态框
+  createModal(content) {
+    // 移除已存在的模态框
+    const existingModal = document.getElementById("membershipModal");
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // 创建新模态框
+    const modal = document.createElement("div");
+    modal.id = "membershipModal";
+    modal.className = "membership-modal";
+    modal.innerHTML = `
+      <div class="membership-modal-content">
+        <button class="membership-modal-close" id="closeModal">×</button>
+        ${content}
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 显示模态框
+    requestAnimationFrame(() => {
+      modal.classList.add("active");
+    });
+
+    // 绑定关闭事件
+    const closeBtn = document.getElementById("closeModal");
+    const modalOverlay = modal;
+
+    closeBtn.addEventListener("click", () => {
+      this.closeModal();
+    });
+
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) {
+        this.closeModal();
+      }
+    });
+  }
+
+  // 关闭模态框
+  closeModal() {
+    const modal = document.getElementById("membershipModal");
+    if (modal) {
+      modal.classList.remove("active");
+      setTimeout(() => {
+        modal.remove();
+      }, 300);
+    }
+  }
+
+  // 显示会员详情（模态框）
+  showMembershipDetailsModal(membership) {
+    const detailsHTML = `
+      <div class="membership-details-card">
+        <div class="membership-details-header" style="background: ${
+          membership.gradient
+        }">
+          <div class="membership-details-icon">${membership.icon}</div>
+          <div class="membership-details-title">${membership.name}</div>
+          <div class="membership-details-status">${membership.status}</div>
+        </div>
+        <div class="membership-details-body">
+          <div class="membership-info-item">
+            <div class="membership-info-label">激活日期</div>
+            <div class="membership-info-value">${membership.activatedDate}</div>
+          </div>
+          <div class="membership-info-item">
+            <div class="membership-info-label">有效期至</div>
+            <div class="membership-info-value">${membership.validUntil}</div>
+          </div>
+          <div class="membership-info-item">
+            <div class="membership-info-label">价格</div>
+            <div class="membership-info-value">${membership.price}</div>
+          </div>
+          <div class="membership-features">
+            <div class="membership-features-title">🎁 会员权益</div>
+            <div class="membership-features-list">
+              ${membership.features
+                .map(
+                  (feature) => `
+                <div class="membership-feature-item">
+                  <span class="feature-check">✓</span>
+                  <span class="feature-text">${feature}</span>
+                </div>
+              `
+                )
+                .join("")}
+            </div>
+          </div>
+          <div class="membership-actions">
+            <button class="btn btn-secondary membership-renew-btn">续费</button>
+            <button class="btn btn-secondary membership-upgrade-btn">升级</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.createModal(detailsHTML);
+
+    // 绑定按钮点击事件
+    setTimeout(() => {
+      const renewBtn = document.querySelector(".membership-renew-btn");
+      const upgradeBtn = document.querySelector(".membership-upgrade-btn");
+
+      if (renewBtn) {
+        renewBtn.addEventListener("click", () => {
+          this.showToast("续费功能开发中");
+          this.closeModal();
+        });
+      }
+
+      if (upgradeBtn) {
+        upgradeBtn.addEventListener("click", () => {
+          this.showToast("升级功能开发中");
+          this.closeModal();
+        });
+      }
+    }, 100);
+  }
+
+  // 显示付费选项（模态框）
+  showPaymentOptionsModal() {
+    const config = this.getMembershipConfig();
+
+    const paymentHTML = `
+      <div class="payment-options-card">
+        <div class="payment-header">
+          <div class="payment-icon">💳</div>
+          <div class="payment-title">开通专业版会员</div>
+          <div class="payment-desc">解锁全部功能，享受专业服务</div>
+        </div>
+        
+        <div class="payment-plans">
+          <div class="payment-plan" data-plan="pro-monthly">
+            <div class="plan-badge">月卡</div>
+            <div class="plan-name">专业版月卡</div>
+            <div class="plan-price">
+              <span class="price-value">¥299</span>
+              <span class="price-unit">/月</span>
+            </div>
+            <div class="plan-features">
+              <div class="plan-feature">✓ 每月50次测评</div>
+              <div class="plan-feature">✓ 智能评估报告</div>
+              <div class="plan-feature">✓ 案例库访问</div>
+            </div>
+            <button class="btn btn-primary plan-btn" data-plan="pro-monthly">立即开通</button>
+          </div>
+          
+          <div class="payment-plan recommended" data-plan="pro-annual">
+            <div class="plan-badge recommended-badge">年卡 · 推荐</div>
+            <div class="plan-name">专业版年卡</div>
+            <div class="plan-price">
+              <span class="price-value">¥2,999</span>
+              <span class="price-unit">/年</span>
+            </div>
+            <div class="plan-save">省¥589</div>
+            <div class="plan-features">
+              <div class="plan-feature">✓ 无限次测评</div>
+              <div class="plan-feature">✓ 高级评估功能</div>
+              <div class="plan-feature">✓ 全部案例库</div>
+              <div class="plan-feature">✓ 年度深度报告</div>
+              <div class="plan-feature">✓ 专属客服</div>
+            </div>
+            <button class="btn btn-primary plan-btn" data-plan="pro-annual">立即开通</button>
+          </div>
+          
+          <div class="payment-plan premium" data-plan="care-annual">
+            <div class="plan-badge premium-badge">高级</div>
+            <div class="plan-name">高关爱年卡</div>
+            <div class="plan-price">
+              <span class="price-value">¥3,999</span>
+              <span class="price-unit">/年</span>
+            </div>
+            <div class="plan-features">
+              <div class="plan-feature">✓ 无限次心理测评</div>
+              <div class="plan-feature">✓ 专属心理咨询</div>
+              <div class="plan-feature">✓ 优先案例推荐</div>
+              <div class="plan-feature">✓ 全年数据报告</div>
+              <div class="plan-feature">✓ 高关爱平台使用</div>
+            </div>
+            <button class="btn btn-primary plan-btn" data-plan="care-annual">立即开通</button>
+          </div>
+        </div>
+        
+        <div class="payment-tip">
+          💡 开通会员后，您可以在个人中心查看会员详情和权益
+        </div>
+      </div>
+    `;
+
+    this.createModal(paymentHTML);
+
+    // 绑定支付按钮点击事件
+    setTimeout(() => {
+      document.querySelectorAll(".plan-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const plan = e.currentTarget.dataset.plan;
+          this.handlePaymentModal(plan);
+        });
+      });
+    }, 100);
+  }
+
+  // 处理支付（模态框版本）
+  handlePaymentModal(plan) {
+    // 关闭当前模态框
+    this.closeModal();
+
+    // 显示支付提示
+    this.showToast("正在跳转到支付页面...");
+
+    setTimeout(() => {
+      // 模拟支付成功
+      this.membershipStatus = plan;
+      localStorage.setItem("membershipStatus", plan);
+
+      const config = this.getMembershipConfig();
+      const membership = config[plan];
+
+      // 更新个人中心显示
+      this.updateMembershipDisplay();
+
+      // 显示成功提示
+      this.showToast(`🎉 ${membership.name}开通成功！`);
+    }, 1500);
+  }
+
+  // 初始化欢迎消息
+  initWelcomeMessage() {
+    // 检查用户身份
+    const savedRole = localStorage.getItem("userRole");
+
+    if (savedRole) {
+      // 已有身份，加载身份信息
+      this.userRole = savedRole;
+    }
+
+    // 总是更新问候语和天气
+    this.updateGreeting();
+    this.updateWeather();
+  }
+
+  // 获取身份配置
+  getRoleConfig() {
+    return {
+      psychologist: {
+        name: "心理老师",
+        icon: "👨‍⚕️",
+        greeting: "老师",
+        description: "专注学生心理健康，提供专业心理辅导",
+      },
+      headteacher: {
+        name: "班主任",
+        icon: "👨‍🏫",
+        greeting: "老师",
+        description: "管理班级事务，关注学生全面发展",
+      },
+      principal: {
+        name: "校领导",
+        icon: "👔",
+        greeting: "领导",
+        description: "统筹学校工作，把握教育方向",
+      },
+    };
+  }
+
+  // 显示身份选择
+  showRoleSelection() {
+    const roleConfig = this.getRoleConfig();
+
+    const roleSelectionHTML = `
+      <div class="role-selection-card">
+        <div class="role-selection-header">
+          <div class="role-selection-icon">👋</div>
+          <h3 class="role-selection-title">欢迎使用Ai心理学家</h3>
+          <p class="role-selection-desc">请选择您的身份，以便为您提供更精准的服务</p>
+        </div>
+        <div class="role-options">
+          ${Object.entries(roleConfig)
+            .map(
+              ([key, role]) => `
+            <div class="role-option" data-role="${key}">
+              <div class="role-option-icon">${role.icon}</div>
+              <div class="role-option-content">
+                <div class="role-option-name">${role.name}</div>
+                <div class="role-option-desc">${role.description}</div>
+              </div>
+              <div class="role-option-arrow">›</div>
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+        <div class="role-selection-tip">
+          💡 您可以随时输入"切换身份"或"身份"来更改身份
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage("", roleSelectionHTML);
+
+    // 绑定点击事件
+    setTimeout(() => {
+      document.querySelectorAll(".role-option").forEach((option) => {
+        option.addEventListener("click", (e) => {
+          const role = e.currentTarget.dataset.role;
+          this.selectRole(role);
+        });
+      });
+    }, 100);
+  }
+
+  // 选择身份
+  selectRole(role) {
+    const roleConfig = this.getRoleConfig();
+    const selectedRole = roleConfig[role];
+
+    if (!selectedRole) return;
+
+    // 保存身份
+    this.userRole = role;
+    localStorage.setItem("userRole", role);
+
+    // 显示确认消息
+    this.addAIMessage(
+      `太好了！已为您设置身份为 <strong>${selectedRole.icon} ${selectedRole.name}</strong><br><br>` +
+        `现在我将以${selectedRole.name}的视角为您提供服务。如需切换身份，随时输入"切换身份"即可。`
+    );
+
+    // 更新问候语和天气
+    setTimeout(() => {
+      this.updateGreeting();
+      this.updateWeather();
+    }, 500);
+  }
+
+  // 显示身份切换选项
+  showRoleSwitchOptions() {
+    const roleConfig = this.getRoleConfig();
+    const currentRole = roleConfig[this.userRole];
+
+    const switchHTML = `
+      <div class="role-switch-card">
+        <div class="current-role-info">
+          <div class="current-role-label">当前身份</div>
+          <div class="current-role-display">
+            <span class="current-role-icon">${currentRole.icon}</span>
+            <span class="current-role-name">${currentRole.name}</span>
+          </div>
+        </div>
+        <div class="role-divider"></div>
+        <div class="role-switch-title">选择新身份</div>
+        <div class="role-options">
+          ${Object.entries(roleConfig)
+            .map(
+              ([key, role]) => `
+            <div class="role-option ${
+              key === this.userRole ? "disabled" : ""
+            }" data-role="${key}">
+              <div class="role-option-icon">${role.icon}</div>
+              <div class="role-option-content">
+                <div class="role-option-name">${role.name}</div>
+                <div class="role-option-desc">${role.description}</div>
+              </div>
+              ${
+                key === this.userRole
+                  ? '<div class="role-current-badge">当前</div>'
+                  : '<div class="role-option-arrow">›</div>'
+              }
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage("为您展示身份切换选项：", switchHTML);
+
+    // 绑定点击事件
+    setTimeout(() => {
+      document
+        .querySelectorAll(".role-option:not(.disabled)")
+        .forEach((option) => {
+          option.addEventListener("click", (e) => {
+            const role = e.currentTarget.dataset.role;
+            this.switchRole(role);
+          });
+        });
+    }, 100);
+  }
+
+  // 切换身份
+  switchRole(newRole) {
+    const roleConfig = this.getRoleConfig();
+    const oldRole = roleConfig[this.userRole];
+    const selectedRole = roleConfig[newRole];
+
+    if (!selectedRole || newRole === this.userRole) return;
+
+    // 更新身份
+    this.userRole = newRole;
+    localStorage.setItem("userRole", newRole);
+
+    // 显示切换成功消息
+    this.addAIMessage(
+      `✅ 身份切换成功！<br><br>` +
+        `从 <strong>${oldRole.icon} ${oldRole.name}</strong> 切换为 <strong>${selectedRole.icon} ${selectedRole.name}</strong><br><br>` +
+        `现在我将以${selectedRole.name}的视角为您提供服务。`
+    );
+
+    // 更新问候语
+    setTimeout(() => {
+      this.updateGreeting();
+    }, 500);
+  }
+
+  // 更新问候语
+  updateGreeting() {
+    const greetingText = document.getElementById("greetingText");
+    if (!greetingText) return;
+
+    const hour = new Date().getHours();
+    let timeGreeting = "";
+
+    if (hour >= 5 && hour < 12) {
+      timeGreeting = "早上好";
+    } else if (hour >= 12 && hour < 14) {
+      timeGreeting = "中午好";
+    } else if (hour >= 14 && hour < 18) {
+      timeGreeting = "下午好";
+    } else if (hour >= 18 && hour < 22) {
+      timeGreeting = "晚上好";
+    } else {
+      timeGreeting = "夜深了，注意休息";
+    }
+
+    if (this.userRole) {
+      // 有身份，显示个性化问候
+      const roleConfig = this.getRoleConfig();
+      const currentRole = roleConfig[this.userRole];
+      greetingText.textContent = `${currentRole.greeting}，${timeGreeting}！`;
+    } else {
+      // 没有身份，显示通用问候
+      greetingText.textContent = `您好，${timeGreeting}！`;
+    }
+  }
+
+  // 更新天气信息
+  updateWeather() {
+    const weatherCard = document.getElementById("weatherCard");
+    if (!weatherCard) return;
+
+    // 模拟天气数据（实际应用中应该调用天气API）
+    const weatherData = this.getWeatherData();
+
+    const weatherIcon = weatherCard.querySelector(".weather-icon");
+    const tempValue = weatherCard.querySelector(".temp-value");
+    const weatherDesc = weatherCard.querySelector(".weather-desc");
+    const tipText = weatherCard.querySelector(".tip-text");
+
+    weatherIcon.textContent = weatherData.icon;
+    tempValue.textContent = weatherData.temp;
+    weatherDesc.textContent = weatherData.desc;
+    tipText.textContent = weatherData.tip;
+
+    // 添加点击事件
+    weatherCard.addEventListener("click", () => {
+      this.showWeatherDetail(weatherData);
+    });
+  }
+
+  // 显示天气详情
+  showWeatherDetail(weatherData) {
+    // 创建一个更详细的天气提示
+    const detailMessage = `
+      <div style="padding: var(--spacing-md);">
+        <div style="text-align: center; margin-bottom: var(--spacing-md);">
+          <div style="font-size: 48px; margin-bottom: var(--spacing-sm);">${
+            weatherData.icon
+          }</div>
+          <div style="font-size: 24px; font-weight: 600; color: var(--primary-blue); margin-bottom: var(--spacing-xs);">${
+            weatherData.temp
+          }</div>
+          <div style="font-size: 16px; color: var(--text-secondary);">${
+            weatherData.desc
+          }</div>
+        </div>
+        <div style="background: #f8fafc; padding: var(--spacing-md); border-radius: var(--border-radius); border-left: 3px solid var(--primary-blue);">
+          <div style="font-weight: 600; margin-bottom: var(--spacing-xs); color: var(--text-primary);">💡 温馨提示</div>
+          <div style="color: var(--text-secondary); line-height: 1.6;">${
+            weatherData.tip
+          }</div>
+        </div>
+        ${
+          weatherData.extraTips
+            ? `
+          <div style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(42, 115, 233, 0.05); border-radius: var(--border-radius);">
+            <div style="font-size: 12px; color: var(--text-secondary);">${weatherData.extraTips}</div>
+          </div>
+        `
+            : ""
+        }
+      </div>
+    `;
+
+    this.addAIMessage("为您展示今天的详细天气信息：", detailMessage);
+    this.scrollToBottom();
+  }
+
+  // 天气数据列表
+  getWeatherDataList() {
+    return [
+      {
+        icon: "☀️",
+        temp: "28°C",
+        desc: "晴天",
+        tip: "天气晴朗，心情也会更好哦！适合带学生做户外团体活动",
+        extraTips: "紫外线较强，建议涂抹防晒霜 • 空气质量优",
+      },
+      {
+        icon: "🌤️",
+        temp: "22°C",
+        desc: "多云转晴",
+        tip: "天气不错，适合户外活动，记得多喝水",
+        extraTips: "温度适宜，是外出的好天气 • 湿度适中",
+      },
+      {
+        icon: "☁️",
+        temp: "20°C",
+        desc: "多云",
+        tip: "云层较厚，温度适中，注意适时增减衣物",
+        extraTips: "可能转阴，建议随身携带外套",
+      },
+      {
+        icon: "🌧️",
+        temp: "18°C",
+        desc: "小雨",
+        tip: "今天有小雨，记得带伞哦！路面湿滑注意安全",
+        extraTips: "降雨概率80% • 能见度一般，驾车请减速慢行",
+      },
+      {
+        icon: "⛈️",
+        temp: "16°C",
+        desc: "小雨转中雨",
+        tip: "今天小雨转中雨，记得带伞，尽量减少外出",
+        extraTips: "降雨量较大，建议推迟户外活动 • 注意防雷电",
+      },
+      {
+        icon: "🌧️",
+        temp: "14°C",
+        desc: "中雨转大雨",
+        tip: "今天雨势较大，务必带伞，注意交通安全！",
+        extraTips: "强降雨预警 • 低洼地区注意积水 • 尽量避免外出",
+      },
+      {
+        icon: "❄️",
+        temp: "-2°C",
+        desc: "小雪",
+        tip: "天气寒冷有降雪，多穿衣服注意保暖，路面结冰小心慢行",
+        extraTips: "道路结冰，驾车请谨慎 • 注意防寒保暖",
+      },
+      {
+        icon: "🌨️",
+        temp: "2°C",
+        desc: "雨夹雪",
+        tip: "天气寒冷，多穿点衣服，注意保暖防寒！",
+        extraTips: "体感温度更低，建议穿着厚外套 • 注意防滑",
+      },
+      {
+        icon: "🌫️",
+        temp: "15°C",
+        desc: "雾霾",
+        tip: "空气质量不佳，建议减少户外活动，戴好口罩",
+        extraTips: "PM2.5指数偏高 • 敏感人群请做好防护",
+      },
+      {
+        icon: "💨",
+        temp: "12°C",
+        desc: "大风",
+        tip: "今天风比较大，出门注意安全，固定好物品",
+        extraTips: "风力5-6级 • 注意高空坠物 • 避免在广告牌下停留",
+      },
+      {
+        icon: "🔥",
+        temp: "35°C",
+        desc: "高温",
+        tip: "天气炎热，注意防暑降温，多喝水，避免中暑",
+        extraTips: "高温预警 • 避免长时间户外活动 • 及时补充水分和盐分",
+      },
+      {
+        icon: "🌡️",
+        temp: "32°C",
+        desc: "晴热",
+        tip: "气温较高，注意防晒，及时补充水分",
+        extraTips: "紫外线强度高 • 建议穿着透气衣物 • 避免正午外出",
+      },
+      {
+        icon: "🌦️",
+        temp: "19°C",
+        desc: "阵雨",
+        tip: "今天可能有阵雨，出门记得带把伞",
+        extraTips: "降雨时间不定，建议随身携带雨具",
+      },
+      {
+        icon: "⛅",
+        temp: "24°C",
+        desc: "晴转多云",
+        tip: "上午天气不错，下午可能转阴",
+        extraTips: "温差较小，适合外出活动",
+      },
+      {
+        icon: "🌥️",
+        temp: "17°C",
+        desc: "阴天",
+        tip: "天气阴沉，注意保持好心情",
+        extraTips: "光线较暗，室内建议开灯 • 可能转雨",
+      },
+      {
+        icon: "🌩️",
+        temp: "21°C",
+        desc: "雷阵雨",
+        tip: "今天有雷阵雨，注意防雷电，尽量不要外出",
+        extraTips: "雷电预警 • 避免在空旷地带活动 • 远离高大树木",
+      },
+      {
+        icon: "🌬️",
+        temp: "10°C",
+        desc: "大风降温",
+        tip: "今天风大降温，多穿衣服注意保暖",
+        extraTips: "风力较大，注意关好门窗 • 体感温度更低",
+      },
+      {
+        icon: "☃️",
+        temp: "-5°C",
+        desc: "中雪",
+        tip: "今天有中雪，路面湿滑，出行注意安全",
+        extraTips: "积雪较厚，建议减少外出 • 注意防寒保暖",
+      },
+      {
+        icon: "🌈",
+        temp: "23°C",
+        desc: "雨后初晴",
+        tip: "雨过天晴，空气清新，适合散步",
+        extraTips: "空气质量优 • 温度适宜 • 可能看到彩虹",
+      },
+      {
+        icon: "🌙",
+        temp: "8°C",
+        desc: "晴朗夜晚",
+        tip: "夜间天气晴朗，温度较低，注意保暖",
+        extraTips: "昼夜温差大 • 适合观星 • 夜间出行注意安全",
+      },
+    ];
+  }
+
+  // 获取天气数据（随机）
+  getWeatherData() {
+    // 这里可以集成真实的天气API，如：
+    // - 和风天气 API
+    // - 高德天气 API
+    // - OpenWeatherMap API
+
+    const weatherList = this.getWeatherDataList();
+
+    // 每次刷新页面随机选择一条天气数据
+    const randomIndex = Math.floor(Math.random() * weatherList.length);
+
+    return weatherList[randomIndex];
   }
 
   bindEvents() {
-    // Tab导航点击事件
-    document.querySelectorAll(".tab-item").forEach((tab) => {
-      tab.addEventListener("click", (e) => {
+    // 防止页面滚动时导航栏跳动
+    const pageContent = document.getElementById("pageContent");
+    if (pageContent) {
+      pageContent.addEventListener("scroll", this.handleScroll.bind(this));
+    }
+  }
+
+  // 初始化菜单
+  initMenu() {
+    const menuBtn = document.getElementById("menuBtn");
+    const sideMenu = document.getElementById("sideMenu");
+    const menuOverlay = document.getElementById("menuOverlay");
+
+    // 菜单按钮点击
+    if (menuBtn) {
+      menuBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.toggleMenu();
+      });
+    }
+
+    // 遮罩层点击关闭菜单
+    if (menuOverlay) {
+      menuOverlay.addEventListener("click", () => {
+        this.closeMenu();
+      });
+    }
+
+    // 隐藏菜单按钮点击
+    const hideMenuBtn = document.getElementById("hideMenuBtn");
+    if (hideMenuBtn) {
+      hideMenuBtn.addEventListener("click", () => {
+        this.closeMenu();
+      });
+    }
+
+    // 菜单项点击
+    document.querySelectorAll(".menu-item[data-page]").forEach((item) => {
+      item.addEventListener("click", (e) => {
         const page = e.currentTarget.dataset.page;
-        this.switchPage(page);
+        this.navigateToPage(page);
+        this.closeMenu();
+
+        // 更新菜单项激活状态
+        document
+          .querySelectorAll(".menu-item")
+          .forEach((mi) => mi.classList.remove("active"));
+        e.currentTarget.classList.add("active");
       });
     });
+  }
 
-    // 防止页面滚动时底部导航栏跳动
-    const pageContent = document.getElementById("pageContent");
-    pageContent.addEventListener("scroll", this.handleScroll.bind(this));
+  // 切换菜单
+  toggleMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+    const menuBtn = document.getElementById("menuBtn");
+
+    if (sideMenu.classList.contains("active")) {
+      this.closeMenu();
+    } else {
+      this.openMenu();
+    }
+  }
+
+  // 打开菜单
+  openMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+    const menuBtn = document.getElementById("menuBtn");
+
+    sideMenu.classList.add("active");
+    menuBtn.classList.add("active");
+    document.body.style.overflow = "hidden";
+  }
+
+  // 关闭菜单
+  closeMenu() {
+    const sideMenu = document.getElementById("sideMenu");
+    const menuBtn = document.getElementById("menuBtn");
+
+    sideMenu.classList.remove("active");
+    menuBtn.classList.remove("active");
+    document.body.style.overflow = "";
   }
 
   // 初始化聊天界面
   initChatInterface() {
     const sendBtn = document.getElementById("sendBtn");
     const chatInput = document.getElementById("chatInput");
+    const inputModeBtn = document.getElementById("inputModeBtn");
+    const voiceInputBtn = document.getElementById("voiceInputBtn");
+
+    // 输入模式切换
+    this.isVoiceMode = false;
+
+    if (inputModeBtn) {
+      inputModeBtn.addEventListener("click", () => {
+        this.toggleInputMode();
+      });
+    }
+
+    // 语音输入按钮
+    if (voiceInputBtn) {
+      voiceInputBtn.addEventListener("mousedown", () => {
+        this.startVoiceRecording();
+      });
+
+      voiceInputBtn.addEventListener("mouseup", () => {
+        this.stopVoiceRecording();
+      });
+
+      voiceInputBtn.addEventListener("mouseleave", () => {
+        if (voiceInputBtn.classList.contains("recording")) {
+          this.stopVoiceRecording();
+        }
+      });
+
+      // 触摸设备支持
+      voiceInputBtn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        this.startVoiceRecording();
+      });
+
+      voiceInputBtn.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        this.stopVoiceRecording();
+      });
+    }
 
     if (sendBtn) {
       sendBtn.addEventListener("click", () => this.sendMessage());
@@ -111,6 +1098,85 @@ class WeChatMiniProgram {
     });
   }
 
+  // 切换输入模式
+  toggleInputMode() {
+    this.isVoiceMode = !this.isVoiceMode;
+    const inputModeBtn = document.getElementById("inputModeBtn");
+    const chatInput = document.getElementById("chatInput");
+    const voiceInputBtn = document.getElementById("voiceInputBtn");
+    const sendBtn = document.getElementById("sendBtn");
+    const modeIcon = inputModeBtn.querySelector(".mode-icon");
+
+    if (this.isVoiceMode) {
+      // 切换到语音模式
+      inputModeBtn.classList.add("voice-mode");
+      modeIcon.textContent = "⌨️";
+      inputModeBtn.title = "切换到文字输入";
+      chatInput.style.display = "none";
+      voiceInputBtn.style.display = "flex";
+      sendBtn.style.display = "none";
+    } else {
+      // 切换到文字模式
+      inputModeBtn.classList.remove("voice-mode");
+      modeIcon.textContent = "🎤";
+      inputModeBtn.title = "切换到语音输入";
+      chatInput.style.display = "block";
+      voiceInputBtn.style.display = "none";
+      sendBtn.style.display = "flex";
+    }
+  }
+
+  // 开始语音录制
+  startVoiceRecording() {
+    const voiceInputBtn = document.getElementById("voiceInputBtn");
+    const voiceText = voiceInputBtn.querySelector(".voice-text");
+
+    voiceInputBtn.classList.add("recording");
+    voiceText.textContent = "正在录音...";
+
+    // 这里可以集成实际的语音识别API
+    console.log("开始录音");
+  }
+
+  // 停止语音录制
+  stopVoiceRecording() {
+    const voiceInputBtn = document.getElementById("voiceInputBtn");
+    const voiceText = voiceInputBtn.querySelector(".voice-text");
+
+    voiceInputBtn.classList.remove("recording");
+    voiceText.textContent = "按住说话";
+
+    // 模拟语音识别结果
+    setTimeout(() => {
+      const mockVoiceText = "这是语音识别的文字内容";
+      const isFirstMessage =
+        !this.userRole && !localStorage.getItem("userRole");
+
+      this.addUserMessage(mockVoiceText);
+      this.showTypingIndicator();
+
+      setTimeout(() => {
+        this.hideTypingIndicator();
+
+        if (isFirstMessage) {
+          // 首次输入，显示身份选择
+          this.addAIMessage(
+            "您好！很高兴为您服务。😊<br><br>" +
+              "为了给您提供更精准的帮助，请先选择您的身份："
+          );
+          setTimeout(() => {
+            this.showRoleSelection();
+          }, 500);
+        } else {
+          // 非首次输入，正常处理
+          this.addAIMessage("我收到了您的语音消息：" + mockVoiceText);
+        }
+      }, 1500);
+    }, 500);
+
+    console.log("停止录音");
+  }
+
   // 导航到指定页面
   navigateToPage(pageName) {
     // 隐藏所有页面
@@ -123,6 +1189,15 @@ class WeChatMiniProgram {
     if (targetPage) {
       targetPage.style.display = "block";
       this.currentPage = pageName;
+
+      // 如果是个人中心页面，更新会员显示
+      if (pageName === "profile") {
+        // 使用requestAnimationFrame确保页面渲染完成
+        requestAnimationFrame(() => {
+          this.updateMembershipDisplay();
+          this.initMembershipIconClick();
+        });
+      }
     }
   }
 
@@ -138,6 +1213,9 @@ class WeChatMiniProgram {
 
     if (!message) return;
 
+    // 检查是否是首次输入（没有身份）
+    const isFirstMessage = !this.userRole && !localStorage.getItem("userRole");
+
     // 添加用户消息
     this.addUserMessage(message);
     chatInput.value = "";
@@ -148,7 +1226,20 @@ class WeChatMiniProgram {
     // 模拟AI回复
     setTimeout(() => {
       this.hideTypingIndicator();
-      this.handleUserIntent(message);
+
+      if (isFirstMessage) {
+        // 首次输入，先显示欢迎消息，然后显示身份选择
+        this.addAIMessage(
+          "您好！很高兴为您服务。😊<br><br>" +
+            "为了给您提供更精准的帮助，请先选择您的身份："
+        );
+        setTimeout(() => {
+          this.showRoleSelection();
+        }, 500);
+      } else {
+        // 非首次输入，正常处理消息
+        this.handleUserIntent(message);
+      }
     }, 1500);
   }
 
@@ -232,13 +1323,35 @@ class WeChatMiniProgram {
 
     const lowerMessage = message.toLowerCase();
 
+    // 身份切换相关
+    if (
+      lowerMessage.includes("切换身份") ||
+      lowerMessage.includes("更换身份") ||
+      lowerMessage === "身份" ||
+      lowerMessage.includes("身份选择")
+    ) {
+      if (!this.userRole) {
+        this.showRoleSelection();
+      } else {
+        this.showRoleSwitchOptions();
+      }
+      return;
+    }
+
+    // 智能意图识别 - 检测是否包含学生信息
+    const studentInfo = this.parseStudentInfo(message);
+    if (studentInfo.hasInfo) {
+      this.handleStudentInfoIntent(message, studentInfo);
+      return;
+    }
+
     // 测评相关 - 启动对话流程
     if (lowerMessage.includes("测评") || lowerMessage.includes("想测评")) {
       this.startAssessmentConversation();
     }
     // 智能评估相关 - 启动对话流程
     else if (
-      lowerMessage.includes("智能评估") ||
+      lowerMessage.includes("心理状态评估") ||
       lowerMessage.includes("评估") ||
       lowerMessage.includes("辅导建议")
     ) {
@@ -267,7 +1380,494 @@ class WeChatMiniProgram {
     // 默认回复
     else {
       this.addAIMessage(
-        '我理解您的需求了。您可以：<br><br>• 输入"我想测评"开始心理测评<br>• 输入"智能评估"获取评估建议<br>• 输入"案例检索"查找相似案例<br>• 输入"导师36计"学习辅导技巧<br><br>我会引导您完成操作 😊'
+        '我理解您的需求了。您可以：<br><br>• 输入"我想测评"开始心理测评<br>• 输入"心理状态评估"获取评估建议<br>• 输入"案例检索"查找相似案例<br>• 输入"导师工具包"学习辅导技巧<br>• 输入"切换身份"更改您的身份<br><br>或者直接描述学生情况，我会智能识别并帮助您 😊'
+      );
+    }
+  }
+
+  // 解析学生信息
+  parseStudentInfo(message) {
+    const info = {
+      hasInfo: false,
+      name: null,
+      age: null,
+      gender: null,
+      problem: null,
+      missingFields: [],
+    };
+
+    // 提取姓名（中文姓名模式）
+    const nameMatch = message.match(
+      /([张王李赵刘陈杨黄周吴徐孙马朱胡郭何高林罗郑梁宋谢唐韩曹许邓萧冯曾程蔡彭潘袁于董余苏叶吕魏蒋田杜丁沈姜范江傅钟卢汪戴崔任陆廖姚方金邱夏谭韦贾邹石熊孟秦阎薛侯雷白龙段郝孔邵史毛常万顾赖武康贺严尹钱施牛洪龚][一-龥]{1,3})/
+    );
+    if (nameMatch) {
+      info.name = nameMatch[1];
+      info.hasInfo = true;
+    }
+
+    // 提取年龄
+    const ageMatch = message.match(/(\d{1,2})\s*[岁周年]/);
+    if (ageMatch) {
+      info.age = parseInt(ageMatch[1]);
+      info.hasInfo = true;
+    }
+
+    // 提取性别
+    if (
+      message.includes("男生") ||
+      message.includes("男孩") ||
+      message.includes("男")
+    ) {
+      info.gender = "男";
+      info.hasInfo = true;
+    } else if (
+      message.includes("女生") ||
+      message.includes("女孩") ||
+      message.includes("女")
+    ) {
+      info.gender = "女";
+      info.hasInfo = true;
+    }
+
+    // 提取问题描述
+    const problemKeywords = [
+      "压力",
+      "焦虑",
+      "抑郁",
+      "失眠",
+      "睡不着",
+      "厌学",
+      "叛逆",
+      "自卑",
+      "孤独",
+      "沟通",
+      "冲突",
+      "情绪",
+      "行为",
+      "问题",
+      "困扰",
+      "烦恼",
+    ];
+    const hasProblem = problemKeywords.some((keyword) =>
+      message.includes(keyword)
+    );
+    if (hasProblem) {
+      info.problem = message;
+      info.hasInfo = true;
+    }
+
+    // 检查缺失字段
+    if (!info.name) info.missingFields.push("姓名");
+    if (!info.age) info.missingFields.push("年龄");
+    if (!info.gender) info.missingFields.push("性别");
+
+    return info;
+  }
+
+  // 处理学生信息意图
+  handleStudentInfoIntent(message, studentInfo) {
+    // 如果识别到姓名，先查询个案库
+    if (studentInfo.name) {
+      const matchedStudents = this.queryStudentsByName(studentInfo.name);
+
+      if (matchedStudents.length > 0) {
+        // 找到匹配的学生
+        this.handleMatchedStudents(matchedStudents, studentInfo, message);
+        return;
+      }
+    }
+
+    // 没有找到匹配或没有姓名，显示识别到的信息
+    this.showRecognizedInfo(studentInfo, message);
+  }
+
+  // 处理匹配到的学生
+  handleMatchedStudents(matchedStudents, studentInfo, originalMessage) {
+    if (matchedStudents.length === 1) {
+      // 找到唯一匹配
+      const student = matchedStudents[0];
+
+      // 合并信息（用户输入的信息优先）
+      const mergedInfo = {
+        name: studentInfo.name || student.name,
+        age: studentInfo.age || student.age,
+        gender: studentInfo.gender || student.gender,
+        grade: student.grade,
+        studentId: student.id,
+        problem: studentInfo.problem,
+        hasInfo: true,
+        missingFields: [],
+      };
+
+      // 检查是否还有缺失信息
+      if (!mergedInfo.problem) {
+        mergedInfo.missingFields.push("问题描述");
+      }
+
+      // 显示匹配信息
+      let matchMessage = `✅ 在个案库中找到了<strong>${student.name}</strong>的信息：<br><br>`;
+      matchMessage += `👤 <strong>姓名</strong>：${student.name}<br>`;
+      matchMessage += `🎂 <strong>年龄</strong>：${student.age}岁<br>`;
+      matchMessage += `⚧ <strong>性别</strong>：${student.gender}<br>`;
+      matchMessage += `📚 <strong>年级</strong>：${student.grade}<br>`;
+
+      if (mergedInfo.problem) {
+        matchMessage += `📝 <strong>问题描述</strong>：${mergedInfo.problem}<br>`;
+      }
+
+      if (student.lastAssessment) {
+        matchMessage += `<br>📅 <strong>上次测评</strong>：${student.lastAssessment}`;
+      }
+
+      this.addAIMessage(matchMessage);
+
+      setTimeout(() => {
+        this.showIntentOptions(mergedInfo, mergedInfo.missingFields.length > 0);
+      }, 500);
+    } else {
+      // 找到多个匹配，让用户选择
+      this.showStudentSelectionForIntent(
+        matchedStudents,
+        studentInfo,
+        originalMessage
+      );
+    }
+  }
+
+  // 显示学生选择（用于意图识别）
+  showStudentSelectionForIntent(students, studentInfo, originalMessage) {
+    let selectionHTML = `在个案库中找到<strong>${students.length}</strong>位名叫<strong>${studentInfo.name}</strong>的学生：<br><br>`;
+
+    const studentCards = students
+      .map(
+        (student, index) => `
+      <div class="student-selection-item" data-student-index="${index}">
+        <div class="student-selection-number">${index + 1}</div>
+        <div class="student-selection-content">
+          <div class="student-selection-name">${student.name}</div>
+          <div class="student-selection-info">
+            ${student.age}岁 • ${student.gender} • ${student.grade}
+            ${
+              student.lastAssessment
+                ? ` • 上次测评：${student.lastAssessment}`
+                : ""
+            }
+          </div>
+        </div>
+        <div class="student-selection-arrow">›</div>
+      </div>
+    `
+      )
+      .join("");
+
+    const cardHTML = `
+      <div class="student-selection-card">
+        ${studentCards}
+        <div class="student-selection-tip">
+          💡 请输入序号（1-${students.length}）或点击选择学生
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage(selectionHTML, cardHTML);
+
+    // 保存到对话状态
+    this.conversationState = {
+      type: "student-selection-for-intent",
+      students: students,
+      studentInfo: studentInfo,
+      originalMessage: originalMessage,
+    };
+
+    // 绑定点击事件
+    setTimeout(() => {
+      document
+        .querySelectorAll(".student-selection-item")
+        .forEach((item, index) => {
+          item.addEventListener("click", () => {
+            this.selectStudentForIntent(index);
+          });
+        });
+    }, 100);
+  }
+
+  // 选择学生（用于意图识别）
+  selectStudentForIntent(index) {
+    const state = this.conversationState;
+    const student = state.students[index];
+    const studentInfo = state.studentInfo;
+
+    // 合并信息
+    const mergedInfo = {
+      name: student.name,
+      age: student.age,
+      gender: student.gender,
+      grade: student.grade,
+      studentId: student.id,
+      problem: studentInfo.problem,
+      hasInfo: true,
+      missingFields: [],
+    };
+
+    if (!mergedInfo.problem) {
+      mergedInfo.missingFields.push("问题描述");
+    }
+
+    // 清除对话状态
+    this.conversationState = null;
+
+    // 显示选择结果
+    this.addAIMessage(
+      `好的！已选择<strong>${student.name}</strong>（${student.age}岁，${student.gender}，${student.grade}）。`
+    );
+
+    setTimeout(() => {
+      this.showIntentOptions(mergedInfo, mergedInfo.missingFields.length > 0);
+    }, 500);
+  }
+
+  // 显示识别到的信息
+  showRecognizedInfo(studentInfo, originalMessage) {
+    let recognizedInfo = "我识别到以下学生信息：<br><br>";
+
+    if (studentInfo.name) {
+      recognizedInfo += `👤 <strong>姓名</strong>：${studentInfo.name}<br>`;
+    }
+    if (studentInfo.age) {
+      recognizedInfo += `🎂 <strong>年龄</strong>：${studentInfo.age}岁<br>`;
+    }
+    if (studentInfo.gender) {
+      recognizedInfo += `⚧ <strong>性别</strong>：${studentInfo.gender}<br>`;
+    }
+    if (studentInfo.problem) {
+      recognizedInfo += `📝 <strong>问题描述</strong>：${studentInfo.problem}<br>`;
+    }
+
+    // 检查是否有缺失信息
+    if (studentInfo.missingFields.length > 0) {
+      recognizedInfo += `<br>⚠️ <strong>缺少信息</strong>：${studentInfo.missingFields.join(
+        "、"
+      )}<br>`;
+      recognizedInfo += `<br>为了更好地帮助您，建议补充完整信息。`;
+
+      this.addAIMessage(recognizedInfo);
+
+      setTimeout(() => {
+        this.showIntentOptions(studentInfo, true);
+      }, 500);
+    } else {
+      // 信息完整，直接显示意图选项
+      this.addAIMessage(recognizedInfo);
+
+      setTimeout(() => {
+        this.showIntentOptions(studentInfo, false);
+      }, 500);
+    }
+  }
+
+  // 显示意图选项
+  showIntentOptions(studentInfo, hasMissingInfo) {
+    const intentOptionsHTML = `
+      <div class="intent-options-card">
+        <div class="intent-header">
+          <div class="intent-icon">🤔</div>
+          <div class="intent-title">您想要做什么？</div>
+          <div class="intent-desc">请选择您的需求，我会为您提供相应的服务</div>
+        </div>
+        <div class="intent-options">
+          <div class="intent-option" data-intent="assessment" data-student-info='${JSON.stringify(
+            studentInfo
+          )}'>
+            <div class="intent-option-number">1</div>
+            <div class="intent-option-content">
+              <div class="intent-option-icon">📊</div>
+              <div class="intent-option-text">
+                <div class="intent-option-title">心理测评</div>
+                <div class="intent-option-subtitle">为学生进行专业的心理测评</div>
+              </div>
+            </div>
+            <div class="intent-option-arrow">›</div>
+          </div>
+          <div class="intent-option" data-intent="case-search" data-student-info='${JSON.stringify(
+            studentInfo
+          )}'>
+            <div class="intent-option-number">2</div>
+            <div class="intent-option-content">
+              <div class="intent-option-icon">🔍</div>
+              <div class="intent-option-text">
+                <div class="intent-option-title">案例检索</div>
+                <div class="intent-option-subtitle">查找相似案例和解决方案</div>
+              </div>
+            </div>
+            <div class="intent-option-arrow">›</div>
+          </div>
+          <div class="intent-option" data-intent="smart-assessment" data-student-info='${JSON.stringify(
+            studentInfo
+          )}'>
+            <div class="intent-option-number">3</div>
+            <div class="intent-option-content">
+              <div class="intent-option-icon">🧠</div>
+              <div class="intent-option-text">
+                <div class="intent-option-title">智能评估</div>
+                <div class="intent-option-subtitle">AI分析并生成评估报告</div>
+              </div>
+            </div>
+            <div class="intent-option-arrow">›</div>
+          </div>
+        </div>
+        <div class="intent-tip">
+          💡 您可以直接输入序号（1/2/3）或点击选项
+        </div>
+      </div>
+    `;
+
+    this.addAIMessage("", intentOptionsHTML);
+
+    // 保存学生信息到对话状态
+    this.conversationState = {
+      type: "intent-selection",
+      studentInfo: studentInfo,
+    };
+
+    // 绑定点击事件
+    setTimeout(() => {
+      document.querySelectorAll(".intent-option").forEach((option) => {
+        option.addEventListener("click", (e) => {
+          const intent = e.currentTarget.dataset.intent;
+          const studentInfoStr = e.currentTarget.dataset.studentInfo;
+          const studentInfo = JSON.parse(studentInfoStr);
+          this.handleIntentSelection(intent, studentInfo);
+        });
+      });
+    }, 100);
+  }
+
+  // 处理意图选择
+  handleIntentSelection(intent, studentInfo) {
+    // 清除对话状态
+    this.conversationState = null;
+
+    switch (intent) {
+      case "assessment":
+        this.addAIMessage(
+          `好的！我将为<strong>${
+            studentInfo.name || "该学生"
+          }</strong>进行心理测评。`
+        );
+        setTimeout(() => {
+          this.startAssessmentWithInfo(studentInfo);
+        }, 500);
+        break;
+
+      case "case-search":
+        this.addAIMessage(
+          `好的！我将为您检索<strong>${
+            studentInfo.name || "该学生"
+          }</strong>的相似案例。`
+        );
+        setTimeout(() => {
+          this.startCaseSearchWithInfo(studentInfo);
+        }, 500);
+        break;
+
+      case "smart-assessment":
+        this.addAIMessage(
+          `好的！我将为<strong>${
+            studentInfo.name || "该学生"
+          }</strong>生成智能评估报告。`
+        );
+        setTimeout(() => {
+          this.startSmartAssessmentWithInfo(studentInfo);
+        }, 500);
+        break;
+    }
+  }
+
+  // 带信息启动测评
+  startAssessmentWithInfo(studentInfo) {
+    this.conversationState = {
+      type: "assessment",
+      step: studentInfo.name
+        ? studentInfo.age
+          ? studentInfo.gender
+            ? "direction"
+            : "gender"
+          : "age"
+        : "name",
+      data: {
+        name: studentInfo.name,
+        age: studentInfo.age,
+        gender: studentInfo.gender,
+      },
+    };
+
+    if (studentInfo.name && studentInfo.age && studentInfo.gender) {
+      // 信息完整，直接询问测评方向
+      this.addAIMessage(
+        `好的。<br><br>请问主要想测评哪个方向？<br><br>• 情绪稳定性<br>• 学习适应性<br>• 社交能力<br>• 综合测评<br><br>请直接输入方向名称`
+      );
+    } else if (studentInfo.name && studentInfo.age) {
+      // 缺少性别
+      this.addAIMessage(
+        `明白了。<br><br>请问<strong>性别</strong>是？（男/女）`
+      );
+    } else if (studentInfo.name) {
+      // 缺少年龄
+      this.addAIMessage(
+        `好的，${studentInfo.name}。<br><br>请问<strong>年龄</strong>是多少？`
+      );
+    } else {
+      // 缺少姓名
+      this.addAIMessage(
+        `好的！我来帮您进行心理测评。<br><br>首先，请告诉我<strong>被测评人的姓名</strong>？`
+      );
+    }
+  }
+
+  // 带信息启动案例检索
+  startCaseSearchWithInfo(studentInfo) {
+    this.conversationState = {
+      type: "case-search",
+      step: studentInfo.problem ? "complete" : "problem",
+      data: {
+        name: studentInfo.name,
+        age: studentInfo.age,
+        gender: studentInfo.gender,
+        problem: studentInfo.problem,
+      },
+    };
+
+    if (studentInfo.problem) {
+      // 有问题描述，直接搜索
+      this.searchAndShowCases();
+    } else {
+      // 缺少问题描述
+      this.addAIMessage(
+        `好的。<br><br>请<strong>简要描述</strong>学生的问题或需要检索的案例类型：<br><br>• 问题关键词（如：考前焦虑、厌学等）<br>• 问题严重程度<br>• 其他相关信息`
+      );
+    }
+  }
+
+  // 带信息启动智能评估
+  startSmartAssessmentWithInfo(studentInfo) {
+    this.conversationState = {
+      type: "smart-assessment",
+      step: studentInfo.problem ? "complete" : "problem",
+      data: {
+        name: studentInfo.name,
+        age: studentInfo.age,
+        gender: studentInfo.gender,
+        problem: studentInfo.problem,
+      },
+    };
+
+    if (studentInfo.problem) {
+      // 有问题描述，直接生成评估
+      this.generateSmartAssessment();
+    } else {
+      // 缺少问题描述
+      this.addAIMessage(
+        `好的。<br><br>请<strong>详细描述</strong>学生的心理问题或行为表现：<br><br>• 具体的问题表现<br>• 持续时间<br>• 影响程度<br>• 家庭背景（可选）`
       );
     }
   }
@@ -311,6 +1911,38 @@ class WeChatMiniProgram {
   // 处理对话流程
   handleConversationFlow(message) {
     const state = this.conversationState;
+
+    // 处理学生选择（用于意图识别）
+    if (state.type === "student-selection-for-intent") {
+      const index = parseInt(message.trim()) - 1;
+      if (index >= 0 && index < state.students.length) {
+        this.selectStudentForIntent(index);
+        return;
+      } else {
+        this.addAIMessage(
+          `请输入有效的序号（1-${state.students.length}）或点击选择学生。`
+        );
+        return;
+      }
+    }
+
+    // 处理意图选择（序号输入）
+    if (state.type === "intent-selection") {
+      const intentMap = {
+        1: "assessment",
+        2: "case-search",
+        3: "smart-assessment",
+      };
+
+      const intent = intentMap[message.trim()];
+      if (intent) {
+        this.handleIntentSelection(intent, state.studentInfo);
+        return;
+      } else {
+        this.addAIMessage("请输入有效的序号（1/2/3）或点击选项进行选择。");
+        return;
+      }
+    }
 
     if (state.type === "assessment") {
       this.handleAssessmentFlow(message);
@@ -1209,9 +2841,10 @@ class WeChatMiniProgram {
   }
   getHomeHTML() {
     setTimeout(() => {
-        this.initChatInterface();
+      this.initChatInterface();
     }, 2000);
     return `
+    <div class="messages-wrap">
     <!-- 聊天消息区域 -->
     <div class="chat-messages" id="chatMessages">
         <!-- 欢迎消息 -->
@@ -1233,14 +2866,6 @@ class WeChatMiniProgram {
                             <div class="feature-icon-compact">🔍</div>
                             <div class="feature-title-compact">案例检索</div>
                         </div>
-                        <div class="feature-menu-item-compact" data-page="smart-assessment">
-                            <div class="feature-icon-compact">🧠</div>
-                            <div class="feature-title-compact">智能评估</div>
-                        </div>
-                        <div class="feature-menu-item-compact" data-page="mentor-36">
-                            <div class="feature-icon-compact">🎓</div>
-                            <div class="feature-title-compact">导师36计</div>
-                        </div>
                     </div>
                     <p class="hint-text">💬 也可以直接输入您的需求，我会智能识别并帮助您</p>
                 </div>
@@ -1260,6 +2885,7 @@ class WeChatMiniProgram {
             </button>
         </div>
     </div>
+     </div>
         `;
   }
   getHomeHTML2() {
@@ -1609,12 +3235,6 @@ class WeChatMiniProgram {
                     <div style="display: flex; align-items: center;">
                         <span style="font-size: 20px; margin-right: 12px;">🛡️</span>
                         <div>我的工作台</div>
-                    </div>
-                </div>
-                <div class="list-item" data-action="notifications">
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 20px; margin-right: 12px;">💡</span>
-                        <div>积分充值</div>
                     </div>
                 </div>
                 <div class="list-item" data-action="security">
