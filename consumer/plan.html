@@ -1,0 +1,3363 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>爱聆心理测评 - 产品深度调研分析报告</title>
+    <style>
+      :root {
+        --primary: #5B8C5A;
+        --primary-light: #7BA87A;
+        --primary-dark: #3D6B3C;
+        --secondary: #8FBC8F;
+        --accent: #E8B86D;
+        --accent-light: #F5DEB3;
+        --text-dark: #2C3E2C;
+        --text-gray: #5A6B5A;
+        --bg-light: #F5F9F5;
+        --bg-cream: #FDFCF8;
+        --border: #D4E4D4;
+        --success: #6AAF6A;
+        --warning: #E8B86D;
+        --danger: #D4726A;
+        --info: #6A9FB5;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', sans-serif;
+        line-height: 1.7;
+        color: var(--text-dark);
+        background: linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 50%, #2D4A2D 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 25px;
+        width: 100%;
+      }
+      .header {
+        text-align: center;
+        color: white;
+        padding: 50px 20px;
+      }
+      .header h1 {
+        font-size: 2.6rem;
+        margin-bottom: 12px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        font-weight: 600;
+        letter-spacing: 2px;
+      }
+      .header .subtitle {
+        font-size: 1.15rem;
+        opacity: 0.95;
+        font-weight: 300;
+        letter-spacing: 1px;
+      }
+      .report {
+        background: var(--bg-cream);
+        border-radius: 24px;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+      }
+      .nav-tabs {
+        display: flex;
+        background: white;
+        border-bottom: 1px solid var(--border);
+        overflow-x: auto;
+        padding: 0 10px;
+      }
+      .nav-tab {
+        padding: 16px 26px;
+        cursor: pointer;
+        border: none;
+        background: none;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-gray);
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -1px;
+      }
+      .nav-tab:hover {
+        background: var(--bg-light);
+        color: var(--primary);
+      }
+      .nav-tab.active {
+        background: transparent;
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+        font-weight: 600;
+      }
+      .tab-content {
+        display: none;
+        padding: 45px;
+        animation: fadeIn 0.4s ease;
+        background: white;
+        margin: 20px;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(91, 140, 90, 0.06);
+      }
+      .tab-content.active {
+        display: block;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      h2 {
+        color: var(--primary-dark);
+        font-size: 1.75rem;
+        margin-bottom: 28px;
+        border-bottom: 3px solid var(--secondary);
+        padding-bottom: 14px;
+        font-weight: 600;
+      }
+      h3 {
+        color: var(--text-dark);
+        font-size: 1.35rem;
+        margin: 32px 0 16px;
+        font-weight: 600;
+      }
+      h4 {
+        color: var(--text-gray);
+        font-size: 1.1rem;
+        margin: 22px 0 12px;
+        font-weight: 600;
+      }
+      .highlight-box {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 28px;
+        border-radius: 16px;
+        margin: 28px 0;
+        box-shadow: 0 6px 20px rgba(91, 140, 90, 0.25);
+      }
+      .highlight-box h3 {
+        color: white;
+        margin-top: 0;
+        border: none;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin: 28px 0;
+      }
+      .stat-card {
+        background: white;
+        padding: 28px 20px;
+        border-radius: 14px;
+        text-align: center;
+        border-left: 5px solid var(--primary);
+        box-shadow: 0 3px 15px rgba(91, 140, 90, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(91, 140, 90, 0.12);
+      }
+      .stat-number {
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: var(--primary);
+        line-height: 1.2;
+      }
+      .stat-label {
+        color: var(--text-gray);
+        margin-top: 10px;
+        font-size: 14px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 28px 0;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 3px 15px rgba(91, 140, 90, 0.08);
+      }
+      th,
+      td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      th {
+        background: var(--primary);
+        color: white;
+        font-weight: 600;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      tr:hover {
+        background: var(--bg-light);
+      }
+      tr:nth-child(even) {
+        background: rgba(91, 140, 90, 0.03);
+      }
+      .timeline {
+        position: relative;
+        padding-left: 35px;
+        margin: 30px 0;
+      }
+      .timeline::before {
+        content: '';
+        position: absolute;
+        left: 12px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #667eea, #764ba2);
+        border-radius: 3px;
+      }
+      .timeline-item {
+        position: relative;
+        margin-bottom: 35px;
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 12px;
+        margin-left: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+      .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -38px;
+        top: 28px;
+        width: 16px;
+        height: 16px;
+        background: #667eea;
+        border-radius: 50%;
+        border: 4px solid white;
+        box-shadow: 0 0 0 3px #667eea;
+      }
+      .phase-title {
+        font-weight: bold;
+        color: #667eea;
+        font-size: 1.2rem;
+        margin-bottom: 12px;
+      }
+      .risk-item {
+        background: linear-gradient(145deg, #fff8e1, #fff3cd);
+        border-left: 5px solid #ffc107;
+        padding: 18px;
+        margin: 12px 0;
+        border-radius: 8px;
+      }
+      .opportunity-item {
+        background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+        border-left: 5px solid #2196f3;
+        padding: 18px;
+        margin: 12px 0;
+        border-radius: 8px;
+      }
+      .feature-box {
+        background: linear-gradient(145deg, #f5f7fa, #fff);
+        border: 1px solid #e9ecef;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 20px 0;
+      }
+      .feature-box h4 {
+        color: #667eea;
+        margin-top: 0;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 8px;
+        display: inline-block;
+      }
+      ul {
+        padding-left: 22px;
+      }
+      li {
+        margin: 10px 0;
+      }
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 10px;
+        font-family: 'Monaco', monospace;
+        font-size: 13px;
+        overflow-x: auto;
+        margin: 20px 0;
+      }
+      .tech-stack {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 25px;
+        border-radius: 15px;
+        margin: 20px 0;
+      }
+      .tech-stack h4 {
+        color: white;
+        margin: 0 0 20px 0;
+        font-size: 18px;
+        text-align: center;
+      }
+      .tech-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+      .tech-item {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .tech-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .tech-category {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+        font-weight: 500;
+      }
+      .tech-value {
+        font-size: 14px;
+        color: #2d3748;
+        font-weight: 600;
+      }
+      .emotion-flow {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 35px;
+        border-radius: 20px;
+        margin: 25px 0;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      }
+      .emotion-flow h4 {
+        color: white;
+        margin: 0 0 30px 0;
+        font-size: 20px;
+        text-align: center;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .flow-container {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 25px;
+        backdrop-filter: blur(10px);
+      }
+      .flow-step {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .flow-step:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+      .step-icon {
+        font-size: 36px;
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 50%;
+        box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+      }
+      .step-analysis .step-icon {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+      }
+      .step-response .step-icon {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        box-shadow: 0 4px 12px rgba(67, 233, 123, 0.4);
+      }
+      .step-content {
+        flex: 1;
+      }
+      .step-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 10px;
+      }
+      .step-desc {
+        font-size: 14px;
+        color: #718096;
+        margin-bottom: 15px;
+      }
+      .flow-connector {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 15px 0;
+      }
+      .connector-line {
+        width: 3px;
+        height: 30px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.3) 100%);
+        border-radius: 2px;
+      }
+      .connector-dot {
+        width: 12px;
+        height: 12px;
+        background: white;
+        border-radius: 50%;
+        margin-top: -6px;
+        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.3);
+      }
+      .analysis-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+      .analysis-card {
+        background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+        padding: 15px;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s;
+      }
+      .analysis-card:hover {
+        border-color: #667eea;
+        transform: scale(1.02);
+      }
+      .card-icon {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+      .card-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 10px;
+      }
+      .card-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .tag {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+      }
+      .intensity-bar {
+        display: flex;
+        gap: 4px;
+        margin-top: 8px;
+      }
+      .bar-segment {
+        flex: 1;
+        padding: 6px;
+        border-radius: 6px;
+        color: white;
+        font-size: 11px;
+        font-weight: 600;
+        text-align: center;
+      }
+      .risk-levels {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .risk-badge {
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .risk-badge.low {
+        background: #f6ffed;
+        color: #52c41a;
+        border: 1px solid #b7eb8f;
+      }
+      .risk-badge.medium {
+        background: #fffbe6;
+        color: #faad14;
+        border: 1px solid #ffe58f;
+      }
+      .risk-badge.high {
+        background: #fff1f0;
+        color: #ff4d4f;
+        border: 1px solid #ffccc7;
+      }
+      .risk-badge.critical {
+        background: #f9f0ff;
+        color: #722ed1;
+        border: 1px solid #d3adf7;
+      }
+      .card-value {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 8px;
+      }
+      .strategy-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+      }
+      .strategy-card {
+        padding: 18px;
+        border-radius: 12px;
+        border: 2px solid;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+      .strategy-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      }
+      .strategy-card.normal {
+        background: linear-gradient(135deg, #e6f7ff 0%, #ffffff 100%);
+        border-color: #1890ff;
+      }
+      .strategy-card.warning {
+        background: linear-gradient(135deg, #fff7e6 0%, #ffffff 100%);
+        border-color: #fa8c16;
+      }
+      .strategy-card.danger {
+        background: linear-gradient(135deg, #fff1f0 0%, #ffffff 100%);
+        border-color: #f5222d;
+      }
+      .strategy-card.emergency {
+        background: linear-gradient(135deg, #f9f0ff 0%, #ffffff 100%);
+        border-color: #722ed1;
+      }
+      .strategy-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .strategy-icon {
+        font-size: 20px;
+      }
+      .strategy-name {
+        font-size: 15px;
+        font-weight: 700;
+        color: #2d3748;
+      }
+      .strategy-desc {
+        font-size: 13px;
+        color: #718096;
+        padding-left: 30px;
+      }
+      .tech-implementation {
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        padding: 35px;
+        border-radius: 20px;
+        margin: 25px 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      }
+      .tech-implementation h4 {
+        color: white;
+        margin: 0 0 25px 0;
+        font-size: 20px;
+        text-align: center;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .api-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .api-section {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .api-section:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+      .api-section.highlight {
+        border: 2px solid #667eea;
+      }
+      .api-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .api-section.highlight .api-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      }
+      .api-icon {
+        font-size: 24px;
+      }
+      .api-title {
+        color: white;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .api-content {
+        padding: 20px;
+      }
+      .api-param {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .param-name {
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        background: #f7fafc;
+        padding: 4px 10px;
+        border-radius: 6px;
+      }
+      .param-type {
+        font-size: 12px;
+        color: #718096;
+        font-style: italic;
+      }
+      .api-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-left: 10px;
+      }
+      .option-tag {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        font-family: 'Monaco', 'Courier New', monospace;
+      }
+      .api-field {
+        margin-bottom: 18px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .api-field:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+      }
+      .field-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .field-name {
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+      }
+      .field-desc {
+        font-size: 12px;
+        color: #718096;
+      }
+      .field-values {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .value-chip {
+        padding: 5px 12px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: 'Monaco', 'Courier New', monospace;
+      }
+      .value-chip.happy {
+        background: #fff7e6;
+        color: #fa8c16;
+        border: 1px solid #ffd591;
+      }
+      .value-chip.sad {
+        background: #e6f7ff;
+        color: #1890ff;
+        border: 1px solid #91d5ff;
+      }
+      .value-chip.angry {
+        background: #fff1f0;
+        color: #f5222d;
+        border: 1px solid #ffa39e;
+      }
+      .value-chip.anxious {
+        background: #f9f0ff;
+        color: #722ed1;
+        border: 1px solid #d3adf7;
+      }
+      .value-chip.fear {
+        background: #fff0f6;
+        color: #eb2f96;
+        border: 1px solid #ffadd2;
+      }
+      .value-chip.neutral {
+        background: #f5f5f5;
+        color: #595959;
+        border: 1px solid #d9d9d9;
+      }
+      .value-chip.level-low {
+        background: #f6ffed;
+        color: #52c41a;
+        border: 1px solid #b7eb8f;
+      }
+      .value-chip.level-medium {
+        background: #fffbe6;
+        color: #faad14;
+        border: 1px solid #ffe58f;
+      }
+      .value-chip.level-high {
+        background: #fff1f0;
+        color: #ff4d4f;
+        border: 1px solid #ffccc7;
+      }
+      .value-chip.level-critical {
+        background: #f9f0ff;
+        color: #722ed1;
+        border: 1px solid #d3adf7;
+      }
+      .memory-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+      .memory-item {
+        background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #e2e8f0;
+        transition: all 0.3s;
+      }
+      .memory-item:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+      }
+      .memory-label {
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 13px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 6px;
+      }
+      .memory-desc {
+        font-size: 12px;
+        color: #718096;
+      }
+      .strategy-options {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .strategy-option {
+        background: #f7fafc;
+        padding: 15px;
+        border-radius: 10px;
+        border-left: 4px solid #667eea;
+      }
+      .option-label {
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+        display: block;
+      }
+      .option-desc {
+        font-size: 12px;
+        color: #718096;
+        margin-bottom: 10px;
+      }
+      .option-values {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .style-badge {
+        padding: 6px 14px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: 'Monaco', 'Courier New', monospace;
+      }
+      .style-badge.empathetic {
+        background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+        color: #2d3436;
+      }
+      .style-badge.analytical {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+      }
+      .style-badge.encouraging {
+        background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+        color: white;
+      }
+      .toggle-group {
+        display: flex;
+        gap: 8px;
+      }
+      .toggle-btn {
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        font-family: 'Monaco', 'Courier New', monospace;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .toggle-btn:hover {
+        background: #667eea;
+        color: white;
+      }
+      /* PM+ 五周流程样式 */
+      .pm-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin: 25px 0;
+      }
+      .pm-week {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s, box-shadow 0.3s;
+      }
+      .pm-week:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
+      .week-header {
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: white;
+      }
+      .week-header.week-0 { background: linear-gradient(135deg, #a8a8a8 0%, #6b6b6b 100%); }
+      .week-header.week-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+      .week-header.week-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+      .week-header.week-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+      .week-header.week-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+      .week-header.week-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+      .week-num {
+        background: rgba(255, 255, 255, 0.25);
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .week-title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .week-content {
+        padding: 20px;
+      }
+      .week-goal {
+        background: #f7fafc;
+        padding: 12px 15px;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #4a5568;
+        margin-bottom: 15px;
+        border-left: 4px solid #667eea;
+      }
+      .week-modules {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .module-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+        background: #f7fafc;
+        border-radius: 10px;
+        transition: all 0.3s;
+      }
+      .module-item:hover {
+        background: #edf2f7;
+      }
+      .module-item.highlight-module {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border: 2px solid #667eea;
+      }
+      .module-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+      }
+      .module-info {
+        flex: 1;
+      }
+      .module-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 4px;
+      }
+      .module-desc {
+        font-size: 12px;
+        color: #718096;
+      }
+      .strategy-flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        padding: 15px;
+        background: linear-gradient(135deg, #f093fb15 0%, #f5576c15 100%);
+        border-radius: 10px;
+      }
+      .flow-item {
+        background: white;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #2d3748;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+      .flow-arrow {
+        color: #f5576c;
+        font-weight: bold;
+        font-size: 16px;
+      }
+      .activity-categories {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+      }
+      .activity-cat {
+        background: linear-gradient(135deg, #4facfe15 0%, #00f2fe15 100%);
+        padding: 15px;
+        border-radius: 10px;
+        border: 2px solid #4facfe;
+      }
+      .cat-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+      }
+      .cat-items {
+        font-size: 12px;
+        color: #718096;
+      }
+      .support-types {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 15px;
+      }
+      .support-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #43e97b15 0%, #38f9d715 100%);
+        padding: 10px 16px;
+        border-radius: 20px;
+        border: 2px solid #43e97b;
+      }
+      .support-icon {
+        font-size: 18px;
+      }
+      .support-text {
+        font-size: 13px;
+        font-weight: 500;
+        color: #2d3748;
+      }
+      /* 评估体系样式 */
+      .assessment-system {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+      }
+      .assessment-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+      .assess-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .assess-content {
+        padding: 20px;
+      }
+      .score-rule {
+        background: #f7fafc;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+      }
+      .score-rule:last-child {
+        margin-bottom: 0;
+      }
+      .rule-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 5px;
+      }
+      .rule-formula {
+        font-size: 12px;
+        color: #718096;
+        font-family: 'Monaco', monospace;
+      }
+      /* 危机干预样式 */
+      .crisis-system {
+        background: linear-gradient(135deg, #fff1f0 0%, #ffffff 100%);
+        padding: 25px;
+        border-radius: 15px;
+        border: 2px solid #ff4d4f;
+        margin: 20px 0;
+      }
+      .crisis-trigger {
+        margin-bottom: 20px;
+      }
+      .trigger-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #cf1322;
+        margin-bottom: 12px;
+      }
+      .trigger-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .trigger-item {
+        background: #ff4d4f;
+        color: white;
+        padding: 6px 14px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .crisis-flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 15px;
+      }
+      .crisis-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        flex: 1;
+        min-width: 200px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .crisis-step.danger {
+        background: #ff4d4f;
+        color: white;
+      }
+      .crisis-step.danger .step-title,
+      .crisis-step.danger .step-desc {
+        color: white;
+      }
+      .crisis-step .step-num {
+        background: #ff4d4f;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+      .crisis-step.danger .step-num {
+        background: white;
+        color: #ff4d4f;
+      }
+      .crisis-step .step-info {
+        flex: 1;
+      }
+      .crisis-step .step-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 4px;
+      }
+      .crisis-step .step-desc {
+        font-size: 12px;
+        color: #718096;
+      }
+      .crisis-arrow {
+        color: #ff4d4f;
+        font-size: 20px;
+        font-weight: bold;
+      }
+      /* 数据模型样式 */
+      .data-models {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .model-card {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid #667eea;
+        transition: all 0.3s;
+      }
+      .model-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2);
+      }
+      .model-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+      .model-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 5px;
+        font-family: 'Monaco', monospace;
+      }
+      .model-desc {
+        font-size: 11px;
+        color: #718096;
+      }
+      /* 结局判定样式 */
+      .outcome-system {
+        margin: 20px 0;
+      }
+      .outcome-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .outcome-badge.success {
+        background: #f6ffed;
+        color: #52c41a;
+        border: 1px solid #b7eb8f;
+      }
+      .outcome-badge.warning {
+        background: #fffbe6;
+        color: #faad14;
+        border: 1px solid #ffe58f;
+      }
+      .outcome-badge.danger {
+        background: #fff1f0;
+        color: #ff4d4f;
+        border: 1px solid #ffccc7;
+      }
+      .outcome-badge.info {
+        background: #e6f7ff;
+        color: #1890ff;
+        border: 1px solid #91d5ff;
+      }
+      /* PM+融入产品样式 */
+      .pm-integration {
+        margin: 25px 0;
+      }
+      .integration-flow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        padding: 30px;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-radius: 15px;
+      }
+      .flow-stage {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        min-width: 150px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s;
+      }
+      .flow-stage:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      }
+      .flow-stage.highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      .flow-stage.highlight .stage-title,
+      .flow-stage.highlight .stage-desc {
+        color: white;
+      }
+      .stage-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+      .stage-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 5px;
+      }
+      .stage-desc {
+        font-size: 12px;
+        color: #718096;
+      }
+      .flow-connector {
+        font-size: 24px;
+        color: #667eea;
+        font-weight: bold;
+      }
+      /* 推荐规则样式 */
+      .recommendation-rules {
+        margin: 20px 0;
+      }
+      .risk-tag {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .risk-tag.low {
+        background: #f6ffed;
+        color: #52c41a;
+      }
+      .risk-tag.medium {
+        background: #fff7e6;
+        color: #fa8c16;
+      }
+      .risk-tag.high {
+        background: #fff1f0;
+        color: #ff4d4f;
+      }
+      /* 用户旅程样式 */
+      .user-journey {
+        margin: 25px 0;
+      }
+      .journey-step {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 15px 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #667eea;
+      }
+      .journey-step.highlight {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-left-color: #f5576c;
+      }
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .journey-step .step-num {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+      }
+      .step-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2d3748;
+      }
+      .journey-arrow {
+        text-align: center;
+        font-size: 20px;
+        color: #667eea;
+        margin: 5px 0;
+      }
+      /* 效果指标样式 */
+      .effect-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .metric-card {
+        background: linear-gradient(135deg, #43e97b15 0%, #38f9d715 100%);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid #43e97b;
+      }
+      .metric-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+      .metric-title {
+        font-size: 13px;
+        color: #4a5568;
+        margin-bottom: 8px;
+      }
+      .metric-target {
+        font-size: 14px;
+        font-weight: 700;
+        color: #2d3748;
+      }
+      /* PM+定价卡片样式 */
+      .pm-pricing {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin: 25px 0;
+      }
+      .pricing-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 2px solid #e2e8f0;
+        position: relative;
+        transition: all 0.3s;
+      }
+      .pricing-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      }
+      .pricing-card.featured {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea08 0%, #764ba208 100%);
+      }
+      .pricing-card.premium {
+        border-color: #f5576c;
+        background: linear-gradient(135deg, #f5576c08 0%, #f093fb08 100%);
+      }
+      .pricing-badge {
+        position: absolute;
+        top: -10px;
+        right: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .pricing-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+      .pricing-price {
+        font-size: 36px;
+        font-weight: 800;
+        color: #667eea;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .pricing-price span {
+        font-size: 14px;
+        font-weight: 500;
+        color: #718096;
+      }
+      .pricing-features {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .feature-item {
+        font-size: 13px;
+        color: #4a5568;
+        padding-left: 5px;
+      }
+      /* 财务模型样式 */
+      .financial-model {
+        margin: 20px 0;
+      }
+      .model-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+      .model-section.highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      .model-section.highlight h4 {
+        color: white;
+      }
+      .model-section h4 {
+        font-size: 15px;
+        color: #2d3748;
+        margin-bottom: 15px;
+      }
+      .revenue-breakdown {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .revenue-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #f7fafc;
+        border-radius: 8px;
+      }
+      .model-section.highlight .revenue-item {
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .revenue-item.total {
+        background: #667eea;
+        color: white;
+      }
+      .model-section.highlight .revenue-item.total {
+        background: white;
+        color: #667eea;
+      }
+      .revenue-label {
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .revenue-calc {
+        font-size: 12px;
+        color: #718096;
+      }
+      .model-section.highlight .revenue-calc {
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .revenue-item.total .revenue-calc {
+        color: white;
+        font-weight: 600;
+      }
+      .model-section.highlight .revenue-item.total .revenue-calc {
+        color: #667eea;
+      }
+      .total-revenue {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        margin-bottom: 10px;
+      }
+      .total-label {
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .total-amount {
+        font-size: 24px;
+        font-weight: 800;
+      }
+      .revenue-note {
+        font-size: 12px;
+        opacity: 0.8;
+        text-align: center;
+      }
+      /* 价值指标样式 */
+      .value-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .metric-box {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        border: 2px solid #667eea;
+      }
+      .metric-box .metric-title {
+        font-size: 12px;
+        color: #4a5568;
+        margin-bottom: 10px;
+      }
+      .metric-box .metric-value {
+        font-size: 24px;
+        font-weight: 800;
+        color: #667eea;
+        margin-bottom: 8px;
+      }
+      .metric-box .metric-desc {
+        font-size: 11px;
+        color: #718096;
+      }
+      /* 会员体系整合样式 */
+      .membership-system {
+        margin: 20px 0;
+      }
+      .membership-intro {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #667eea;
+      }
+      .membership-intro p {
+        margin: 0;
+        font-size: 14px;
+        color: #4a5568;
+      }
+      .single-purchase {
+        margin-top: 20px;
+      }
+      .single-purchase h4 {
+        color: #2d3748;
+        margin-bottom: 15px;
+      }
+      .feature-item.highlight {
+        color: #667eea;
+        font-weight: 600;
+      }
+      .feature-item.dim {
+        color: #a0aec0;
+        text-decoration: line-through;
+      }
+      .footer {
+        text-align: center;
+        padding: 35px;
+        color: white;
+        margin-top: 25px;
+        opacity: 0.9;
+      }
+      @media (max-width: 1024px) {
+        .container {
+          padding: 15px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .pm-pricing {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .tech-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .data-models {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+        .header {
+          padding: 25px 15px;
+        }
+        .header h1 {
+          font-size: 1.5rem;
+        }
+        .subtitle {
+          font-size: 14px;
+        }
+        .tab-content {
+          padding: 15px;
+        }
+        .nav-tabs {
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 10px;
+        }
+        .nav-tab {
+          padding: 10px 14px;
+          font-size: 12px;
+          flex: 1 1 auto;
+          min-width: calc(33% - 8px);
+          text-align: center;
+        }
+        /* 统计卡片 */
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+        .stat-card {
+          padding: 15px;
+        }
+        .stat-number {
+          font-size: 24px;
+        }
+        .stat-label {
+          font-size: 11px;
+        }
+        /* 表格响应式 */
+        table {
+          font-size: 12px;
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+        th, td {
+          padding: 8px 10px;
+        }
+        /* PM+定价卡片 */
+        .pm-pricing {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        .pricing-card {
+          padding: 20px;
+        }
+        .pricing-price {
+          font-size: 28px;
+        }
+        /* 技术栈 */
+        .tech-stack {
+          padding: 20px;
+        }
+        .tech-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        .tech-item {
+          padding: 12px;
+        }
+        /* 情绪识别流程 */
+        .emotion-flow {
+          padding: 20px;
+        }
+        .flow-step {
+          padding: 15px;
+          flex-direction: column;
+          text-align: center;
+        }
+        .step-icon {
+          width: 50px;
+          height: 50px;
+          font-size: 28px;
+        }
+        .analysis-grid {
+          grid-template-columns: 1fr;
+        }
+        .strategy-container {
+          grid-template-columns: 1fr;
+        }
+        /* PM+时间线 */
+        .pm-week {
+          margin: 10px 0;
+        }
+        .week-header {
+          padding: 12px 15px;
+          flex-wrap: wrap;
+        }
+        .week-num {
+          font-size: 11px;
+          padding: 4px 10px;
+        }
+        .week-title {
+          font-size: 14px;
+        }
+        .week-content {
+          padding: 15px;
+        }
+        .module-item {
+          padding: 10px;
+        }
+        .strategy-flow {
+          padding: 10px;
+        }
+        .flow-item {
+          padding: 6px 10px;
+          font-size: 11px;
+        }
+        .flow-arrow {
+          font-size: 14px;
+        }
+        /* 评估体系 */
+        .assessment-system {
+          grid-template-columns: 1fr;
+        }
+        /* 危机干预 */
+        .crisis-flow {
+          flex-direction: column;
+        }
+        .crisis-step {
+          min-width: 100%;
+        }
+        .crisis-arrow {
+          transform: rotate(90deg);
+        }
+        /* 数据模型 */
+        .data-models {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+        .model-card {
+          padding: 15px;
+        }
+        .model-icon {
+          font-size: 24px;
+        }
+        .model-name {
+          font-size: 11px;
+        }
+        /* 用户旅程 */
+        .integration-flow {
+          flex-direction: column;
+          padding: 20px;
+        }
+        .flow-stage {
+          min-width: 100%;
+        }
+        .flow-connector {
+          transform: rotate(90deg);
+        }
+        .user-journey .journey-step {
+          padding: 15px;
+        }
+        /* 效果指标 */
+        .effect-metrics {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        .metric-card {
+          padding: 15px;
+        }
+        /* 财务模型 */
+        .revenue-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 5px;
+        }
+        .total-revenue {
+          flex-direction: column;
+          text-align: center;
+          gap: 10px;
+        }
+        .total-amount {
+          font-size: 20px;
+        }
+        /* 价值指标 */
+        .value-metrics {
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        .metric-box {
+          padding: 15px;
+        }
+        .metric-box .metric-value {
+          font-size: 18px;
+        }
+        /* 技术实现 */
+        .tech-implementation {
+          padding: 20px;
+        }
+        .api-section {
+          margin-bottom: 15px;
+        }
+        .api-header {
+          padding: 12px 15px;
+        }
+        .api-content {
+          padding: 15px;
+        }
+        .memory-grid {
+          grid-template-columns: 1fr;
+        }
+        /* 风险控制 */
+        .risk-item {
+          padding: 15px;
+        }
+        /* 时间线 */
+        .timeline-item {
+          padding: 20px;
+        }
+        .phase-title {
+          font-size: 16px;
+        }
+        /* 活动分类 */
+        .activity-categories {
+          grid-template-columns: 1fr;
+        }
+        .support-types {
+          flex-direction: column;
+        }
+        /* 单次购买表格 */
+        .single-purchase table {
+          font-size: 11px;
+        }
+        /* 会员权益表 */
+        .membership-intro {
+          padding: 12px 15px;
+        }
+        /* 页脚 */
+        .footer {
+          padding: 25px 15px;
+        }
+        .footer p {
+          font-size: 12px;
+        }
+      }
+      @media (max-width: 480px) {
+        .header h1 {
+          font-size: 1.3rem;
+        }
+        .nav-tab {
+          min-width: calc(50% - 8px);
+          padding: 8px 10px;
+          font-size: 11px;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .stat-number {
+          font-size: 20px;
+        }
+        .tech-grid {
+          grid-template-columns: 1fr;
+        }
+        .data-models {
+          grid-template-columns: 1fr 1fr;
+        }
+        .effect-metrics {
+          grid-template-columns: 1fr;
+        }
+        .value-metrics {
+          grid-template-columns: 1fr;
+        }
+        .trigger-items {
+          flex-direction: column;
+        }
+        .risk-levels {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .card-tags {
+          justify-content: flex-start;
+        }
+        .api-options {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .option-tag {
+          width: 100%;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🧠 爱聆心理测评</h1>
+        <div class="subtitle">产品深度调研分析报告 & 迭代规划方案</div>
+      </div>
+      <div class="report">
+        <div class="nav-tabs">
+          <button class="nav-tab active" onclick="showTab('market')">市场分析</button>
+          <button class="nav-tab" onclick="showTab('competitors')">竞品研究</button>
+          <button class="nav-tab" onclick="showTab('current')">现状诊断</button>
+          <button class="nav-tab" onclick="showTab('ai')">AI陪伴方案</button>
+          <button class="nav-tab" onclick="showTab('pm')">PM+方案</button>
+          <button class="nav-tab" onclick="showTab('roadmap')">迭代路线</button>
+          <button class="nav-tab" onclick="showTab('business')">商业模式</button>
+        </div>
+      </div></div
+    ></body
+  ></html
+>
+
+<!-- 市场分析 -->
+<div id="market" class="tab-content active">
+  <h2>📊 一、市场环境深度分析</h2>
+  <div class="highlight-box">
+    <h3>🎯 核心洞察</h3>
+    <p
+      >中国心理健康服务市场正处于爆发前夜，线上渗透率仅5%，Z世代心理健康意识觉醒为产品发展提供历史性机遇窗口。</p
+    >
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"
+      ><div class="stat-number">800亿</div><div class="stat-label">2024年市场规模</div></div
+    >
+    <div class="stat-card"
+      ><div class="stat-number">15-20%</div><div class="stat-label">年复合增长率</div></div
+    >
+    <div class="stat-card"
+      ><div class="stat-number">5%</div><div class="stat-label">线上渗透率</div></div
+    >
+    <div class="stat-card"
+      ><div class="stat-number">76%</div><div class="stat-label">Z世代关注心理健康</div></div
+    >
+  </div>
+  <h3>1.1 宏观市场趋势</h3>
+  <table>
+    <tr><th>趋势维度</th><th>现状描述</th><th>机会点</th></tr>
+    <tr
+      ><td>政策支持</td><td>《健康中国2030》将心理健康纳入国家战略</td
+      ><td>政策红利期，合规产品优先</td></tr
+    >
+    <tr
+      ><td>需求爆发</td><td>疫情后心理问题发生率上升40%</td><td>刚需市场，用户教育成本降低</td></tr
+    >
+    <tr><td>供给不足</td><td>心理咨询师缺口达130万</td><td>AI+心理服务填补供给缺口</td></tr>
+    <tr><td>代际变化</td><td>Z世代心理健康意识远超前代</td><td>年轻化产品定位机会</td></tr>
+  </table>
+  <h3>1.2 目标用户画像</h3>
+  <table>
+    <tr><th>用户群体</th><th>年龄特征</th><th>核心需求</th><th>付费意愿</th><th>获客渠道</th></tr>
+    <tr
+      ><td><strong>Z世代探索者</strong></td
+      ><td>18-25岁</td><td>自我认知、性格测试、社交话题</td><td>中等（9.9-29.9元）</td
+      ><td>小红书、B站</td></tr
+    >
+    <tr
+      ><td><strong>职场压力族</strong></td
+      ><td>25-35岁</td><td>情绪疏导、职业规划、压力管理</td><td>较高（29.9-99元）</td
+      ><td>微信、知乎</td></tr
+    >
+    <tr
+      ><td><strong>情感困惑者</strong></td
+      ><td>20-35岁</td><td>亲密关系、情感咨询、分手疗愈</td><td>高（99-299元）</td
+      ><td>抖音、微博</td></tr
+    >
+    <tr
+      ><td><strong>轻度心理困扰</strong></td
+      ><td>全年龄</td><td>匿名倾诉、AI陪伴、专业转介</td><td>高（会员订阅）</td
+      ><td>搜索引擎、口碑</td></tr
+    >
+  </table>
+  <h3>1.3 市场机会矩阵</h3>
+  <div class="opportunity-item"
+    ><strong>🔵 专业服务平民化：</strong
+    >传统心理咨询单次300-800元，AI+测评可提供10-50元的低成本替代方案，覆盖更广泛人群</div
+  >
+  <div class="opportunity-item"
+    ><strong>🔵 娱乐化降门槛：</strong
+    >通过游戏化、社交化包装降低心理服务的"病耻感"，让用户"玩着玩着就疗愈了"</div
+  >
+  <div class="opportunity-item"
+    ><strong>🔵 长期陪伴价值：</strong
+    >从单次咨询转向持续陪伴，通过AI+社区提升用户LTV至500-1000元/年</div
+  >
+</div>
+
+<!-- 竞品研究 -->
+<div id="competitors" class="tab-content">
+  <h2>🔍 二、竞品深度研究</h2>
+  <h3>2.1 第一梯队：综合平台型</h3>
+  <table>
+    <tr
+      ><th>竞品</th><th>月活</th><th>核心模式</th><th>客单价</th><th>核心优势</th
+      ><th>主要劣势</th></tr
+    >
+    <tr
+      ><td><strong>壹心理</strong></td
+      ><td>500万+</td><td>内容+咨询+测评</td><td>300-600元</td><td>内容生态完善、品牌认知度高</td
+      ><td>商业化重、体验下降</td></tr
+    >
+    <tr
+      ><td><strong>简单心理</strong></td
+      ><td>300万+</td><td>咨询预约平台</td><td>400-800元</td><td>咨询师资源强、专业度高</td
+      ><td>价格高、门槛高</td></tr
+    >
+    <tr
+      ><td><strong>KnowYourself</strong></td
+      ><td>200万+</td><td>内容付费+社区</td><td>99-299元</td><td>年轻化、内容深度、社区活跃</td
+      ><td>变现能力弱</td></tr
+    >
+  </table>
+  <h3>2.2 第二梯队：垂直功能型</h3>
+  <table>
+    <tr><th>竞品</th><th>定位</th><th>月活</th><th>盈利模式</th><th>可借鉴点</th></tr>
+    <tr
+      ><td><strong>小睡眠</strong></td
+      ><td>助眠工具</td><td>800万+</td><td>会员订阅29.9/月</td
+      ><td>功能聚焦、体验极致、订阅模式</td></tr
+    >
+    <tr
+      ><td><strong>潮汐</strong></td
+      ><td>专注冥想</td><td>200万+</td><td>会员+硬件</td><td>设计美学、品牌调性、场景化</td></tr
+    >
+    <tr
+      ><td><strong>Now冥想</strong></td
+      ><td>冥想课程</td><td>100万+</td><td>课程付费</td><td>内容专业化、课程体系</td></tr
+    >
+  </table>
+  <h3>2.3 AI新势力：海外标杆</h3>
+  <table>
+    <tr><th>产品</th><th>核心能力</th><th>用户规模</th><th>商业模式</th><th>可借鉴点</th></tr>
+    <tr
+      ><td><strong>Woebot</strong></td
+      ><td>CBT认知行为疗法AI</td><td>150万+</td><td>B端授权+C端订阅</td
+      ><td>结构化心理干预流程、临床验证</td></tr
+    >
+    <tr
+      ><td><strong>Wysa</strong></td
+      ><td>情绪追踪+AI教练</td><td>500万+</td><td>免费+高级订阅</td
+      ><td>每日情绪打卡、个性化建议</td></tr
+    >
+    <tr
+      ><td><strong>Replika</strong></td
+      ><td>情感陪伴AI</td><td>1000万+</td><td>订阅制$7.99/月</td
+      ><td>人格化AI、记忆系统、情感连接</td></tr
+    >
+  </table>
+  <div class="highlight-box">
+    <h3>🎯 爱聆差异化定位</h3>
+    <p><strong>"专业测评 × 轻松互动 × AI陪伴"</strong></p>
+    <p
+      >介于专业平台和娱乐测试之间，用娱乐化方式降低心理服务门槛，通过AI建立长期陪伴关系，最终形成"测评→陪伴→成长→咨询"的完整用户旅程。</p
+    >
+  </div>
+  <h3>2.4 竞争格局总结</h3>
+  <div class="feature-box">
+    <h4>市场空白点</h4>
+    <ul>
+      <li><strong>AI+测评深度融合：</strong>竞品多为"测评"或"AI"单点突破，真正融合者少</li>
+      <li><strong>轻量化解压工具：</strong>敲木鱼、撸猫等互动解压功能在竞品中独树一帜</li>
+      <li><strong>年轻化+专业化平衡：</strong>既不像壹心理那么"重"，也不像趣味测试那么"浅"</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 现状诊断 -->
+<div id="current" class="tab-content">
+  <h2>🔬 三、爱聆心理测评现状诊断</h2>
+  <h3>3.1 核心功能模块评估</h3>
+  <table>
+    <tr><th>功能模块</th><th>当前状态</th><th>竞品水平</th><th>差距分析</th><th>优先级</th></tr>
+    <tr
+      ><td>心理测评</td><td>⭐⭐⭐⭐ MBTI/九型人格等</td><td>⭐⭐⭐⭐⭐ 量表丰富</td
+      ><td>量表数量、解读深度</td><td style="color: #c62828; font-weight: bold">P0</td></tr
+    >
+    <tr
+      ><td>AI对话</td><td>⭐⭐⭐ 基础Coze对话</td><td>⭐⭐⭐⭐ 情绪识别</td
+      ><td>情感理解、危机识别、记忆</td><td style="color: #c62828; font-weight: bold">P0</td></tr
+    >
+    <tr
+      ><td>解压工具</td><td>⭐⭐⭐⭐⭐ 敲木鱼/撸猫等</td><td>⭐⭐⭐ 常规</td
+      ><td><span style="color: #2e7d32; font-weight: bold">差异化优势</span></td
+      ><td>保持强化</td></tr
+    >
+    <tr
+      ><td>结果分享</td><td>⭐⭐ 基础</td><td>⭐⭐⭐⭐⭐ 精美卡片</td><td>社交传播能力弱</td
+      ><td style="color: #ef6c00; font-weight: bold">P1</td></tr
+    >
+    <tr
+      ><td>社区功能</td><td>❌ 无</td><td>⭐⭐⭐⭐ 活跃</td><td>完全缺失</td
+      ><td style="color: #ef6c00; font-weight: bold">P1</td></tr
+    >
+    <tr
+      ><td>会员体系</td><td>❌ 无</td><td>⭐⭐⭐⭐⭐ 成熟</td><td>商业化基础缺失</td
+      ><td style="color: #c62828; font-weight: bold">P0</td></tr
+    >
+    <tr
+      ><td>冥想/助眠</td><td>❌ 无</td><td>⭐⭐⭐⭐⭐ 成熟</td><td>功能缺失</td
+      ><td style="color: #1565c0; font-weight: bold">P2</td></tr
+    >
+  </table>
+  <h3>3.2 技术架构评估</h3>
+  <div class="feature-box">
+    <h4>✅ 技术优势</h4>
+    <ul>
+      <li><strong>现代化技术栈：</strong>Vue3 + TypeScript + Vant4，开发效率高、可维护性强</li>
+      <li><strong>多端适配：</strong>H5 + 微信小程序 + 小红书小程序，覆盖主流渠道</li>
+      <li><strong>AI基础能力：</strong>已集成Coze平台，具备AI对话基础设施</li>
+      <li><strong>实时通信：</strong>集成腾讯IM SDK，支持实时聊天场景</li>
+    </ul>
+  </div>
+  <div class="tech-stack">
+    <h4>🛠️ 技术栈概览</h4>
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="tech-category">前端框架</div>
+        <div class="tech-value">Vue 3.x + TypeScript</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-category">UI组件库</div>
+        <div class="tech-value">Vant 4.x</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-category">状态管理</div>
+        <div class="tech-value">Pinia</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-category">构建工具</div>
+        <div class="tech-value">Vite</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-category">AI能力</div>
+        <div class="tech-value">Coze API</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-category">即时通讯</div>
+        <div class="tech-value">腾讯IM SDK</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-category">图表可视化</div>
+        <div class="tech-value">ECharts</div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-category">多端适配</div>
+        <div class="tech-value">H5 / 微信小程序 / 小红书小程序</div>
+      </div>
+    </div>
+  </div>
+  <h3>3.3 SWOT分析</h3>
+  <table>
+    <tr
+      ><th style="width: 50%">优势 (Strengths)</th><th style="width: 50%">劣势 (Weaknesses)</th></tr
+    >
+    <tr>
+      <td>
+        <ul>
+          <li>解压互动工具差异化明显</li>
+          <li>技术架构现代化，迭代快</li>
+          <li>AI基础能力已具备</li>
+          <li>多端覆盖，触达广</li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li>AI能力单一，缺乏情绪识别</li>
+          <li>无社区功能，用户粘性不足</li>
+          <li>商业化薄弱，无会员体系</li>
+          <li>品牌认知度低</li>
+        </ul>
+      </td>
+    </tr>
+    <tr><th>机会 (Opportunities)</th><th>威胁 (Threats)</th></tr>
+    <tr>
+      <td>
+        <ul>
+          <li>心理健康市场高速增长</li>
+          <li>AI技术成熟度提升</li>
+          <li>Z世代心理健康意识觉醒</li>
+          <li>政策支持心理健康服务</li>
+        </ul>
+      </td>
+      <td>
+        <ul>
+          <li>头部竞品资源优势明显</li>
+          <li>监管政策不确定性</li>
+          <li>AI心理服务伦理风险</li>
+          <li>用户隐私安全要求高</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- AI陪伴方案 -->
+<div id="ai" class="tab-content">
+  <h2>🤖 四、AI陪伴升级方案</h2>
+  <div class="highlight-box">
+    <h3>🎯 产品愿景</h3>
+    <p>打造"聆心AI"——一个懂你、陪你、帮你成长的AI心理伙伴，从工具型产品升级为陪伴型产品。</p>
+  </div>
+  <h3>4.1 多人格AI角色体系</h3>
+  <table>
+    <tr><th>角色名称</th><th>人格特点</th><th>适用场景</th><th>对话风格</th></tr>
+    <tr
+      ><td>🌸 <strong>温暖姐姐</strong></td
+      ><td>共情倾听型</td><td>情绪低落、需要倾诉</td><td>温柔、包容、善于倾听</td></tr
+    >
+    <tr
+      ><td>🧠 <strong>理性导师</strong></td
+      ><td>认知分析型</td><td>决策困难、思维混乱</td><td>逻辑清晰、客观分析</td></tr
+    >
+    <tr
+      ><td>⚡ <strong>活力伙伴</strong></td
+      ><td>正向激励型</td><td>缺乏动力、需要鼓励</td><td>积极、幽默、充满能量</td></tr
+    >
+    <tr
+      ><td>📚 <strong>专业顾问</strong></td
+      ><td>心理科普型</td><td>想了解心理知识</td><td>专业、严谨、有深度</td></tr
+    >
+  </table>
+  <h3>4.2 情绪识别引擎</h3>
+  <div class="feature-box">
+    <h4>核心能力</h4>
+    <ul>
+      <li
+        ><strong>文本情绪分析：</strong>识别用户消息中的情绪倾向（积极/消极/中性）及具体情绪类型</li
+      >
+      <li><strong>情绪强度评估：</strong>1-10级情绪强度量化，触发不同响应策略</li>
+      <li><strong>关键词预警：</strong>识别自伤、绝望、轻生等高风险关键词，触发危机干预</li>
+      <li><strong>情绪趋势追踪：</strong>记录用户情绪变化曲线，发现异常波动</li>
+    </ul>
+  </div>
+  <div class="emotion-flow">
+    <h4>🧠 情绪识别架构流程</h4>
+    
+    <div class="flow-container">
+      <div class="flow-step step-input">
+        <div class="step-icon">📝</div>
+        <div class="step-content">
+          <div class="step-title">用户输入文本</div>
+          <div class="step-desc">接收用户的对话内容进行分析</div>
+        </div>
+      </div>
+      
+      <div class="flow-connector">
+        <div class="connector-line"></div>
+        <div class="connector-dot"></div>
+      </div>
+      
+      <div class="flow-step step-analysis">
+        <div class="step-icon">🔍</div>
+        <div class="step-content">
+          <div class="step-title">情绪分析引擎</div>
+          <div class="analysis-grid">
+            <div class="analysis-card">
+              <div class="card-icon">😊</div>
+              <div class="card-label">情绪分类</div>
+              <div class="card-tags">
+                <span class="tag">快乐</span>
+                <span class="tag">悲伤</span>
+                <span class="tag">愤怒</span>
+                <span class="tag">焦虑</span>
+                <span class="tag">恐惧</span>
+                <span class="tag">中性</span>
+              </div>
+            </div>
+            <div class="analysis-card">
+              <div class="card-icon">📊</div>
+              <div class="card-label">情绪强度</div>
+              <div class="intensity-bar">
+                <div class="bar-segment" style="background: #52c41a;">1-3</div>
+                <div class="bar-segment" style="background: #faad14;">4-6</div>
+                <div class="bar-segment" style="background: #ff4d4f;">7-10</div>
+              </div>
+            </div>
+            <div class="analysis-card">
+              <div class="card-icon">⚠️</div>
+              <div class="card-label">风险等级</div>
+              <div class="risk-levels">
+                <span class="risk-badge low">低</span>
+                <span class="risk-badge medium">中</span>
+                <span class="risk-badge high">高</span>
+                <span class="risk-badge critical">紧急</span>
+              </div>
+            </div>
+            <div class="analysis-card">
+              <div class="card-icon">🔑</div>
+              <div class="card-label">关键词匹配</div>
+              <div class="card-value">高风险词库实时检测</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="flow-connector">
+        <div class="connector-line"></div>
+        <div class="connector-dot"></div>
+      </div>
+      
+      <div class="flow-step step-response">
+        <div class="step-icon">⚙️</div>
+        <div class="step-content">
+          <div class="step-title">响应策略选择</div>
+          <div class="strategy-container">
+            <div class="strategy-card normal">
+              <div class="strategy-header">
+                <span class="strategy-icon">💬</span>
+                <span class="strategy-name">正常对话</span>
+              </div>
+              <div class="strategy-desc">根据角色人格回复</div>
+            </div>
+            <div class="strategy-card warning">
+              <div class="strategy-header">
+                <span class="strategy-icon">💙</span>
+                <span class="strategy-name">情绪波动</span>
+              </div>
+              <div class="strategy-desc">增加共情表达</div>
+            </div>
+            <div class="strategy-card danger">
+              <div class="strategy-header">
+                <span class="strategy-icon">🤝</span>
+                <span class="strategy-name">高风险</span>
+              </div>
+              <div class="strategy-desc">触发关怀流程</div>
+            </div>
+            <div class="strategy-card emergency">
+              <div class="strategy-header">
+                <span class="strategy-icon">🚨</span>
+                <span class="strategy-name">紧急</span>
+              </div>
+              <div class="strategy-desc">危机干预+资源推送</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <h3>4.3 对话记忆系统</h3>
+  <div class="feature-box">
+    <h4>记忆层级设计</h4>
+    <ul>
+      <li><strong>短期记忆（会话内）：</strong>当前对话上下文，保持话题连贯性</li>
+      <li><strong>中期记忆（7天）：</strong>近期对话摘要，记住用户最近关心的问题</li>
+      <li><strong>长期记忆（永久）：</strong>用户画像、重要事件、偏好设置</li>
+    </ul>
+  </div>
+  <h3>4.4 危机干预机制</h3>
+  <div class="risk-item">
+    <strong>⚠️ 三级预警体系</strong>
+    <ul>
+      <li><strong>黄色预警：</strong>检测到负面情绪关键词 → 增加关怀表达，推荐放松工具</li>
+      <li><strong>橙色预警：</strong>检测到自伤倾向 → 主动询问状态，推送心理热线</li>
+      <li><strong>红色预警：</strong>检测到紧急风险 → 立即推送危机资源，后台人工介入</li>
+    </ul>
+  </div>
+  <h3>4.5 技术实现方案</h3>
+  <div class="tech-implementation">
+    <h4>💻 AI对话增强接口设计</h4>
+    
+    <div class="api-container">
+      <div class="api-section">
+        <div class="api-header">
+          <span class="api-icon">🎭</span>
+          <span class="api-title">多角色支持</span>
+        </div>
+        <div class="api-content">
+          <div class="api-param">
+            <span class="param-name">角色类型</span>
+            <span class="param-type">字符串</span>
+          </div>
+          <div class="api-options">
+            <span class="option-tag">温暖姐姐</span>
+            <span class="option-tag">理性导师</span>
+            <span class="option-tag">活力伙伴</span>
+            <span class="option-tag">专业顾问</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-section highlight">
+        <div class="api-header">
+          <span class="api-icon">🔍</span>
+          <span class="api-title">情绪分析结果</span>
+        </div>
+        <div class="api-content">
+          <div class="api-field">
+            <div class="field-row">
+              <span class="field-name">主要情绪</span>
+              <span class="field-desc">情绪类型识别</span>
+            </div>
+            <div class="field-values">
+              <span class="value-chip happy">快乐</span>
+              <span class="value-chip sad">悲伤</span>
+              <span class="value-chip angry">愤怒</span>
+              <span class="value-chip anxious">焦虑</span>
+              <span class="value-chip fear">恐惧</span>
+              <span class="value-chip neutral">中性</span>
+            </div>
+          </div>
+          <div class="api-field">
+            <div class="field-row">
+              <span class="field-name">情绪强度</span>
+              <span class="field-desc">1-10级量化评分</span>
+            </div>
+          </div>
+          <div class="api-field">
+            <div class="field-row">
+              <span class="field-name">风险等级</span>
+              <span class="field-desc">危机预警级别</span>
+            </div>
+            <div class="field-values">
+              <span class="value-chip level-low">低风险</span>
+              <span class="value-chip level-medium">中风险</span>
+              <span class="value-chip level-high">高风险</span>
+              <span class="value-chip level-critical">紧急</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-section">
+        <div class="api-header">
+          <span class="api-icon">🧠</span>
+          <span class="api-title">上下文记忆</span>
+        </div>
+        <div class="api-content">
+          <div class="memory-grid">
+            <div class="memory-item">
+              <div class="memory-label">近期话题</div>
+              <div class="memory-desc">用户最近关心的话题列表</div>
+            </div>
+            <div class="memory-item">
+              <div class="memory-label">情绪趋势</div>
+              <div class="memory-desc">历史情绪变化曲线数据</div>
+            </div>
+            <div class="memory-item">
+              <div class="memory-label">用户偏好</div>
+              <div class="memory-desc">个性化设置和喜好记录</div>
+            </div>
+            <div class="memory-item">
+              <div class="memory-label">重要事件</div>
+              <div class="memory-desc">关键时刻和里程碑记录</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="api-section">
+        <div class="api-header">
+          <span class="api-icon">⚙️</span>
+          <span class="api-title">响应策略</span>
+        </div>
+        <div class="api-content">
+          <div class="strategy-options">
+            <div class="strategy-option">
+              <div class="option-label">对话风格</div>
+              <div class="option-values">
+                <span class="style-badge empathetic">共情型</span>
+                <span class="style-badge analytical">分析型</span>
+                <span class="style-badge encouraging">激励型</span>
+              </div>
+            </div>
+            <div class="strategy-option">
+              <div class="option-label">推荐资源</div>
+              <div class="option-desc">是否推送相关心理资源</div>
+              <div class="toggle-group">
+                <span class="toggle-btn">开启</span>
+                <span class="toggle-btn">关闭</span>
+              </div>
+            </div>
+            <div class="strategy-option">
+              <div class="option-label">危机干预</div>
+              <div class="option-desc">是否触发紧急干预流程</div>
+              <div class="toggle-group">
+                <span class="toggle-btn">开启</span>
+                <span class="toggle-btn">关闭</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PM+方案 -->
+<div id="pm" class="tab-content">
+  <h2>📊 五、PM+ 心理健康管理方案</h2>
+  <div class="highlight-box">
+    <h3>🎯 产品理念</h3>
+    <p>PM+ (Problem Management Plus) —— 基于世界卫生组织开发的成熟心理疏导项目，通过5周结构化AI会话，教授用户四大核心策略：<strong>压力管理、问题管理、行为激活、社会支持</strong>，帮助用户建立持续的心理健康自我管理能力。</p>
+  </div>
+
+  <h3>5.1 PM+ 五周疏导流程</h3>
+  <div class="pm-timeline">
+    <div class="pm-week">
+      <div class="week-header week-0">
+        <span class="week-num">第0周</span>
+        <span class="week-title">预评估阶段</span>
+      </div>
+      <div class="week-content">
+        <div class="week-goal">🎯 目标：知情同意 + PSYCHLOPS基线评估</div>
+        <div class="week-modules">
+          <div class="module-item">
+            <span class="module-icon">📋</span>
+            <div class="module-info">
+              <div class="module-name">知情同意</div>
+              <div class="module-desc">介绍PM+项目、保密协议、数据使用说明</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">📝</span>
+            <div class="module-info">
+              <div class="module-name">PSYCHLOPS预评估</div>
+              <div class="module-desc">识别困扰问题A/B、功能影响、身心健康状态</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pm-week">
+      <div class="week-header week-1">
+        <span class="week-num">第1周</span>
+        <span class="week-title">心理教育与压力管理</span>
+      </div>
+      <div class="week-content">
+        <div class="week-goal">🎯 目标：建立关系，教授呼吸训练</div>
+        <div class="week-modules">
+          <div class="module-item">
+            <span class="module-icon">🤝</span>
+            <div class="module-info">
+              <div class="module-name">简介与保密协议</div>
+              <div class="module-desc">建立信任关系，明确会话规则</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">📊</span>
+            <div class="module-info">
+              <div class="module-name">期间评估</div>
+              <div class="module-desc">回顾预评估问题，危机干预筛查</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">📚</span>
+            <div class="module-info">
+              <div class="module-name">什么是PM+</div>
+              <div class="module-desc">介绍四大策略，动机访谈，利弊分析</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">💡</span>
+            <div class="module-info">
+              <div class="module-name">了解逆境</div>
+              <div class="module-desc">正常化情绪反应，理解压力机制</div>
+            </div>
+          </div>
+          <div class="module-item highlight-module">
+            <span class="module-icon">🧘</span>
+            <div class="module-info">
+              <div class="module-name">压力管理 - 呼吸训练</div>
+              <div class="module-desc">放慢呼吸技巧，困难排查与指导</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pm-week">
+      <div class="week-header week-2">
+        <span class="week-num">第2周</span>
+        <span class="week-title">问题管理</span>
+      </div>
+      <div class="week-content">
+        <div class="week-goal">🎯 目标：教授问题管理策略，制定行动计划</div>
+        <div class="week-modules">
+          <div class="module-item">
+            <span class="module-icon">🔄</span>
+            <div class="module-info">
+              <div class="module-name">评估与回顾</div>
+              <div class="module-desc">PSYCHLOPS评估，上周作业回顾</div>
+            </div>
+          </div>
+          <div class="module-item highlight-module">
+            <span class="module-icon">🎯</span>
+            <div class="module-info">
+              <div class="module-name">问题管理策略</div>
+              <div class="module-desc">列出问题 → 分类(可解决/不可解决) → 界定问题 → 头脑风暴 → 选择方案 → 行动计划</div>
+            </div>
+          </div>
+        </div>
+        <div class="strategy-flow">
+          <div class="flow-item">📋 列出问题</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-item">🔀 分类筛选</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-item">🔍 界定问题</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-item">💡 头脑风暴</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-item">✅ 选择方案</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-item">📅 行动计划</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pm-week">
+      <div class="week-header week-3">
+        <span class="week-num">第3周</span>
+        <span class="week-title">行为激活</span>
+      </div>
+      <div class="week-content">
+        <div class="week-goal">🎯 目标：打破不活动循环，增加愉悦活动</div>
+        <div class="week-modules">
+          <div class="module-item">
+            <span class="module-icon">📊</span>
+            <div class="module-info">
+              <div class="module-name">总体回顾</div>
+              <div class="module-desc">评估问题管理计划执行情况</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">🔄</span>
+            <div class="module-info">
+              <div class="module-name">回顾问题管理</div>
+              <div class="module-desc">完成/未完成分支处理，效果评估</div>
+            </div>
+          </div>
+          <div class="module-item highlight-module">
+            <span class="module-icon">⚡</span>
+            <div class="module-info">
+              <div class="module-name">采取行动，持之以恒</div>
+              <div class="module-desc">选择愉悦活动/任务，拆解小步骤，制定计划</div>
+            </div>
+          </div>
+        </div>
+        <div class="activity-categories">
+          <div class="activity-cat">
+            <div class="cat-title">🌟 愉悦活动</div>
+            <div class="cat-items">与外界联系 | 照顾自己 | 给自己留出时间</div>
+          </div>
+          <div class="activity-cat">
+            <div class="cat-title">✅ 任务导向</div>
+            <div class="cat-items">达成目标 | 活跃起来 | 日常事务</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pm-week">
+      <div class="week-header week-4">
+        <span class="week-num">第4周</span>
+        <span class="week-title">加强社会支持</span>
+      </div>
+      <div class="week-content">
+        <div class="week-goal">🎯 目标：建立支持网络，学会寻求帮助</div>
+        <div class="week-modules">
+          <div class="module-item">
+            <span class="module-icon">🔄</span>
+            <div class="module-info">
+              <div class="module-name">回顾前两周策略</div>
+              <div class="module-desc">问题管理 + 行为激活执行情况</div>
+            </div>
+          </div>
+          <div class="module-item highlight-module">
+            <span class="module-icon">🤝</span>
+            <div class="module-info">
+              <div class="module-name">加强社会支持</div>
+              <div class="module-desc">识别信任的人，制定支持计划，建立信任测试</div>
+            </div>
+          </div>
+        </div>
+        <div class="support-types">
+          <div class="support-item">
+            <span class="support-icon">💬</span>
+            <span class="support-text">分享困难和感受</span>
+          </div>
+          <div class="support-item">
+            <span class="support-icon">🆘</span>
+            <span class="support-text">寻求实际帮助</span>
+          </div>
+          <div class="support-item">
+            <span class="support-icon">🏫</span>
+            <span class="support-text">联系社区资源</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pm-week">
+      <div class="week-header week-5">
+        <span class="week-num">第5周</span>
+        <span class="week-title">保持健康与结束</span>
+      </div>
+      <div class="week-content">
+        <div class="week-goal">🎯 目标：总结成果，预防复发，展望未来</div>
+        <div class="week-modules">
+          <div class="module-item">
+            <span class="module-icon">📊</span>
+            <div class="module-info">
+              <div class="module-name">全面回顾</div>
+              <div class="module-desc">所有策略执行情况总结</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">🛡️</span>
+            <div class="module-info">
+              <div class="module-name">保持健康</div>
+              <div class="module-desc">改善评估，未来应对策略</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">🎓</span>
+            <div class="module-info">
+              <div class="module-name">想象如何助人</div>
+              <div class="module-desc">案例练习，巩固所学策略</div>
+            </div>
+          </div>
+          <div class="module-item">
+            <span class="module-icon">🌈</span>
+            <div class="module-info">
+              <div class="module-name">展望未来</div>
+              <div class="module-desc">设定短期目标，结束疏导</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>5.2 PSYCHLOPS 评估体系</h3>
+  <div class="assessment-system">
+    <div class="assessment-card">
+      <div class="assess-header">📋 评估内容</div>
+      <div class="assess-content">
+        <table>
+          <tr><th>问题</th><th>内容</th><th>评分</th></tr>
+          <tr><td>Q1</td><td>最困扰的问题A + 影响程度</td><td>0-5分</td></tr>
+          <tr><td>Q2</td><td>另一个困扰问题B + 影响程度</td><td>0-5分</td></tr>
+          <tr><td>Q3</td><td>受影响的功能领域 + 困难程度</td><td>0-5分</td></tr>
+          <tr><td>Q4</td><td>整体身心健康状态</td><td>0-5分</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="assessment-card">
+      <div class="assess-header">📊 评分规则</div>
+      <div class="assess-content">
+        <div class="score-rule">
+          <div class="rule-label">完整评估</div>
+          <div class="rule-formula">总分 = Q1 + Q2 + Q3 + Q4 (满分20分)</div>
+        </div>
+        <div class="score-rule">
+          <div class="rule-label">仅Q1评估</div>
+          <div class="rule-formula">总分 = Q1×2 + Q3 + Q4 (满分20分)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>5.3 危机干预机制</h3>
+  <div class="crisis-system">
+    <div class="crisis-trigger">
+      <div class="trigger-title">⚠️ 触发条件</div>
+      <div class="trigger-items">
+        <span class="trigger-item">Q4得分 ≥ 4分</span>
+        <span class="trigger-item">提及自杀/自伤</span>
+        <span class="trigger-item">高风险关键词</span>
+      </div>
+    </div>
+    <div class="crisis-flow">
+      <div class="crisis-step">
+        <div class="step-num">1</div>
+        <div class="step-info">
+          <div class="step-title">安全评估</div>
+          <div class="step-desc">询问过去一个月是否有结束生命的想法或计划</div>
+        </div>
+      </div>
+      <div class="crisis-arrow">→</div>
+      <div class="crisis-step">
+        <div class="step-num">2</div>
+        <div class="step-info">
+          <div class="step-title">详细追问</div>
+          <div class="step-desc">了解具体想法、采取的行动、未来计划</div>
+        </div>
+      </div>
+      <div class="crisis-arrow">→</div>
+      <div class="crisis-step danger">
+        <div class="step-num">3</div>
+        <div class="step-info">
+          <div class="step-title">高危处置</div>
+          <div class="step-desc">触发红色警报，通知心理老师/管理员</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h3>5.4 核心数据模型</h3>
+  <div class="data-models">
+    <div class="model-card">
+      <div class="model-icon">👤</div>
+      <div class="model-name">UserProfile</div>
+      <div class="model-desc">用户基础信息</div>
+    </div>
+    <div class="model-card">
+      <div class="model-icon">📊</div>
+      <div class="model-name">PsychlopsScore</div>
+      <div class="model-desc">心理痛苦评估分数</div>
+    </div>
+    <div class="model-card">
+      <div class="model-icon">📋</div>
+      <div class="model-name">ProblemList</div>
+      <div class="model-desc">问题列表(可解决/不可解决)</div>
+    </div>
+    <div class="model-card">
+      <div class="model-icon">✅</div>
+      <div class="model-name">SolutionPlan</div>
+      <div class="model-desc">问题解决行动计划</div>
+    </div>
+    <div class="model-card">
+      <div class="model-icon">⚡</div>
+      <div class="model-name">ActivityPlan</div>
+      <div class="model-desc">行为激活计划</div>
+    </div>
+    <div class="model-card">
+      <div class="model-icon">🤝</div>
+      <div class="model-name">SocialSupportPlan</div>
+      <div class="model-desc">社会支持计划</div>
+    </div>
+  </div>
+
+  <h3>5.5 效果评估与结局判定</h3>
+  <div class="outcome-system">
+    <table>
+      <tr><th>结局类型</th><th>判定条件</th><th>后续处理</th></tr>
+      <tr>
+        <td><span class="outcome-badge success">改善显著</span></td>
+        <td>Post分数明显低于Pre分数</td>
+        <td>鼓励继续实践，3个月后跟进</td>
+      </tr>
+      <tr>
+        <td><span class="outcome-badge warning">无改善(轻度)</span></td>
+        <td>痛苦不严重且无自杀意念</td>
+        <td>鼓励继续独立实践策略</td>
+      </tr>
+      <tr>
+        <td><span class="outcome-badge danger">无改善(严重)</span></td>
+        <td>严重困境或有自杀意念</td>
+        <td>转介给精神健康专家</td>
+      </tr>
+      <tr>
+        <td><span class="outcome-badge info">起效慢</span></td>
+        <td>投入PM+但改善不大</td>
+        <td>考虑增加PM+会面次数</td>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- 迭代路线 -->
+<div id="roadmap" class="tab-content">
+  <h2>🛣️ 六、产品迭代路线图</h2>
+  
+  <div class="highlight-box">
+    <h3>🎯 核心产品逻辑：测评驱动的PM+疏导闭环</h3>
+    <p>用户通过专业测评识别心理问题 → 系统智能推荐PM+疏导方案 → 5周结构化AI会话疗愈 → 复测验证效果 → 持续改善，形成"测评-疏导-验证"的完整产品闭环。</p>
+  </div>
+
+  <h3>6.1 PM+融入C端产品的核心路径</h3>
+  <div class="pm-integration">
+    <div class="integration-flow">
+      <div class="flow-stage">
+        <div class="stage-icon">📊</div>
+        <div class="stage-title">专业测评</div>
+        <div class="stage-desc">PHQ-9/GAD-7等量表识别问题</div>
+      </div>
+      <div class="flow-connector">→</div>
+      <div class="flow-stage highlight">
+        <div class="stage-icon">🎯</div>
+        <div class="stage-title">智能推荐</div>
+        <div class="stage-desc">根据测评结果推荐PM+方案</div>
+      </div>
+      <div class="flow-connector">→</div>
+      <div class="flow-stage">
+        <div class="stage-icon">🤖</div>
+        <div class="stage-title">5周疏导</div>
+        <div class="stage-desc">AI引导完成PM+全流程</div>
+      </div>
+      <div class="flow-connector">→</div>
+      <div class="flow-stage">
+        <div class="stage-icon">✅</div>
+        <div class="stage-title">效果验证</div>
+        <div class="stage-desc">复测对比，量化改善</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>6.2 测评结果与PM+推荐规则</h3>
+  <div class="recommendation-rules">
+    <table>
+      <tr><th>测评类型</th><th>分数区间</th><th>风险等级</th><th>推荐方案</th></tr>
+      <tr>
+        <td>PHQ-9 抑郁筛查</td>
+        <td>5-9分 (轻度)</td>
+        <td><span class="risk-tag low">低风险</span></td>
+        <td>推荐PM+行为激活模块</td>
+      </tr>
+      <tr>
+        <td>PHQ-9 抑郁筛查</td>
+        <td>10-14分 (中度)</td>
+        <td><span class="risk-tag medium">中风险</span></td>
+        <td>强烈推荐完整PM+5周疏导</td>
+      </tr>
+      <tr>
+        <td>PHQ-9 抑郁筛查</td>
+        <td>≥15分 (重度)</td>
+        <td><span class="risk-tag high">高风险</span></td>
+        <td>PM+ + 真人咨询师转介</td>
+      </tr>
+      <tr>
+        <td>GAD-7 焦虑筛查</td>
+        <td>5-9分 (轻度)</td>
+        <td><span class="risk-tag low">低风险</span></td>
+        <td>推荐PM+压力管理模块</td>
+      </tr>
+      <tr>
+        <td>GAD-7 焦虑筛查</td>
+        <td>10-14分 (中度)</td>
+        <td><span class="risk-tag medium">中风险</span></td>
+        <td>强烈推荐完整PM+5周疏导</td>
+      </tr>
+      <tr>
+        <td>GAD-7 焦虑筛查</td>
+        <td>≥15分 (重度)</td>
+        <td><span class="risk-tag high">高风险</span></td>
+        <td>PM+ + 真人咨询师转介</td>
+      </tr>
+      <tr>
+        <td>人际关系量表</td>
+        <td>问题明显</td>
+        <td><span class="risk-tag medium">中风险</span></td>
+        <td>推荐PM+社会支持模块</td>
+      </tr>
+      <tr>
+        <td>学业压力量表</td>
+        <td>压力较大</td>
+        <td><span class="risk-tag medium">中风险</span></td>
+        <td>推荐PM+问题管理模块</td>
+      </tr>
+    </table>
+  </div>
+
+  <h3>6.3 用户旅程设计</h3>
+  <div class="user-journey">
+    <div class="journey-step">
+      <div class="step-header">
+        <span class="step-num">1</span>
+        <span class="step-name">测评入口</span>
+      </div>
+      <div class="step-content">
+        <ul>
+          <li>首页推荐专业测评（PHQ-9、GAD-7等）</li>
+          <li>测评完成后展示详细结果报告</li>
+          <li>根据分数智能判断风险等级</li>
+        </ul>
+      </div>
+    </div>
+    <div class="journey-arrow">↓</div>
+    <div class="journey-step highlight">
+      <div class="step-header">
+        <span class="step-num">2</span>
+        <span class="step-name">PM+推荐引导</span>
+      </div>
+      <div class="step-content">
+        <ul>
+          <li>测评结果页展示PM+推荐卡片</li>
+          <li>说明PM+是WHO认证的疏导方案</li>
+          <li>展示预期效果和所需时间（5周）</li>
+          <li>一键开启PM+疏导之旅</li>
+        </ul>
+      </div>
+    </div>
+    <div class="journey-arrow">↓</div>
+    <div class="journey-step">
+      <div class="step-header">
+        <span class="step-num">3</span>
+        <span class="step-name">PM+疏导执行</span>
+      </div>
+      <div class="step-content">
+        <ul>
+          <li>第0周：PSYCHLOPS预评估，建立基线</li>
+          <li>第1-4周：每周1次AI会话（约90分钟）</li>
+          <li>周间作业：呼吸训练、行动计划执行</li>
+          <li>第5周：总结回顾，效果评估</li>
+        </ul>
+      </div>
+    </div>
+    <div class="journey-arrow">↓</div>
+    <div class="journey-step">
+      <div class="step-header">
+        <span class="step-num">4</span>
+        <span class="step-name">效果验证与持续</span>
+      </div>
+      <div class="step-content">
+        <ul>
+          <li>PM+完成后自动触发复测</li>
+          <li>对比Pre/Post分数，量化改善效果</li>
+          <li>生成个人成长报告，可分享</li>
+          <li>推荐后续巩固方案或进阶服务</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="phase-title">📍 Phase 1: 基础增强期 (第1-2个月)</div>
+      <p><strong>目标：</strong>完善测评体系，建立PM+推荐入口</p>
+      <h4>1.1 专业测评体系搭建</h4>
+      <ul>
+        <li>上线PHQ-9（抑郁筛查）、GAD-7（焦虑筛查）专业量表</li>
+        <li>建立测评结果与PM+推荐的智能匹配规则</li>
+        <li>测评结果页增加PM+推荐卡片和引导入口</li>
+        <li>结果页重设计：增加雷达图、风险等级可视化</li>
+      </ul>
+      <h4>1.2 AI陪伴升级</h4>
+      <ul>
+        <li>上线4个AI角色（温暖姐姐、理性导师、活力伙伴、专业顾问）</li>
+        <li>接入情绪识别能力，实现基础情绪分析</li>
+        <li>建立危机干预基础流程（Q4≥4分触发）</li>
+      </ul>
+      <h4>1.3 会员体系1.0</h4>
+      <table>
+        <tr><th>会员类型</th><th>价格</th><th>核心权益</th></tr>
+        <tr><td>免费用户</td><td>0元</td><td>每日3次AI对话、基础测评摘要</td></tr>
+        <tr><td>基础会员</td><td>19.9元/月</td><td>无限AI对话、完整测评报告、去广告</td></tr>
+        <tr><td>高级会员</td><td>39.9元/月</td><td>基础权益 + PM+疏导 + 专业解读</td></tr>
+      </table>
+      <p><strong>里程碑：</strong>DAU 5,000 | 测评→PM+转化率 10% | 月收入 5万</p>
+    </div>
+    
+    <div class="timeline-item">
+      <div class="phase-title">📍 Phase 2: PM+核心期 (第2-4个月)</div>
+      <p><strong>目标：</strong>上线完整PM+疏导流程，建立疗愈闭环</p>
+      <h4>2.1 PM+ 5周疏导系统</h4>
+      <ul>
+        <li><strong>第0周模块：</strong>知情同意 + PSYCHLOPS预评估</li>
+        <li><strong>第1周模块：</strong>心理教育 + 压力管理（呼吸训练）</li>
+        <li><strong>第2周模块：</strong>问题管理策略（6步法）</li>
+        <li><strong>第3周模块：</strong>行为激活（打破不活动循环）</li>
+        <li><strong>第4周模块：</strong>加强社会支持</li>
+        <li><strong>第5周模块：</strong>保持健康 + 效果评估</li>
+      </ul>
+      <h4>2.2 PM+配套功能</h4>
+      <ul>
+        <li><strong>会话提醒：</strong>每周定时提醒进行PM+会话</li>
+        <li><strong>作业系统：</strong>呼吸训练打卡、行动计划追踪</li>
+        <li><strong>进度仪表盘：</strong>可视化展示5周进度和改善曲线</li>
+        <li><strong>成长报告：</strong>PM+完成后生成个人成长报告</li>
+      </ul>
+      <h4>2.3 社区功能上线</h4>
+      <ul>
+        <li><strong>PM+互助小组：</strong>同期参与PM+的用户互相鼓励</li>
+        <li><strong>经验分享区：</strong>PM+毕业用户分享心得</li>
+        <li><strong>匿名树洞：</strong>发布心情/困扰，互相评论鼓励</li>
+      </ul>
+      <p><strong>里程碑：</strong>DAU 20,000 | PM+完成率 60% | 7日留存 40% | 月收入 30万</p>
+    </div>
+    
+    <div class="timeline-item">
+      <div class="phase-title">📍 Phase 3: 商业化深化期 (第4-6个月)</div>
+      <p><strong>目标：</strong>PM+商业化，拓展B端服务</p>
+      <h4>3.1 PM+付费产品矩阵</h4>
+      <table>
+        <tr><th>产品类型</th><th>定价</th><th>内容</th></tr>
+        <tr><td>PM+单次疏导</td><td>99元/5周</td><td>完整5周AI疏导流程</td></tr>
+        <tr><td>PM+年度会员</td><td>299元/年</td><td>无限次PM+疏导 + 专属报告</td></tr>
+        <tr><td>PM+ + 咨询师</td><td>499元/5周</td><td>AI疏导 + 2次真人咨询</td></tr>
+        <tr><td>青少年PM+</td><td>199元/5周</td><td>青少年专属版本 + 家长报告</td></tr>
+      </table>
+      <h4>3.2 真人咨询师对接</h4>
+      <ul>
+        <li>PM+高风险用户自动推荐真人咨询师</li>
+        <li>PM+完成后可选择咨询师深度服务</li>
+        <li>咨询师可查看用户PM+历程，提升咨询效率</li>
+      </ul>
+      <p><strong>里程碑：</strong>DAU 50,000 | PM+付费转化 8% | 月收入 80万</p>
+    </div>
+  </div>
+
+  <h3>6.4 关键指标追踪</h3>
+  <table>
+    <tr><th>阶段</th><th>时间</th><th>DAU</th><th>测评→PM+转化</th><th>PM+完成率</th><th>付费率</th><th>月收入</th></tr>
+    <tr><td>Phase 1</td><td>M1-M2</td><td>5,000</td><td>10%</td><td>-</td><td>2%</td><td>5万</td></tr>
+    <tr><td>Phase 2</td><td>M3-M4</td><td>20,000</td><td>15%</td><td>60%</td><td>5%</td><td>30万</td></tr>
+    <tr><td>Phase 3</td><td>M5-M6</td><td>50,000</td><td>20%</td><td>70%</td><td>8%</td><td>100万</td></tr>
+  </table>
+
+  <h3>6.5 PM+效果验证指标</h3>
+  <div class="effect-metrics">
+    <div class="metric-card">
+      <div class="metric-icon">📉</div>
+      <div class="metric-title">PSYCHLOPS分数下降</div>
+      <div class="metric-target">目标：平均下降30%+</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">😊</div>
+      <div class="metric-title">用户满意度</div>
+      <div class="metric-target">目标：NPS ≥ 50</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">🔄</div>
+      <div class="metric-title">复购率</div>
+      <div class="metric-target">目标：30%用户再次使用</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-icon">📣</div>
+      <div class="metric-title">推荐率</div>
+      <div class="metric-target">目标：40%用户推荐他人</div>
+    </div>
+  </div>
+</div>
+
+        <!-- 商业模式 -->
+        <div id="business" class="tab-content">
+            <h2>💰 七、商业模式设计</h2>
+            
+            <div class="highlight-box">
+                <h3>🎯 核心商业逻辑</h3>
+                <p>以PM+疏导服务为核心付费产品，通过"测评引流 → PM+转化 → 效果付费 → 持续服务"的模式，建立可持续的心理健康服务商业闭环。</p>
+            </div>
+
+            <h3>7.1 收入结构规划</h3>
+            <div class="stats-grid">
+                <div class="stat-card"><div class="stat-number">50%</div><div class="stat-label">会员订阅</div></div>
+                <div class="stat-card"><div class="stat-number">25%</div><div class="stat-label">单次PM+</div></div>
+                <div class="stat-card"><div class="stat-number">15%</div><div class="stat-label">单次测评</div></div>
+                <div class="stat-card"><div class="stat-number">10%</div><div class="stat-label">咨询抽成</div></div>
+            </div>
+
+            <h3>7.2 会员体系与PM+定价（整合版）</h3>
+            <div class="membership-system">
+                <div class="membership-intro">
+                    <p>💡 <strong>核心逻辑：</strong>PM+疏导服务作为高级会员的核心权益，同时支持单次购买，满足不同用户需求。</p>
+                </div>
+                
+                <div class="pm-pricing">
+                    <div class="pricing-card">
+                        <div class="pricing-title">免费用户</div>
+                        <div class="pricing-price">0<span>元</span></div>
+                        <div class="pricing-features">
+                            <div class="feature-item">✓ 每日3次AI对话</div>
+                            <div class="feature-item">✓ 基础测评（摘要版报告）</div>
+                            <div class="feature-item">✓ 1个AI角色</div>
+                            <div class="feature-item">✓ 当日对话记忆</div>
+                            <div class="feature-item">✓ 社区浏览</div>
+                            <div class="feature-item dim">✗ PM+疏导服务</div>
+                            <div class="feature-item dim">✗ 成长档案</div>
+                        </div>
+                    </div>
+                    <div class="pricing-card">
+                        <div class="pricing-title">基础会员</div>
+                        <div class="pricing-price">19.9<span>元/月</span></div>
+                        <div class="pricing-features">
+                            <div class="feature-item">✓ 无限AI对话（封顶500论对话）</div>
+                            <div class="feature-item">✓ 3次完整测评报告</div>
+                            <div class="feature-item">✓ 全部4个AI角色</div>
+                            <div class="feature-item">✓ 7天对话记忆</div>
+                            <div class="feature-item">✓ 社区发帖+评论</div>
+                            <div class="feature-item">✓ 基础成长档案</div>
+                            <div class="feature-item">✓ 去广告</div>
+                            <div class="feature-item dim">✗ PM+疏导服务</div>
+                        </div>
+                    </div>
+                    <div class="pricing-card featured">
+                        <div class="pricing-badge">推荐</div>
+                        <div class="pricing-title">高级会员</div>
+                        <div class="pricing-price">39.9<span>元/月</span></div>
+                        <div class="pricing-features">
+                            <div class="feature-item highlight">✓ 每季度1次PM+疏导</div>
+                            <div class="feature-item highlight">✓ 基础会员全部权益</div>
+                            <div class="feature-item">✓ 测评专业解读</div>
+                            <div class="feature-item">✓ 30天对话记忆</div>
+                            <div class="feature-item">✓ 完整成长档案</div>
+                            <div class="feature-item">✓ 社区专属标识</div>
+                            <div class="feature-item">✓ 咨询师8折优惠</div>
+                        </div>
+                    </div>
+                    <div class="pricing-card premium">
+                        <div class="pricing-badge">最超值</div>
+                        <div class="pricing-title">PM+年度会员</div>
+                        <div class="pricing-price">299<span>元/年</span></div>
+                        <div class="pricing-features">
+                            <div class="feature-item highlight">✓ 无限次PM+疏导</div>
+                            <div class="feature-item highlight">✓ 高级会员全部权益</div>
+                            <div class="feature-item">✓ 永久对话记忆</div>
+                            <div class="feature-item">✓ 专属成长档案</div>
+                            <div class="feature-item">✓ PM+互助小组</div>
+                            <div class="feature-item">✓ 咨询师7折+优先</div>
+                            <div class="feature-item">✓ 3个月效果追踪</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4>📦 单次购买选项</h4>
+                <div class="single-purchase">
+                    <table>
+                        <tr><th>产品</th><th>价格</th><th>说明</th><th>适用人群</th></tr>
+                        <tr>
+                            <td><strong>PM+单次疏导</strong></td>
+                            <td>99元/5周</td>
+                            <td>完整5周AI疏导 + 成长报告</td>
+                            <td>想先体验PM+效果的用户</td>
+                        </tr>
+                        <tr>
+                            <td><strong>青少年PM+</strong></td>
+                            <td>199元/5周</td>
+                            <td>青少年专属内容 + 家长报告</td>
+                            <td>13-18岁青少年（需家长同意）</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PM+ + 咨询师</strong></td>
+                            <td>499元/5周</td>
+                            <td>AI疏导 + 1次真人咨询</td>
+                            <td>需要专业支持的中高风险用户</td>
+                        </tr>
+                        <tr>
+                            <td><strong>专业测评解读</strong></td>
+                            <td>19.9元/次</td>
+                            <td>单次测评完整报告+专业解读</td>
+                            <td>只想做单次深度测评的用户</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <h3>7.3 会员权益对比表</h3>
+            <table>
+                <tr><th>权益项</th><th>免费用户</th><th>基础会员<br/>(19.9/月)</th><th>高级会员<br/>(39.9/月)</th><th>PM+年度会员<br/>(299/年)</th></tr>
+                <tr><td>AI对话次数</td><td>3次/天</td><td>无限（封顶500论对话）</td><td>无限（封顶500论对话）</td><td>无限（封顶500论对话）</td></tr>
+                <tr><td>测评报告</td><td>摘要版</td><td>3次完整版</td><td>3次完整版</td><td>5次完整版/每月</td></tr>
+                <tr><td><strong>PM+疏导</strong></td><td>❌</td><td>❌</td><td>✅ 1次/季度</td><td>✅ 无限次</td></tr>
+                <tr><td>AI角色</td><td>1个</td><td>全部4个</td><td>全部4个</td><td>全部4个</td></tr>
+                <tr><td>对话记忆</td><td>当日</td><td>7天</td><td>30天</td><td>永久</td></tr>
+                <tr><td>成长档案</td><td>❌</td><td>基础版</td><td>完整版</td><td>专属档案</td></tr>
+                <tr><td>社区功能</td><td>浏览</td><td>发帖+评论</td><td>专属标识</td><td>PM+互助小组</td></tr>
+                <tr><td>咨询优惠</td><td>无</td><td>9折</td><td>8折</td><td>7折+优先</td></tr>
+                <tr><td>广告</td><td>有</td><td>无</td><td>无</td><td>无</td></tr>
+                <tr><td><strong>折算月费</strong></td><td>0元</td><td>19.9元</td><td>39.9元</td><td>≈25元</td></tr>
+            </table>
+
+            <h3>7.4 财务预测模型</h3>
+            <div class="financial-model">
+                <div class="model-section">
+                    <h4>📊 C端收入预测 (6个月后稳态)</h4>
+                    <div class="revenue-breakdown">
+                        <div class="revenue-item">
+                            <span class="revenue-label">会员订阅收入</span>
+                            <span class="revenue-calc">50,000 DAU × 4% 付费 × 35元均价 = 70,000元/月</span>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">单次PM+购买</span>
+                            <span class="revenue-calc">50,000 DAU × 2% 转化 × 120元均价 = 120,000元/月</span>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">单次测评</span>
+                            <span class="revenue-calc">50,000 DAU × 1.5% 转化 × 20元 = 15,000元/月</span>
+                        </div>
+                        <div class="revenue-item">
+                            <span class="revenue-label">真人咨询抽成</span>
+                            <span class="revenue-calc">500次/月 × 50元抽成 = 25,000元/月</span>
+                        </div>
+                        <div class="revenue-item total">
+                            <span class="revenue-label">C端总计</span>
+                            <span class="revenue-calc">约 230,000元/月</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="model-section highlight">
+                    <h4>💰 总收入预测</h4>
+                    <div class="total-revenue">
+                        <span class="total-label">月收入目标</span>
+                        <span class="total-amount">230,000元/月</span>
+                    </div>
+                    <p class="revenue-note">保守估计，实际可达50万/月（需DAU 10万+）</p>
+                </div>
+            </div>
+
+            <h3>7.5 PM+核心价值指标</h3>
+            <div class="value-metrics">
+                <div class="metric-box">
+                    <div class="metric-title">用户获取成本 (CAC)</div>
+                    <div class="metric-value">≤ 30元</div>
+                    <div class="metric-desc">通过测评自然转化降低获客成本</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-title">用户生命周期价值 (LTV)</div>
+                    <div class="metric-value">≥ 200元</div>
+                    <div class="metric-desc">PM+复购 + 会员续费 + 增值服务</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-title">LTV/CAC 比率</div>
+                    <div class="metric-value">≥ 6:1</div>
+                    <div class="metric-desc">健康的商业模式指标</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-title">PM+完成率</div>
+                    <div class="metric-value">≥ 70%</div>
+                    <div class="metric-desc">5周疏导完整完成比例</div>
+                </div>
+            </div>
+
+            <h3>7.6 风险控制</h3>
+            <div class="risk-item">
+                <strong>⚠️ 监管风险</strong>
+                <ul>
+                    <li>明确定位为"心理健康科普工具"，非医疗诊断</li>
+                    <li>PM+基于WHO公开方案，具有权威背书</li>
+                    <li>用户协议明确服务边界和免责声明</li>
+                    <li>与专业心理机构合作，建立转介机制</li>
+                </ul>
+            </div>
+            <div class="risk-item">
+                <strong>⚠️ 危机事件风险</strong>
+                <ul>
+                    <li>PM+内置危机干预机制（Q4≥4分触发）</li>
+                    <li>高风险用户自动转介真人咨询师</li>
+                    <li>对接专业心理危机热线（如：北京心理危机研究与干预中心 010-82951332）</li>
+                    <li>保留完整PM+会话记录备查</li>
+                </ul>
+            </div>
+            <div class="risk-item">
+                <strong>⚠️ 效果风险</strong>
+                <ul>
+                    <li>PM+基于WHO循证方案，有效性经过验证</li>
+                    <li>PSYCHLOPS前后测量化效果，数据透明</li>
+                    <li>无效用户可申请退款或转介咨询师</li>
+                    <li>持续收集用户反馈，优化疏导流程</li>
+                </ul>
+            </div>
+            <div class="risk-item">
+                <strong>⚠️ 青少年保护风险</strong>
+                <ul>
+                    <li>青少年PM+需家长同意并绑定</li>
+                    <li>家长端可查看疏导进度和报告</li>
+                    <li>危机预警自动通知家长和学校</li>
+                    <li>遵循《未成年人保护法》相关规定</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>📊 报告生成时间：2025年1月</p>
+        <p>🎯 建议执行周期：6个月</p>
+        <p>📈 预期ROI：300%+</p>
+    </div>
+</div>
+<script>
+    function showTab(tabName) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+</script>
+</body>
+</html>
