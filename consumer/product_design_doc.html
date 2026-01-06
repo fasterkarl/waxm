@@ -94,9 +94,9 @@
 <div class="main">
 
     <section id="intro">
-        <h1>产品设计说明书 (PRD) <span class="tag green" style="vertical-align: middle; margin-left: 8px;">v2.0</span></h1>
+        <h1>产品设计说明书 (PRD) <span class="tag green" style="vertical-align: middle; margin-left: 8px;">v2.1</span></h1>
         <div class="meta-info">
-            <span>📅 2026-01-04</span>
+            <span>📅 2026-01-06</span>
             <span>👤 产品经理: Antigravity</span>
             <span>🔒 密级: 内部公开</span>
         </div>
@@ -105,7 +105,7 @@
             <strong>核心愿景：</strong> 打造一款<strong>面向C端的数字化AI心理干预疗愈产品</strong>。不仅提供碎片化的解压工具，更核心的是将世界卫生组织 (WHO) 的 <strong>PM+ (Problem Management Plus)</strong> 疗法标准化、流程化、智能化，为轻中度心理困扰人群提供低门槛的专业服务。
         </div>
 
-        <p>本文档基于《爱聆心理测评-深度调研报告》的市场洞察，结合当前 V1.0 版本的技术实现，详细定义了产品的业务逻辑、功能规格与交互细节。</p>
+        <p>本文档基于《爱聆心理测评-深度调研报告》的市场洞察，结合当前 V2.1 版本的技术实现，详细定义了产品的业务逻辑、功能规格与交互细节。<span class="tag blue">Updated</span> 本版本已同步原型最新功能实现。
     </section>
 
     <section id="users">
@@ -130,7 +130,7 @@
 
     <section id="strategy">
         <h2>3. 竞品差异化与产品策略</h2>
-        <p>相较于市面上的《壹心理》、《抑郁研究所》等竞品，爱聆的核心竞争力在于<strong>“循证医学 + 全流程闭环”</strong>。</p>
+        <p>相较于市面上的《壹心理》、《抑郁研究所》等竞品，爱聆的核心竞争力在于<strong>"循证医学 + 全流程闭环"</strong>。</p>
         
         <table>
             <thead>
@@ -167,7 +167,7 @@
 
     <section id="ia">
         <h2>4. 信息架构 (Information Architecture)</h2>
-        <p>产品采用扁平化架构，以“首页 Dashboard”为中心，向各个垂直功能模块发散。</p>
+        <p>产品采用扁平化架构，以"首页 Dashboard"为中心，向各个垂直功能模块发散。</p>
         <div class="mermaid-wrapper">
             <div class="mermaid">
                 graph TD
@@ -195,30 +195,204 @@
     <section id="pm-logic">
         <h2>5. PM+ 核心业务流转逻辑</h2>
         <p>这是系统的核心引擎，严格遵循 WHO 协议的 5 个阶段。</p>
-        
+
         <div class="mermaid-wrapper">
             <div class="mermaid">
                 graph LR
                 Start(("用户接入")) --> PreTest{"PSYCHLOPS<br/>预评估"}
-                
+
                 PreTest -- 高危 --> Crisis["🔴 危机模式 SOS"]
-                
+
                 PreTest -- 适宜 --> W1["🟢 Week 1"]
                 W1 --> |教导| Skill1["慢呼吸管理"]
                 W1 --> |作业| HW1["每日练习打卡"]
-                
+
                 HW1 --> |完成| W2["Week 2"]
                 W2 --> |教导| Skill2["问题拆解行动"]
                 W2 --> |作业| HW2["执行微行动"]
-                
+
                 HW2 --> |完成| W3["Week 3"]
                 W3 --> |教导| Skill3["行为激活"]
-                
+
                 W3 --> W4["Week 4 社会支持"]
                 W4 --> W5["Week 5 预防复发"]
-                
+
                 W5 --> PostTest{"后测评估"}
                 PostTest --> End(("结案报告"))
+            </div>
+        </div>
+
+        <h3>PM+ 流程详细实现说明</h3>
+        <div class="card-grid">
+            <div class="card">
+                <h4>第0阶段：预评估 (Pre-Assessment)</h4>
+                <ul class="custom-list">
+                    <li><strong>欢迎与知情同意：</strong> AI介绍PM+项目，说明保密原则。</li>
+                    <li><strong>PSYCHLOPS量表：</strong>
+                        <ul>
+                            <li>Q1-2：选择困扰问题（可语音录制，ASR转文字+AI提取因子）。</li>
+                            <li>Q3：功能影响（固定选项：学习、睡眠、社交等）。</li>
+                            <li>Q4：身心健康评估（0-5分）。</li>
+                            <li>Q4≥4时触发危机干预。</li>
+                        </ul>
+                    </li>
+                    <li><strong>评分计算：</strong> Q1+Q2+Q3+Q4（最高20分）。</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>第1周：心理教育与压力管理</h4>
+                <ul class="custom-list">
+                    <li><strong>周评估：</strong> 回顾预评估问题，PSYCHLOPS周测。</li>
+                    <li><strong>危机筛查：</strong> 每周评估Q4，持续监测自杀意念。</li>
+                    <li><strong>PM+介绍：</strong> 5周结构化课程，4大核心策略说明。</li>
+                    <li><strong>动机访谈：</strong> 参与利弊分析，增强用户参与意愿。</li>
+                    <li><strong>压力管理：</strong>
+                        <ul>
+                            <li>教授4-7-8呼吸训练（慢呼吸管理）。</li>
+                            <li>识别身体反应（心跳、呼吸、紧张等）。</li>
+                            <li>困难排查表：4种常见问题及解决方案。</li>
+                        </ul>
+                    </li>
+                    <li><strong>家庭作业：</strong> 呼吸训练每日10-20分钟。</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>第2周：问题管理策略</h4>
+                <ul class="custom-list">
+                    <li><strong>问题分类游戏：</strong>
+                        <ul>
+                            <li>列出所有困扰问题。</li>
+                            <li>游戏化分类：可解决 vs 不可解决。</li>
+                            <li>筛选出可解决问题。</li>
+                        </ul>
+                    </li>
+                    <li><strong>问题界定：</strong>
+                        <ul>
+                            <li>选择一个具体问题。</li>
+                            <li>识别可控要素。</li>
+                        </ul>
+                    </li>
+                    <li><strong>头脑风暴：</strong>
+                        <ul>
+                            <li>生成N个解决方案（自己能做/别人能帮）。</li>
+                            <li>优势利用：用个人优点解决问题。</li>
+                        </ul>
+                    </li>
+                    <li><strong>方案筛选：</strong>
+                        <ul>
+                            <li>三步验证：有帮助？无坏处？能做到？</li>
+                            <li>保留符合条件的方案。</li>
+                        </ul>
+                    </li>
+                    <li><strong>行动计划：</strong>
+                        <ul>
+                            <li>选择一个最想尝试的方案。</li>
+                            <li>制定具体步骤和时间。</li>
+                            <li>确定所需帮助和提醒方式。</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>第3周：行为激活</h4>
+                <ul class="custom-list">
+                    <li><strong>上周回顾：</strong>
+                        <ul>
+                            <li>问题管理计划完成情况。</li>
+                            <li>效果评估：有帮助？需重新回顾？</li>
+                        </ul>
+                    </li>
+                    <li><strong>打破不活动循环：</strong>
+                        <ul>
+                            <li>情绪低落→减少活动→更情绪低落。</li>
+                            <li>通过增加活动打破恶性循环。</li>
+                        </ul>
+                    </li>
+                    <li><strong>愉快活动选择：</strong>
+                        <ul>
+                            <li>与外界联系：拜访朋友、打电话、聚会。</li>
+                            <li>照顾自己：按时起床、洗澡、梳理。</li>
+                            <li>给自己留时间：读书、冥想、烹饪、音乐。</li>
+                        </ul>
+                    </li>
+                    <li><strong>任务活动选择：</strong>
+                        <ul>
+                            <li>达成目标：洗衣服、打扫、整理。</li>
+                            <li>活跃起来：散步、尝试新活动、运动。</li>
+                        </ul>
+                    </li>
+                    <li><strong>任务拆解：</strong> AI自动拆解大任务为小步骤。</li>
+                    <li><strong>计划制定：</strong> 安排具体时间和步骤。</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>第4周：加强社会支持</h4>
+                <ul class="custom-list">
+                    <li><strong>上周回顾：</strong>
+                        <ul>
+                            <li>行为激活计划完成情况。</li>
+                            <li>问题管理完成情况。</li>
+                        </ul>
+                    </li>
+                    <li><strong>社会支持的重要性：</strong>
+                        <ul>
+                            <li>分享困难和感受。</li>
+                            <li>寻求资源帮助。</li>
+                            <li>与社区组织联系。</li>
+                        </ul>
+                    </li>
+                    <li><strong>信任评估：</strong>
+                        <ul>
+                            <li>有可信任的人：制定联系计划（做什么、何时、聊什么）。</li>
+                            <li>无信任的人：引导寻找资源（班级好友、心理老师、网络好友）。</li>
+                            <li>信任测试：告诉一个不太重要的事情观察。</li>
+                        </ul>
+                    </li>
+                    <li><strong>新任务设定：</strong> 选择不同类型活动/任务。</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h4>第5周：保持健康与结束</h4>
+                <ul class="custom-list">
+                    <li><strong>总体回顾：</strong>
+                        <ul>
+                            <li>所有计划完成情况。</li>
+                            <li>社会支持实施情况。</li>
+                            <li>PSYCHLOPS后测评估。</li>
+                        </ul>
+                    </li>
+                    <li><strong>保持健康策略：</strong>
+                        <ul>
+                            <li>像学习新语言一样需要持续练习。</li>
+                            <li>用户成为自己的帮助者。</li>
+                            <li>未来应对困难的方法。</li>
+                        </ul>
+                    </li>
+                    <li><strong>巩固练习：</strong>
+                        <ul>
+                            <li>想象如何帮助他人使用PM+策略。</li>
+                            <li>案例分析：识别适用策略。</li>
+                        </ul>
+                    </li>
+                    <li><strong>展望未来：</strong>
+                        <ul>
+                            <li>短期内想处理的问题。</li>
+                            <li>第一步行动和时间。</li>
+                        </ul>
+                    </li>
+                    <li><strong>结局判定：</strong>
+                        <ul>
+                            <li>改善显著：继续实践，3个月跟进。</li>
+                            <li>无改善：鼓励独立实践/转介专家/增加会面次数。</li>
+                        </ul>
+                    </li>
+                    <li><strong>完成评估：</strong> Pre-Score vs Post-Score，生成改善报告。</li>
+                </ul>
             </div>
         </div>
     </section>
@@ -233,16 +407,58 @@
                 <h4>5.1 首页 Dashboard (Home)</h4>
                 <span class="tag green">Tab 1</span>
             </div>
-            <p><strong>定位：</strong> 用户的“心理状态驾驶舱”，聚合当前任务与核心数据。</p>
+            <p><strong>定位：</strong> 用户的"心理状态驾驶舱"，聚合当前任务与核心数据。</p>
             <ul class="custom-list">
-                <li><strong>可视化心理图谱 (Mind Graph)：</strong> <span class="tag blue">New</span> 
+                <li><strong>智能问候 Banner：</strong>
                     <ul>
-                         <li>首页核心区域展示动态“心理图谱”。该图谱基于用户的聊天情绪、测评结果及 PM+ 训练数据实时更新。</li>
-                         <li>以可视化的方式（如情绪波形、能力雷达图）让用户直观看到自己的状态变化，形成数据反馈闭环。</li>
+                        <li>根据时段（清晨/深夜）推送个性化暖心文案（早安、午安、晚安等）。</li>
+                        <li>动态问候语："探索者"身份标签，增强用户归属感。</li>
                     </ul>
                 </li>
-                <li><strong>智能问候 Banner：</strong> 根据时段（清晨/深夜）与用户当前情绪位面推送个性化暖心文案。</li>
-                <li><strong>PM+ 课程主卡片：</strong> 显示当前周次进度。若用户被算法判定为“需要干预”，此处会高亮引导开启课程。</li>
+                <li><strong>心情打卡模块：</strong>
+                    <ul>
+                        <li>5种情绪选项：😊喜悦、😌平静、😴疲惫、😟焦虑、😢难过。</li>
+                        <li>一键打卡，快速记录当下情绪状态。</li>
+                        <li>打卡数据自动同步至情绪日记和心理图谱。</li>
+                    </ul>
+                </li>
+                <li><strong>可视化心理图谱 (Mind Graph)：</strong> <span class="tag blue">Core Feature</span> 
+                    <ul>
+                         <li>首页核心区域展示动态"心理图谱"雷达图。</li>
+                         <li>6个维度实时监测：情绪、压力、睡眠、能量、专注、社交。</li>
+                         <li>数据源：基于用户的聊天情绪、测评结果、PM+ 训练数据、心情打卡等多维度数据实时计算。</li>
+                         <li>交互细节：每次数据更新时，雷达图平滑过渡动画，"实时更新"标签变为"刚刚更新"提示用户。</li>
+                         <li>价值体现：以可视化的方式让用户直观看到自己的状态变化，形成数据反馈闭环，增强用户粘性。</li>
+                    </ul>
+                </li>
+                <li><strong>PM+ 课程主卡片：</strong>
+                    <ul>
+                        <li>根据用户进度动态展示：未开始/进行中/已完成三种状态。</li>
+                        <li>进行中时显示当前周次标题、描述和进度条。</li>
+                        <li>完成后显示"恭喜完成"祝贺文案和"查看成果"按钮。</li>
+                        <li>若用户被算法判定为"需要干预"，此处会高亮引导开启课程。</li>
+                    </ul>
+                </li>
+                <li><strong>周进度列表：</strong>
+                    <ul>
+                        <li>5周课程卡片式展示，每周显示标题、图标和状态。</li>
+                        <li>状态标识：已完成（绿色勾）、进行中（当前高亮）、未解锁（灰色）。</li>
+                        <li>点击可进入对应周次会话。</li>
+                    </ul>
+                </li>
+                <li><strong>今日作业任务：</strong>
+                    <ul>
+                        <li>仅在用户有未完成作业时显示。</li>
+                        <li>展示作业类型（呼吸训练/认知作业/行动计划等）和截止提示。</li>
+                        <li>一键跳转执行。</li>
+                    </ul>
+                </li>
+                <li><strong>快捷工具入口：</strong>
+                    <ul>
+                        <li>4个高频工具一键直达：呼吸训练、着陆技术、情绪日记、紧急求助。</li>
+                        <li>图标化设计，视觉引导明确。</li>
+                    </ul>
+                </li>
             </ul>
         </div>
 
@@ -260,7 +476,7 @@
                         <li><strong>付费解锁：</strong> <span class="tag yellow">Monetization</span> 查看深度专业报告（含详细维度分析、专家建议）。</li>
                     </ul>
                 </li>
-                <li><strong>干预导流：</strong> 报告页底部根据结果（如中度焦虑）**强引导用户解锁 PM+ 课程**，实现“测-评-治”闭环。</li>
+                <li><strong>干预导流：</strong> 报告页底部根据结果（如中度焦虑）**强引导用户解锁 PM+ 课程**，实现"测-评-治"闭环。</li>
             </ul>
         </div>
 
@@ -272,9 +488,53 @@
             </div>
             <p><strong>定位：</strong> 拟人化心理伙伴与实时情绪监测站。</p>
             <ul class="custom-list">
-                <li><strong>实时情绪计算 (Real-time Emotion)：</strong> 对话过程中，AiLing 实时分析用户语意与语调。若检测到“持续焦虑”，会主动推送 PHQ-9 测评卡片。</li>
-                <li><strong>智能推荐引擎：</strong> 根据情绪分析结果，AiLing 会在对话中自然植入建议：“我也许能帮你，要不要试试我们的 PM+ 疏导课程？”从而引导转化。</li>
-                <li><strong>图谱同步：</strong> 每次对话结束，提取的情绪标签（如“因工作焦虑”）会自动同步至首页的“心理图谱”。</li>
+                <li><strong>快捷话题卡片：</strong> <span class="tag blue">Updated</span>
+                    <ul>
+                        <li>预设4个高频话题：😔心情不好、😰压力很大、🧘学放松、😴睡眠问题。</li>
+                        <li>点击快速发送，降低用户输入门槛，开启对话更便捷。</li>
+                        <li>话题可根据用户画像动态调整。</li>
+                    </ul>
+                </li>
+                <li><strong>双模式输入系统：</strong> <span class="tag blue">New</span>
+                    <ul>
+                        <li><strong>文本模式：</strong> 传统输入框，支持回车发送，适合精准表达。</li>
+                        <li><strong>语音模式：</strong> 按住录音，松开发送的交互设计。
+                            <ul>
+                                <li>语音录制全屏模态：波形动画、计时器显示（0:00实时更新）。</li>
+                                <li>交互细节：按住说话，上滑取消，松开发送。</li>
+                                <li>视觉反馈：波纹扩散动画，中央麦克风图标，状态提示文字。</li>
+                                <li>取消区域：上滑进入"松开取消"区域，显示×图标和提示。</li>
+                                <li>模式切换：麦克风/键盘按钮一键切换两种输入方式。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>实时情绪计算 (Real-time Emotion)：</strong>
+                    <ul>
+                        <li>对话过程中，AiLing 实时分析用户语意与语调。</li>
+                        <li>若检测到"持续焦虑"（如多次提及压力、担心、害怕等词汇），会主动推送 PHQ-9 测评卡片。</li>
+                        <li>危机预警机制：检测到自杀/自伤关键词，立即触发危机干预流程。</li>
+                    </ul>
+                </li>
+                <li><strong>智能推荐引擎：</strong>
+                    <ul>
+                        <li>根据情绪分析结果，AiLing 会在对话中自然植入建议。</li>
+                        <li>引导话术示例："我也许能帮你，要不要试试我们的 PM+ 疏导课程？"</li>
+                        <li>实现"测-评-治"商业闭环的关键转化点。</li>
+                    </ul>
+                </li>
+                <li><strong>图谱同步：</strong>
+                    <ul>
+                        <li>每次对话结束，AI提取的情绪标签（如"因工作焦虑"）会自动同步至首页的"心理图谱"。</li>
+                        <li>触发首页雷达图的实时更新动画，给予用户即时反馈。</li>
+                    </ul>
+                </li>
+                <li><strong>全屏体验：</strong>
+                    <ul>
+                        <li>AiLing页面隐藏底部导航，营造沉浸式对话体验。</li>
+                        <li>返回按钮和顶部菜单提供导航支持。</li>
+                    </ul>
+                </li>
             </ul>
         </div>
 
@@ -285,25 +545,52 @@
                 <span class="tag green">Tab 4</span>
             </div>
             <p><strong>定位：</strong> 轻量级自助工具箱，即开即用。</p>
-            <div class="card-grid">
-                <div class="card" style="margin-bottom:0;">
-                    <strong>📿 3D 静心木鱼</strong>
-                    <p style="font-size:12px; color:#666;">拟真物理敲击与回弹动画，配合触觉震动与“功德+1”特效，解压神器。</p>
-                </div>
-                <!-- ... 其他工具保持不变 ... -->
-                 <div class="card" style="margin-bottom:0;">
-                    <strong>🌬️ 4-7-8 呼吸</strong>
-                    <p style="font-size:12px; color:#666;">动态圆环视觉引导，调节副交感神经，快速缓解惊恐。</p>
-                </div>
-                <div class="card" style="margin-bottom:0;">
-                    <strong>⚓ 着陆练习 (Grounding)</strong>
-                    <p style="font-size:12px; color:#666;">5步感官引导（看、听、触...），将注意力拉回当下。</p>
-                </div>
-                <div class="card" style="margin-bottom:0;">
-                    <strong>📔 情绪日记</strong>
-                    <p style="font-size:12px; color:#666;">Emoji 快速记录心情，生成月度情绪热力图。</p>
-                </div>
-            </div>
+            <ul class="custom-list">
+                <li><strong>呼吸训练 (Breathing Exercise)：</strong>
+                    <ul>
+                        <li>4-7-8 腹式呼吸法：吸气4秒、屏息7秒、呼气8秒。</li>
+                        <li>动态圆环视觉引导，调节副交感神经，快速缓解惊恐。</li>
+                        <li>配备语音引导和视觉计时，帮助用户掌握节奏。</li>
+                    </ul>
+                </li>
+                <li><strong>5-4-3-2-1 着陆练习 (Grounding)：</strong>
+                    <ul>
+                        <li>5步感官引导：看5样东西、听4种声音、触3种感觉、闻2种气味、尝1种味道。</li>
+                        <li>将注意力从焦虑漩涡拉回当下，快速稳定情绪。</li>
+                        <li>交互式卡片，逐步引导用户完成。</li>
+                    </ul>
+                </li>
+                <li><strong>冥想木鱼 (Meditation Fish)：</strong> <span class="tag blue">Highlight</span>
+                    <ul>
+                        <li>拟真物理敲击与回弹动画，配合震动反馈。</li>
+                        <li>"功德+1"视觉特效，每次敲击都有即时反馈。</li>
+                        <li>电子消气功，每敲一次减一分压力，适合愤怒或焦虑时快速释放。</li>
+                        <li>统计敲击次数，可记录为能量释放记录。</li>
+                    </ul>
+                </li>
+                <li><strong>渐进式肌肉放松 (Progressive Muscle Relaxation)：</strong>
+                    <ul>
+                        <li>通过紧张-放松循环释放身体压力。</li>
+                        <li>引导用户逐个肌肉群进行紧张-放松练习。</li>
+                        <li>音频指导，适合睡前放松。</li>
+                    </ul>
+                </li>
+                <li><strong>意象引导冥想 (Imagery Meditation)：</strong>
+                    <ul>
+                        <li>想象安全平静的场景（如海滩、森林、高山）。</li>
+                        <li>沉浸式音频 + 视觉引导，获得内心安宁。</li>
+                        <li>多个场景可选，适合不同偏好用户。</li>
+                    </ul>
+                </li>
+                <li><strong>情绪日记 (Emotion Journal)：</strong>
+                    <ul>
+                        <li>Emoji 快速记录心情（5种基本情绪）。</li>
+                        <li>支持添加文字描述，记录触发事件和应对方式。</li>
+                        <li>生成月度情绪热力图，可视化情绪波动趋势。</li>
+                        <li>与首页心理图谱数据联动，完善情绪档案。</li>
+                    </ul>
+                </li>
+            </ul>
         </div>
 
         <!-- 5.5 个人中心 -->
@@ -325,40 +612,84 @@
                 <h4 style="color: #EF4444; border-color: #EF4444;">🚨 全局模块：危机干预 (SOS)</h4>
                 <span class="tag yellow">High Priority</span>
             </div>
-            <p><strong>触发方式：</strong> 首页常驻、高危词识别、重度测评结果。</p>
-            <p><strong>功能：</strong> 一键呼叫 (110/12356)、即时引导呼吸/着陆。</p>
+            <p><strong>定位：</strong> 心理安全保障网，为高危用户提供即时支持。</p>
+            <ul class="custom-list">
+                <li><strong>触发方式：</strong>
+                    <ul>
+                        <li><strong>主动触发：</strong> 首页常驻"紧急求助"按钮，能量坊快捷入口。</li>
+                        <li><strong>被动触发：</strong> AI 对话识别高危词（自杀、自伤等）。</li>
+                        <li><strong>测评触发：</strong> PSYCHLOPS Q4得分≥4，或PHQ-9/SAS重度风险。</li>
+                    </ul>
+                </li>
+                <li><strong>危机评估流程：</strong> <span class="tag blue">Updated</span>
+                    <ul>
+                        <li><strong>自杀意念评估：</strong>
+                            <ol>
+                                <li>"过去一个月里，你是否有过认真的想法或计划来结束自己的生命？"</li>
+                                <li>"如果有，请描述你的想法或计划。"</li>
+                                <li>"你采取了什么行动来结束自己的生命？"</li>
+                                <li>"你是否计划在接下来的两周内结束自己的生命？"</li>
+                            </ol>
+                        </li>
+                        <li><strong>高危判定：</strong> 若用户计划在两周内实施，立即触发红色警报。</li>
+                    </ul>
+                </li>
+                <li><strong>即时干预措施：</strong>
+                    <ul>
+                        <li><strong>一键呼叫：</strong> 快速拨打110/120/12356（心理援助热线）。</li>
+                        <li><strong>呼吸引导：</strong> 即时启动4-7-8呼吸训练，稳定情绪。</li>
+                        <li><strong>着陆练习：</strong> 引导用户完成54321着陆，拉回现实。</li>
+                        <li><strong>AI安抚：</strong> 提供即时安抚话术，陪伴用户度过危机时刻。</li>
+                    </ul>
+                </li>
+                <li><strong>资源引导：</strong>
+                    <ul>
+                        <li>展示专业心理热线列表（全国24小时心理援助热线）。</li>
+                        <li>推荐当地心理咨询机构或医院精神科。</li>
+                        <li>危机档案记录，用于后续跟踪和风险评估。</li>
+                    </ul>
+                </li>
+                <li><strong>隐私保护：</strong>
+                    <ul>
+                        <li>所有危机记录加密存储，仅授权人员可访问。</li>
+                        <li>紧急情况下，系统保留联系紧急联系人（需用户授权）。</li>
+                    </ul>
+                </li>
+            </ul>
         </div>
 
     </section>
 
     <section id="business-loop">
         <h2>10. 商业模式与数据闭环 (Business & Data Loop)</h2>
-        <p>本项目构建了“免费工具引流 -> AI 情感识别 -> 付费专业干预”的完整商业闭环。</p>
-        
+        <p>本项目构建了"免费工具引流 -> AI 情感识别 -> 付费专业干预"的完整商业闭环。</p>
+
         <div class="mermaid-wrapper">
             <div class="mermaid">
                 graph TD
                 %% 流量层
                 Traffic[免费流量入口] -->|使用工具| Fish[木鱼/呼吸/日记]
                 Traffic -->|免费对话| Chat[AiLing 陪伴]
-                
+
                 %% 数据层
                 Chat -->|实时情绪识别| Emotion[情绪监测引擎]
                 Fish -->|高频使用| UserData[行为数据]
-                
+                Mood[心情打卡] -->|情绪数据| UserData
+
                 %% 转化层
                 Emotion -->|推送建议| Assess[付费/专业测评]
                 Assess -->|生成报告| Report[深度解读报告]
-                
+
                 %% 核心变现层
                 Report -->|重度风险引导| PM[付费 PM+ 疗程]
                 Chat -->|自然推荐| PM
-                
+
                 %% 价值反馈层
                 PM -->|练习数据| Graph[个人心理图谱]
                 Assess -->|结果数据| Graph
                 Chat -->|情绪标签| Graph
-                
+                Mood -->|打卡数据| Graph
+
                 Graph -->|首页展示| Home[可视化反馈]
                 Home -->|增强粘性| Traffic
             </div>
@@ -368,21 +699,195 @@
             <div class="card">
                 <h4>💰 商业变现路径</h4>
                 <ul class="custom-list">
-                    <li><strong>单次付费：</strong> 专业心理测评深度报告解锁。</li>
-                    <li><strong>订阅制 (SaaS)：</strong> 解锁 PM+ 5周完整疗程及 AI 陪伴的高级记忆功能。</li>
+                    <li><strong>单次付费：</strong> 专业心理测评深度报告解锁（¥9.9/份）。
+                        <ul>
+                            <li>免费版：基础分数展示。</li>
+                            <li>付费版：详细维度分析、专家建议、改善建议。</li>
+                        </ul>
+                    </li>
+                    <li><strong>订阅制 (SaaS)：</strong> 解锁 PM+ 5周完整疗程及高级功能。
+                        <ul>
+                            <li>PM+完整课程（价值¥199-299）。</li>
+                            <li>AI 陪伴的高级记忆功能。</li>
+                            <li>专属心理图谱深度分析。</li>
+                        </ul>
+                    </li>
+                    <li><strong>转化策略：</strong>
+                        <ul>
+                            <li>AiLing对话中自然推荐PM+。</li>
+                            <li>测评报告底部强引导。</li>
+                            <li>首页PM+卡片进度提醒。</li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
             <div class="card">
                 <h4>🔄 数据飞轮效应</h4>
                 <ul class="custom-list">
-                    <li>用户越多互动（聊天/测评），<strong>心理图谱</strong>越精准。</li>
+                    <li>用户越多互动（聊天/测评/打卡），<strong>心理图谱</strong>越精准。</li>
                     <li>图谱越精准，AiLing 的<strong>共情与推荐</strong>越准确。</li>
                     <li>推荐越准确，<strong>付费转化率</strong>越高，且用户<strong>粘性</strong>越强。</li>
+                    <li>高粘性用户持续产生数据，进一步优化算法，形成正向循环。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>📊 关键数据指标</h4>
+                <ul class="custom-list">
+                    <li><strong>获客指标：</strong> 日活用户、新增用户、留存率。</li>
+                    <li><strong>互动指标：</strong>
+                        <ul>
+                            <li>工具使用频次（木鱼、呼吸、日记等）。</li>
+                            <li>对话轮数（AiLing平均对话长度）。</li>
+                            <li>打卡率（心情打卡完成率）。</li>
+                        </ul>
+                    </li>
+                    <li><strong>转化指标：</strong>
+                        <ul>
+                            <li>测评付费转化率（免费→付费报告）。</li>
+                            <li>PM+课程转化率（测评→PM+）。</li>
+                            <li>PM+完成率（开始→完成5周）。</li>
+                        </ul>
+                    </li>
+                    <li><strong>价值指标：</strong>
+                        <ul>
+                            <li>PSYCHLOPS改善率（Pre vs Post）。</li>
+                            <li>NPS（净推荐值）。</li>
+                            <li>用户满意度评分。</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>🎯 产品核心竞争力</h4>
+                <ul class="custom-list">
+                    <li><strong>循证医学基石：</strong> WHO PM+疗法，科学验证有效。</li>
+                    <li><strong>全流程闭环：</strong> 预评估→5周课程→后测评估→结案。</li>
+                    <li><strong>AI+真人融合：</strong> AI陪伴 + 专业流程 = 高效低成本。</li>
+                    <li><strong>可视化反馈：</strong> 心理图谱实时展示，增强用户参与感。</li>
+                    <li><strong>危机安全保障：</strong> 多层危机干预机制，用户安全第一。</li>
+                    <li><strong>交互体验创新：</strong>
+                        <ul>
+                            <li>语音输入：按住说话，上滑取消。</li>
+                            <li>快捷话题：降低输入门槛。</li>
+                            <li>游戏化元素：问题分类、情绪打卡。</li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
     </section>
 
+    </section>
+
+    <section id="changelog">
+        <h2>11. 版本更新记录 (Changelog)</h2>
+
+        <h3>v2.1 (2026-01-06) - 原型深度优化版</h3>
+        <div class="card">
+            <h4>✨ 新增功能 (New Features)</h4>
+            <ul class="custom-list">
+                <li><strong>心理图谱 (Mind Graph)：</strong>
+                    <ul>
+                        <li>首页核心区域新增动态雷达图，展示6个维度：情绪、压力、睡眠、能量、专注、社交。</li>
+                        <li>基于用户聊天情绪、测评结果、PM+训练数据、心情打卡等多维度数据实时计算。</li>
+                        <li>数据更新时有平滑过渡动画，"实时更新"标签变更为"刚刚更新"。</li>
+                    </ul>
+                </li>
+                <li><strong>心情打卡模块：</strong>
+                    <ul>
+                        <li>首页新增5种情绪快捷打卡：😊喜悦、😌平静、😴疲惫、😟焦虑、😢难过。</li>
+                        <li>一键记录，数据自动同步至情绪日记和心理图谱。</li>
+                    </ul>
+                </li>
+                <li><strong>语音录制全屏模态：</strong>
+                    <ul>
+                        <li>AiLing聊天页新增语音输入模式。</li>
+                        <li>按住说话，松开发送，上滑取消的交互设计。</li>
+                        <li>波纹扩散动画、中央麦克风图标、计时器实时显示。</li>
+                        <li>语音/文本模式一键切换。</li>
+                    </ul>
+                </li>
+                <li><strong>快捷话题卡片：</strong>
+                    <ul>
+                        <li>AiLing聊天页新增4个高频话题：心情不好、压力很大、学放松、睡眠问题。</li>
+                        <li>点击快速发送，降低用户输入门槛。</li>
+                    </ul>
+                </li>
+                <li><strong>冥想木鱼工具：</strong>
+                    <ul>
+                        <li>能量坊新增"冥想木鱼"工具。</li>
+                        <li>拟真物理敲击与回弹动画，配合震动反馈。</li>
+                        <li>"功德+1"视觉特效，每次敲击即时反馈。</li>
+                        <li>电子消气功，适合愤怒或焦虑时快速释放。</li>
+                    </ul>
+                </li>
+                <li><strong>危机干预详细流程：</strong>
+                    <ul>
+                        <li>新增自杀意念评估完整流程（4个步骤）。</li>
+                        <li>高危判定逻辑：计划在两周内实施→立即触发红色警报。</li>
+                        <li>即时干预措施：一键呼叫、呼吸引导、着陆练习、AI安抚。</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>🔧 功能优化 (Improvements)</h4>
+            <ul class="custom-list">
+                <li><strong>首页布局优化：</strong>
+                    <ul>
+                        <li>模块化卡片设计，信息层次更清晰。</li>
+                        <li>PM+主卡片根据用户进度动态展示（未开始/进行中/已完成）。</li>
+                        <li>周进度列表新增状态图标和颜色标识。</li>
+                        <li>今日作业任务仅在有时显示，避免冗余。</li>
+                    </ul>
+                </li>
+                <li><strong>PM+流程完善：</strong>
+                    <ul>
+                        <li>第0阶段预评估：新增问题分类和因子提取逻辑。</li>
+                        <li>第1周：新增呼吸训练困难排查表（4种常见问题）。</li>
+                        <li>第2-5周：详细问题管理、行为激活、社会支持流程。</li>
+                        <li>危机筛查：每周PSYCHLOPS Q4≥4时持续监测。</li>
+                    </ul>
+                </li>
+                <li><strong>测评功能增强：</strong>
+                    <ul>
+                        <li>4个专业量表：MBTI人格测试、SAS焦虑、PHQ-9抑郁、职业倦怠。</li>
+                        <li>免费/付费分层模式：基础分数免费，深度报告付费。</li>
+                        <li>付费转化引导：测评报告底部强引导解锁PM+课程。</li>
+                    </ul>
+                </li>
+                <li><strong>能量坊工具丰富：</strong>
+                    <ul>
+                        <li>6个工具：呼吸训练、54321着陆、渐进式肌肉放松、意象引导、冥想木鱼、情绪日记。</li>
+                        <li>每个工具都有详细的引导说明和交互设计。</li>
+                    </ul>
+                </li>
+                <li><strong>个人中心完善：</strong>
+                    <ul>
+                        <li>新增心理健康仪表盘（PSYCHLOPS折线图）。</li>
+                        <li>我的档案：统一管理测评报告、聊天记录、危机档案。</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>🐛 Bug修复与细节优化</h4>
+            <ul class="custom-list">
+                <li>AiLing页面隐藏底部导航，营造沉浸式对话体验。</li>
+                <li>首页图谱更新时机优化：切换到首页时自动更新，避免数据不同步。</li>
+                <li>PM+流程数据模型完善：新增mindGraphData、moodLog等字段。</li>
+                <li>本地存储优化：saveState/loadState确保用户数据持久化。</li>
+            </ul>
+        </div>
+
+        <h3>v2.0 (2026-01-04) - 初始版本</h3>
+        <div class="card">
+            <ul class="custom-list">
+                <li>基础产品框架搭建。</li>
+                <li>核心功能模块定义：首页、测评、AiLing、能量坊、个人中心。</li>
+                <li>PM+核心流程设计（5周结构化课程）。</li>
+                <li>商业模式设计：免费工具→付费测评→PM+课程。</li>
+                <li>竞品分析和差异化策略。</li>
+            </ul>
+        </div>
     </section>
 
     <footer>
