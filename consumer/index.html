@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>爱聆 AiLing | PM+ 专业心理疏导系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="phone">
+    <div class="status-bar"><span id="timeDisplay">9:41</span><div class="status-icons"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div></div>
+    
+    <div class="app-container">
+        <!-- 首页 -->
+        <div class="page active" id="homePage">
+            <div class="page-scroll">
+                <header class="home-header">
+                    <div class="greeting">
+                        <h1 id="greetingText">早安，探索者</h1>
+                        <p class="subtitle">在这片森境中，我们陪你漫游</p>
+                    </div>
+                    <div class="avatar-wrapper" onclick="switchPage('user')">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="avatar">
+                        <div class="notification-dot"></div>
+                    </div>
+                </header>
+
+                <!-- 心情打卡 -->
+                <section class="mood-section">
+                    <h3 class="section-title">此刻的内心天气</h3>
+                    <div class="mood-grid">
+                        <div class="mood-item" data-mood="happy" onclick="selectMood(this)"><span class="mood-emoji">😊</span><span class="mood-label">喜悦</span></div>
+                        <div class="mood-item" data-mood="calm" onclick="selectMood(this)"><span class="mood-emoji">😌</span><span class="mood-label">平静</span></div>
+                        <div class="mood-item" data-mood="tired" onclick="selectMood(this)"><span class="mood-emoji">😴</span><span class="mood-label">疲惫</span></div>
+                        <div class="mood-item" data-mood="anxious" onclick="selectMood(this)"><span class="mood-emoji">😟</span><span class="mood-label">焦虑</span></div>
+                        <div class="mood-item" data-mood="sad" onclick="selectMood(this)"><span class="mood-emoji">😢</span><span class="mood-label">难过</span></div>
+                    </div>
+                </section>
+
+                <!-- 心理图谱模块 -->
+                <section class="mind-graph-card">
+                    <div class="card-header">
+                        <h3>我的心理图谱</h3>
+                        <span class="update-badge">实时更新</span>
+                    </div>
+                    <div class="radar-container">
+                        <!-- SVG 雷达图背景 -->
+                        <svg class="radar-bg" viewBox="0 0 100 100">
+                            <polygon points="50,10 90,30 90,70 50,90 10,70 10,30" class="radar-grid" />
+                            <polygon points="50,25 75,37.5 75,62.5 50,75 25,62.5 25,37.5" class="radar-grid-inner" />
+                            <!-- 数据区域 -->
+                            <polygon id="radarData" points="50,10 90,30 90,70 50,90 10,70 10,30" class="radar-area" />
+                        </svg>
+                        <!-- 维度标签 -->
+                        <span class="radar-label label-top">情绪</span>
+                        <span class="radar-label label-tr">压力</span>
+                        <span class="radar-label label-br">睡眠</span>
+                        <span class="radar-label label-bottom">能量</span>
+                        <span class="radar-label label-bl">专注</span>
+                        <span class="radar-label label-tl">社交</span>
+                    </div>
+                    <p class="graph-tip">基于您的对话、测评及练习数据生成</p>
+                </section>
+
+                <!-- PM+ 主卡片 -->
+                <section class="pm-hero-card" onclick="enterPM()">
+                    <div class="pm-hero-content">
+                        <div class="pm-badge">WHO 推荐 · PM+ 循证干预</div>
+                        <h2 class="pm-hero-title" id="pmHeroTitle">开启你的心灵成长之旅</h2>
+                        <p class="pm-hero-desc" id="pmHeroDesc">5周结构化心理疏导，已帮助全球数百万人</p>
+                        <div class="pm-hero-progress" id="pmHeroProgress" style="display:none;">
+                            <div class="progress-bar"><div class="progress-fill" id="pmProgressFill"></div></div>
+                            <span class="progress-text" id="pmProgressText">0/5 周</span>
+                        </div>
+                    </div>
+                    <div class="pm-hero-action">
+                        <span id="pmActionText">立即开始</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="pm-hero-bg"><i class="fas fa-seedling"></i></div>
+                </section>
+
+                <!-- 测评引导卡片 -->
+                <section class="assessment-hero" onclick="switchPage('assess')">
+                    <div class="assessment-content">
+                        <h3>探索你的内心世界</h3>
+                        <p>通过专业心理测评，多维度了解真实的自己</p>
+                        <div class="assessment-action">
+                            <span>前往测评中心</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="assessment-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                </section>
+
+                <!-- 周进度卡片 -->
+                <section class="week-section" id="weekSection">
+                    <h3 class="section-title">PM+ 学习进度</h3>
+                    <div class="week-list" id="weekList"></div>
+                </section>
+
+                <!-- 今日作业 -->
+                <section class="homework-section" id="homeworkSection" style="display:none;">
+                    <h3 class="section-title">今日练习任务</h3>
+                    <div class="homework-card" id="homeworkCard"></div>
+                </section>
+
+                <!-- 快捷工具 -->
+                <section class="tools-section">
+                    <h3 class="section-title">心灵急救箱</h3>
+                    <div class="tools-grid">
+                        <div class="tool-item" onclick="openTool('breathing')"><div class="tool-icon breath-icon"><i class="fas fa-wind"></i></div><span>呼吸训练</span></div>
+                        <div class="tool-item" onclick="openTool('grounding')"><div class="tool-icon ground-icon"><i class="fas fa-hand-holding-heart"></i></div><span>着陆技术</span></div>
+                        <div class="tool-item" onclick="openTool('journal')"><div class="tool-icon journal-icon"><i class="fas fa-book-open"></i></div><span>情绪日记</span></div>
+                        <div class="tool-item" onclick="openTool('sos')"><div class="tool-icon sos-icon"><i class="fas fa-phone"></i></div><span>紧急求助</span></div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- PM+ 会话页 -->
+        <div class="page" id="pmPage">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <button class="back-btn" onclick="exitPM()"><i class="fas fa-chevron-left"></i></button>
+                    <div class="counselor-info">
+                        <div class="counselor-avatar"><i class="fas fa-user-md"></i></div>
+                        <div class="counselor-meta">
+                            <h4>AI 心理咨询师</h4>
+                            <div class="online-status"><span class="status-dot"></span>在线中</div>
+                        </div>
+                    </div>
+                    <div class="session-info" id="sessionInfo">预评估</div>
+                </div>
+                <div class="chat-messages" id="chatMessages"></div>
+                <div class="chat-input-area" id="chatInputArea"></div>
+            </div>
+        </div>
+
+        <!-- 测评页 -->
+        <div class="page" id="assessPage">
+            <div class="page-scroll">
+                <header class="page-header"><h1>探索内心世界</h1><p class="subtitle">专业心理测评，了解真正的自己</p></header>
+                <div class="assess-list" id="assessList"></div>
+            </div>
+        </div>
+
+        <!-- 心理测评页 -->
+        <div class="page" id="assessPage">
+            <div class="page-scroll">
+                <header class="page-header"><h1>心理测评中心</h1><p class="subtitle">科学认知，探索自我</p></header>
+                <div class="assess-list" id="assessList"></div>
+            </div>
+        </div>
+
+        <!-- AiLing 聊天页 -->
+        <div class="page" id="aiPage">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <button class="back-btn" onclick="switchPage('home')"><i class="fas fa-chevron-left"></i></button>
+                    <div class="counselor-info">
+                        <div class="counselor-avatar ai-avatar"><i class="fas fa-ghost"></i></div>
+                        <div class="counselor-meta"><h4>AiLing 心灵伙伴</h4><p class="ai-desc">循证心理陪伴 · 随时倾听</p></div>
+                    </div>
+                    <button class="chat-menu-btn" onclick="showAiChatMenu()"><i class="fas fa-ellipsis-v"></i></button>
+                </div>
+                <!-- 快捷话题 -->
+                <div class="quick-topics" id="quickTopics">
+                    <div class="topic-chip" onclick="sendQuickTopic('我今天心情不太好')">😔 心情不好</div>
+                    <div class="topic-chip" onclick="sendQuickTopic('我最近压力很大')">😰 压力很大</div>
+                    <div class="topic-chip" onclick="sendQuickTopic('我想学习放松技巧')">🧘 学放松</div>
+                    <div class="topic-chip" onclick="sendQuickTopic('我睡眠不好怎么办')">😴 睡眠问题</div>
+                </div>
+                <div class="chat-messages" id="aiChatMessages">
+                    <div class="bubble ai">嗨，我是 AiLing！今天想聊些什么呢？😊</div>
+                    <div class="bubble ai">你可以点击上方的快捷话题，或者直接输入文字/语音和我交流～</div>
+                </div>
+                <!-- 输入区域：支持文本和语音双模式 -->
+                <div class="ai-chat-input-area" id="aiInputArea">
+                    <!-- 文本输入模式 -->
+                    <div class="input-mode text-mode" id="textInputMode">
+                        <div class="input-row">
+                            <button class="mode-switch-btn" onclick="switchToVoiceMode()" title="切换语音">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                            <input type="text" id="aiChatInput" placeholder="输入你想说的话..." onkeypress="if(event.key==='Enter')sendAiChat()">
+                            <button class="send-btn" onclick="sendAiChat()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 语音输入模式 -->
+                    <div class="input-mode voice-mode" id="voiceInputMode" style="display:none;">
+                        <div class="voice-input-container">
+                            <button class="mode-switch-btn" onclick="switchToTextMode()" title="切换文字">
+                                <i class="fas fa-keyboard"></i>
+                            </button>
+                            <button class="voice-record-btn" id="voiceRecordBtn"
+                                    onmousedown="startVoiceRecord(event)" 
+                                    onmouseup="stopVoiceRecord(event)"
+                                    ontouchstart="startVoiceRecord(event)" 
+                                    ontouchend="stopVoiceRecord(event)">
+                                <span class="voice-record-text" id="voiceRecordText">按住 说话</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 语音录制全屏模态 -->
+        <div class="voice-recording-modal" id="voiceRecordingModal">
+            <div class="voice-modal-content">
+                <div class="voice-cancel-zone" id="voiceCancelZone">
+                    <i class="fas fa-times"></i>
+                    <span>松开取消</span>
+                </div>
+                <div class="voice-visual">
+                    <div class="voice-ripple"></div>
+                    <div class="voice-ripple delay-1"></div>
+                    <div class="voice-ripple delay-2"></div>
+                    <div class="voice-mic-circle">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                </div>
+                <p class="voice-status" id="voiceStatus">正在聆听...</p>
+                <p class="voice-timer" id="voiceTimer">0:00</p>
+                <p class="voice-hint">松开发送，上滑取消</p>
+            </div>
+        </div>
+
+        <!-- 能量坊 -->
+        <div class="page" id="toolsPage">
+            <div class="page-scroll">
+                <header class="page-header"><h1>心灵能量坊</h1><p class="subtitle">小工具帮你快速调节情绪</p></header>
+                <div class="energy-tools" id="energyTools"></div>
+            </div>
+        </div>
+
+        <!-- 个人中心 -->
+        <div class="page" id="userPage">
+            <div class="page-scroll">
+                <div class="user-profile" id="userProfile"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="nav-bar" id="navBar">
+        <div class="nav-item active" data-page="home" onclick="switchPage('home')"><i class="fas fa-house"></i><span>首页</span></div>
+        <div class="nav-item" data-page="assess" onclick="switchPage('assess')"><i class="fas fa-compass"></i><span>测评</span></div>
+        <div class="nav-item ai-nav" data-page="ai" onclick="switchPage('ai')"><div class="ai-btn"><i class="fas fa-ghost"></i></div><span>AiLing</span></div>
+        <div class="nav-item" data-page="tools" onclick="switchPage('tools')"><i class="fas fa-leaf"></i><span>能量坊</span></div>
+        <div class="nav-item" data-page="user" onclick="switchPage('user')"><i class="fas fa-user"></i><span>我的</span></div>
+    </nav>
+
+    <!-- 弹层容器 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="sheet" id="sheet"></div>
+    <div class="modal" id="modal"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="pm-flow.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

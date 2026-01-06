@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爱聆 AiLing | 产品设计说明书 (PRD) v2.0</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #5B8C5A;
+            --primary-dark: #386638;
+            --secondary: #E8B86D;
+            --text-main: #1F2937;
+            --text-light: #6B7280;
+            --bg-body: #F3F4F6;
+            --bg-card: #FFFFFF;
+            --border: #E5E7EB;
+        }
+
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; line-height: 1.6; color: var(--text-main); background: var(--bg-body); margin: 0; display: flex; }
+        
+        /* 侧边导航 */
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--border); height: 100vh; position: fixed; padding: 2rem 1.5rem; overflow-y: auto; box-sizing: border-box; }
+        .logo { font-size: 20px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .nav-section { margin-bottom: 1.5rem; }
+        .nav-title { font-size: 12px; text-transform: uppercase; color: #9CA3AF; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: 0.5px; }
+        .nav-link { display: block; padding: 8px 12px; color: var(--text-light); text-decoration: none; border-radius: 6px; font-size: 14px; margin-bottom: 2px; transition: all 0.2s; }
+        .nav-link:hover { background: #F3F4F6; color: var(--primary); }
+        .nav-link.active { background: #DCFCE7; color: var(--primary-dark); font-weight: 600; }
+
+        /* 主内容 */
+        .main { margin-left: 260px; padding: 3rem 4rem; flex: 1; max-width: 1000px; }
+        
+        h1 { font-size: 2.25rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem; }
+        h2 { font-size: 1.5rem; border-left: 4px solid var(--primary); padding-left: 1rem; margin: 3rem 0 1.5rem 0; color: var(--text-main); }
+        h3 { font-size: 1.125rem; color: var(--primary-dark); margin: 2rem 0 1rem 0; display: flex; align-items: center; gap: 8px; }
+
+        .meta-info { font-size: 0.875rem; color: var(--text-light); margin-bottom: 2rem; display: flex; gap: 20px; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; background: #E5E7EB; color: #374151; }
+        .tag.blue { background: #DBEAFE; color: #1E40AF; }
+        .tag.green { background: #DCFCE7; color: #166534; }
+        .tag.yellow { background: #FEF3C7; color: #92400E; }
+
+        /* 卡片组件 */
+        .card { background: white; border-radius: 8px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); margin-bottom: 1.5rem; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+        
+        /* 引用块 */
+        .quote-box { background: #F0FDFA; border-left: 4px solid #14B8A6; padding: 1rem; color: #0F766E; font-size: 0.95rem; margin: 1rem 0; border-radius: 0 4px 4px 0; }
+
+        /* 表格 */
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; background: white; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        th { background: #F9FAFB; font-weight: 600; color: var(--text-main); }
+
+        /* 列表 */
+        ul.custom-list { list-style: none; padding: 0; }
+        ul.custom-list li { margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative; }
+        ul.custom-list li::before { content: "•"; color: var(--primary); font-weight: bold; position: absolute; left: 0; font-size: 1.2rem; line-height: 1.5rem; }
+
+        /* 流程图容器 */
+        .mermaid-wrapper { background: white; padding: 1rem; border-radius: 8px; border: 1px solid var(--border); margin: 1.5rem 0; overflow-x: auto; }
+
+        footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border); color: var(--text-light); font-size: 0.875rem; }
+    </style>
+</head>
+<body>
+
+<nav class="sidebar">
+    <div class="logo">� 爱聆 AiLing</div>
+    
+    <div class="nav-section">
+        <div class="nav-title">战略层 Strategy</div>
+        <a href="#intro" class="nav-link active">1. 产品综述</a>
+        <a href="#users" class="nav-link">2. 用户与痛点</a>
+        <a href="#strategy" class="nav-link">3. 差异化策略</a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-title">结构层 Structure</div>
+        <a href="#ia" class="nav-link">4. 信息架构 (IA)</a>
+        <a href="#pm-logic" class="nav-link">5. PM+ 核心逻辑</a>
+    </div>
+
+    <div class="nav-section">
+        <div class="nav-title">核心功能 Core</div>
+        <a href="#feature-ailing" class="nav-link">6. AiLing 智能对话</a>
+        <a href="#feature-assess" class="nav-link">7. 心理测评中心</a>
+        <a href="#feature-tools" class="nav-link">8. 能量坊与木鱼</a>
+        <a href="#feature-sos" class="nav-link">9. 危机干预机制</a>
+    </div>
+</nav>
+
+<div class="main">
+
+    <section id="intro">
+        <h1>产品设计说明书 (PRD) <span class="tag green" style="vertical-align: middle; margin-left: 8px;">v2.0</span></h1>
+        <div class="meta-info">
+            <span>📅 2026-01-04</span>
+            <span>👤 产品经理: Antigravity</span>
+            <span>🔒 密级: 内部公开</span>
+        </div>
+
+        <div class="quote-box">
+            <strong>核心愿景：</strong> 打造一款<strong>面向C端的数字化AI心理干预疗愈产品</strong>。不仅提供碎片化的解压工具，更核心的是将世界卫生组织 (WHO) 的 <strong>PM+ (Problem Management Plus)</strong> 疗法标准化、流程化、智能化，为轻中度心理困扰人群提供低门槛的专业服务。
+        </div>
+
+        <p>本文档基于《爱聆心理测评-深度调研报告》的市场洞察，结合当前 V1.0 版本的技术实现，详细定义了产品的业务逻辑、功能规格与交互细节。</p>
+    </section>
+
+    <section id="users">
+        <h2>2. 用户画像与痛点分析</h2>
+        <p>基于调研报告，我们的目标用户主要集中在 18-35 岁，面临高压生活状态的人群。</p>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>🎒 青少年心理困扰者 (Mike, 18岁)</h3>
+                <p><strong>场景：</strong> 高中生，学业压力巨大，与父母沟通不畅，常感到孤独和无助。</p>
+                <p><strong>痛点：</strong> 害怕被老师同学异样眼光看待；不想去学校心理室；渴望被理解但不知如何表达。</p>
+                <p><strong>需求：</strong> <span class="tag blue">私密性高</span> <span class="tag blue">同伴式对话</span> <span class="tag blue">情绪宣泄</span></p>
+            </div>
+            <div class="card">
+                <h3>🎓 迷茫求职者 (Kevin, 22岁)</h3>
+                <p><strong>场景：</strong> 应届毕业生，考研失败，找工作碰壁，自我价值感低。</p>
+                <p><strong>痛点：</strong> 经济能力有限，付不起高昂咨询费；不知道自己适合什么，对未来恐慌。</p>
+                <p><strong>需求：</strong> <span class="tag blue">低成本/免费</span> <span class="tag blue">职业性格测评</span> <span class="tag blue">情绪疏导</span></p>
+            </div>
+        </div>
+    </section>
+
+    <section id="strategy">
+        <h2>3. 竞品差异化与产品策略</h2>
+        <p>相较于市面上的《壹心理》、《抑郁研究所》等竞品，爱聆的核心竞争力在于<strong>“循证医学 + 全流程闭环”</strong>。</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>维度</th>
+                    <th>传统心理 APP</th>
+                    <th>爱聆 AiLing</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>专业基石</strong></td>
+                    <td>科普文章 + 咨询师黄页 (平台模式)</td>
+                    <td><strong>WHO PM+ 疗法</strong> (数字化疗法)</td>
+                </tr>
+                <tr>
+                    <td><strong>干预深度</strong></td>
+                    <td>单次测评或咨询，缺乏连续性</td>
+                    <td><strong>5周结构化课程</strong>，持续跟踪干预</td>
+                </tr>
+                <tr>
+                    <td><strong>交互体验</strong></td>
+                    <td>问卷填空式，枯燥</td>
+                    <td><strong>AI 全双工对话 + 3D 物理互动</strong> (木鱼)</td>
+                </tr>
+                <tr>
+                    <td><strong>危机处理</strong></td>
+                    <td>仅提示拨打热线</td>
+                    <td><strong>一键 SOS 覆盖层</strong> + 即时着陆练习</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="ia">
+        <h2>4. 信息架构 (Information Architecture)</h2>
+        <p>产品采用扁平化架构，以“首页 Dashboard”为中心，向各个垂直功能模块发散。</p>
+        <div class="mermaid-wrapper">
+            <div class="mermaid">
+                graph TD
+                Home["🏠 首页 Dashboard"] --> Assessment["📝 测评中心"]
+                Home --> Tools["🧘 能量坊"]
+                Home --> AiLing["💬 AiLing 咨询室"]
+                Home --> User["👤 个人中心"]
+
+                Assessment --> List["量表列表 (MBTI/SAS/PHQ-9)"]
+                Assessment --> Report["测评报告页"]
+
+                AiLing --> Voice["全屏语音模式"]
+                AiLing --> Text["文本对话模式"]
+
+                Tools --> Fish["3D 静心木鱼"]
+                Tools --> Breath["4-7-8 呼吸引导"]
+                Tools --> Grounding["54321 着陆练习"]
+                
+                User --> History["干预历史"]
+                User --> Profile["成长档案"]
+            </div>
+        </div>
+    </section>
+
+    <section id="pm-logic">
+        <h2>5. PM+ 核心业务流转逻辑</h2>
+        <p>这是系统的核心引擎，严格遵循 WHO 协议的 5 个阶段。</p>
+        
+        <div class="mermaid-wrapper">
+            <div class="mermaid">
+                graph LR
+                Start(("用户接入")) --> PreTest{"PSYCHLOPS<br/>预评估"}
+                
+                PreTest -- 高危 --> Crisis["🔴 危机模式 SOS"]
+                
+                PreTest -- 适宜 --> W1["🟢 Week 1"]
+                W1 --> |教导| Skill1["慢呼吸管理"]
+                W1 --> |作业| HW1["每日练习打卡"]
+                
+                HW1 --> |完成| W2["Week 2"]
+                W2 --> |教导| Skill2["问题拆解行动"]
+                W2 --> |作业| HW2["执行微行动"]
+                
+                HW2 --> |完成| W3["Week 3"]
+                W3 --> |教导| Skill3["行为激活"]
+                
+                W3 --> W4["Week 4 社会支持"]
+                W4 --> W5["Week 5 预防复发"]
+                
+                W5 --> PostTest{"后测评估"}
+                PostTest --> End(("结案报告"))
+            </div>
+        </div>
+    </section>
+
+    <section id="modules">
+        <h2>5. 全功能模块详解 (System Modules)</h2>
+        <p>本章按照 APP 底部导航栏 (Tabbar) 的操作流，逐一拆解各个页面的功能设计与交互逻辑。</p>
+
+        <!-- 5.1 首页 -->
+        <div class="feature-box" id="page-home">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4>5.1 首页 Dashboard (Home)</h4>
+                <span class="tag green">Tab 1</span>
+            </div>
+            <p><strong>定位：</strong> 用户的“心理状态驾驶舱”，聚合当前任务与核心数据。</p>
+            <ul class="custom-list">
+                <li><strong>可视化心理图谱 (Mind Graph)：</strong> <span class="tag blue">New</span> 
+                    <ul>
+                         <li>首页核心区域展示动态“心理图谱”。该图谱基于用户的聊天情绪、测评结果及 PM+ 训练数据实时更新。</li>
+                         <li>以可视化的方式（如情绪波形、能力雷达图）让用户直观看到自己的状态变化，形成数据反馈闭环。</li>
+                    </ul>
+                </li>
+                <li><strong>智能问候 Banner：</strong> 根据时段（清晨/深夜）与用户当前情绪位面推送个性化暖心文案。</li>
+                <li><strong>PM+ 课程主卡片：</strong> 显示当前周次进度。若用户被算法判定为“需要干预”，此处会高亮引导开启课程。</li>
+            </ul>
+        </div>
+
+        <!-- 5.2 测评中心 -->
+        <div class="feature-box" id="page-assess">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4>5.2 心理测评中心 (Assessment)</h4>
+                <span class="tag green">Tab 2</span>
+            </div>
+            <p><strong>定位：</strong> 风险筛查入口与付费转化节点。</p>
+            <ul class="custom-list">
+                <li><strong>分层服务模式：</strong>
+                    <ul>
+                        <li><strong>免费版：</strong> 基础分数展示。</li>
+                        <li><strong>付费解锁：</strong> <span class="tag yellow">Monetization</span> 查看深度专业报告（含详细维度分析、专家建议）。</li>
+                    </ul>
+                </li>
+                <li><strong>干预导流：</strong> 报告页底部根据结果（如中度焦虑）**强引导用户解锁 PM+ 课程**，实现“测-评-治”闭环。</li>
+            </ul>
+        </div>
+
+        <!-- 5.3 AiLing 对话 -->
+        <div class="feature-box" id="page-ailing">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4>5.3 AiLing 咨询室 (Ai Companion)</h4>
+                <span class="tag green">Tab 3 (Core)</span>
+            </div>
+            <p><strong>定位：</strong> 拟人化心理伙伴与实时情绪监测站。</p>
+            <ul class="custom-list">
+                <li><strong>实时情绪计算 (Real-time Emotion)：</strong> 对话过程中，AiLing 实时分析用户语意与语调。若检测到“持续焦虑”，会主动推送 PHQ-9 测评卡片。</li>
+                <li><strong>智能推荐引擎：</strong> 根据情绪分析结果，AiLing 会在对话中自然植入建议：“我也许能帮你，要不要试试我们的 PM+ 疏导课程？”从而引导转化。</li>
+                <li><strong>图谱同步：</strong> 每次对话结束，提取的情绪标签（如“因工作焦虑”）会自动同步至首页的“心理图谱”。</li>
+            </ul>
+        </div>
+
+        <!-- 5.4 能量坊 -->
+        <div class="feature-box" id="page-tools">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4>5.4 能量坊 (Energy Workshop)</h4>
+                <span class="tag green">Tab 4</span>
+            </div>
+            <p><strong>定位：</strong> 轻量级自助工具箱，即开即用。</p>
+            <div class="card-grid">
+                <div class="card" style="margin-bottom:0;">
+                    <strong>📿 3D 静心木鱼</strong>
+                    <p style="font-size:12px; color:#666;">拟真物理敲击与回弹动画，配合触觉震动与“功德+1”特效，解压神器。</p>
+                </div>
+                <!-- ... 其他工具保持不变 ... -->
+                 <div class="card" style="margin-bottom:0;">
+                    <strong>🌬️ 4-7-8 呼吸</strong>
+                    <p style="font-size:12px; color:#666;">动态圆环视觉引导，调节副交感神经，快速缓解惊恐。</p>
+                </div>
+                <div class="card" style="margin-bottom:0;">
+                    <strong>⚓ 着陆练习 (Grounding)</strong>
+                    <p style="font-size:12px; color:#666;">5步感官引导（看、听、触...），将注意力拉回当下。</p>
+                </div>
+                <div class="card" style="margin-bottom:0;">
+                    <strong>📔 情绪日记</strong>
+                    <p style="font-size:12px; color:#666;">Emoji 快速记录心情，生成月度情绪热力图。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5.5 个人中心 -->
+        <div class="feature-box" id="page-user">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4>5.5 个人中心 (User Profile)</h4>
+                <span class="tag green">Tab 5</span>
+            </div>
+            <p><strong>定位：</strong> 用户成长记录与数据资产管理。</p>
+            <ul class="custom-list">
+                <li><strong>心理健康仪表盘：</strong> 折线图展示 PSYCHLOPS 痛苦指数变化。</li>
+                <li><strong>我的档案：</strong> 统一管理测评报告、聊天记录及危机档案。</li>
+            </ul>
+        </div>
+
+        <!-- 5.6 SOS -->
+        <div class="feature-box" id="module-sos" style="border-left: 4px solid #EF4444;">
+             <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="color: #EF4444; border-color: #EF4444;">🚨 全局模块：危机干预 (SOS)</h4>
+                <span class="tag yellow">High Priority</span>
+            </div>
+            <p><strong>触发方式：</strong> 首页常驻、高危词识别、重度测评结果。</p>
+            <p><strong>功能：</strong> 一键呼叫 (110/12356)、即时引导呼吸/着陆。</p>
+        </div>
+
+    </section>
+
+    <section id="business-loop">
+        <h2>10. 商业模式与数据闭环 (Business & Data Loop)</h2>
+        <p>本项目构建了“免费工具引流 -> AI 情感识别 -> 付费专业干预”的完整商业闭环。</p>
+        
+        <div class="mermaid-wrapper">
+            <div class="mermaid">
+                graph TD
+                %% 流量层
+                Traffic[免费流量入口] -->|使用工具| Fish[木鱼/呼吸/日记]
+                Traffic -->|免费对话| Chat[AiLing 陪伴]
+                
+                %% 数据层
+                Chat -->|实时情绪识别| Emotion[情绪监测引擎]
+                Fish -->|高频使用| UserData[行为数据]
+                
+                %% 转化层
+                Emotion -->|推送建议| Assess[付费/专业测评]
+                Assess -->|生成报告| Report[深度解读报告]
+                
+                %% 核心变现层
+                Report -->|重度风险引导| PM[付费 PM+ 疗程]
+                Chat -->|自然推荐| PM
+                
+                %% 价值反馈层
+                PM -->|练习数据| Graph[个人心理图谱]
+                Assess -->|结果数据| Graph
+                Chat -->|情绪标签| Graph
+                
+                Graph -->|首页展示| Home[可视化反馈]
+                Home -->|增强粘性| Traffic
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h4>💰 商业变现路径</h4>
+                <ul class="custom-list">
+                    <li><strong>单次付费：</strong> 专业心理测评深度报告解锁。</li>
+                    <li><strong>订阅制 (SaaS)：</strong> 解锁 PM+ 5周完整疗程及 AI 陪伴的高级记忆功能。</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>🔄 数据飞轮效应</h4>
+                <ul class="custom-list">
+                    <li>用户越多互动（聊天/测评），<strong>心理图谱</strong>越精准。</li>
+                    <li>图谱越精准，AiLing 的<strong>共情与推荐</strong>越准确。</li>
+                    <li>推荐越准确，<strong>付费转化率</strong>越高，且用户<strong>粘性</strong>越强。</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    </section>
+
+    <footer>
+        <p>Copyright &copy; 2026 爱聆 AiLing Product Team.</p>
+    </footer>
+
+</div>
+
+<script>
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+
+</body>
+</html>
