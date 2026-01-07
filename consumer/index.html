@@ -43,7 +43,12 @@
                 <section class="mind-graph-card">
                     <div class="card-header">
                         <h3>我的心理图谱</h3>
-                        <span class="update-badge">实时更新</span>
+                        <div class="card-header-actions">
+                            <span class="update-badge">实时更新</span>
+                            <button class="icon-btn-text" onclick="switchPage('history')" title="历史趋势">
+                                <i class="fas fa-history"></i> 趋势
+                            </button>
+                        </div>
                     </div>
                     <div class="radar-container">
                         <!-- SVG 雷达图背景 -->
@@ -64,6 +69,35 @@
                     <p class="graph-tip">基于您的对话、测评及练习数据生成</p>
                 </section>
 
+                <!-- 测评引导卡片 -->
+                <section class="assessment-hero">
+                    <div class="assessment-content" onclick="switchPage('assess')">
+                        <h3>探索你的内心世界</h3>
+                        <p>通过专业心理测评，多维度了解真实的自己</p>
+                    </div>
+                    
+                    <!-- 快捷量表入口 -->
+                    <div class="assess-quick-links">
+                        <div class="quick-link-item" onclick="event.stopPropagation(); startAssessment('mbti')">
+                            <span class="q-emoji">🎭</span>
+                            <span class="q-name">性格MBTI</span>
+                        </div>
+                        <div class="quick-link-item" onclick="event.stopPropagation(); startAssessment('sas')">
+                            <span class="q-emoji">🌡️</span>
+                            <span class="q-name">焦虑自测</span>
+                        </div>
+                        <div class="quick-link-item" onclick="event.stopPropagation(); startAssessment('phq9')">
+                            <span class="q-emoji">💭</span>
+                            <span class="q-name">抑郁评估</span>
+                        </div>
+                    </div>
+
+                    <div class="assessment-action" onclick="switchPage('assess')">
+                        <span>更多探索请前往测评中心</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </section>
+
                 <!-- PM+ 主卡片 -->
                 <section class="pm-hero-card" onclick="enterPM()">
                     <div class="pm-hero-content">
@@ -82,20 +116,6 @@
                     <div class="pm-hero-bg"><i class="fas fa-seedling"></i></div>
                 </section>
 
-                <!-- 测评引导卡片 -->
-                <section class="assessment-hero" onclick="switchPage('assess')">
-                    <div class="assessment-content">
-                        <h3>探索你的内心世界</h3>
-                        <p>通过专业心理测评，多维度了解真实的自己</p>
-                        <div class="assessment-action">
-                            <span>前往测评中心</span>
-                            <i class="fas fa-chevron-right"></i>
-                        </div>
-                    </div>
-                    <div class="assessment-icon">
-                        <i class="fas fa-clipboard-check"></i>
-                    </div>
-                </section>
 
                 <!-- 周进度卡片 -->
                 <section class="week-section" id="weekSection">
@@ -141,15 +161,7 @@
             </div>
         </div>
 
-        <!-- 测评页 -->
-        <div class="page" id="assessPage">
-            <div class="page-scroll">
-                <header class="page-header"><h1>探索内心世界</h1><p class="subtitle">专业心理测评，了解真正的自己</p></header>
-                <div class="assess-list" id="assessList"></div>
-            </div>
-        </div>
-
-        <!-- 心理测评页 -->
+        <!-- 测评中心页 -->
         <div class="page" id="assessPage">
             <div class="page-scroll">
                 <header class="page-header"><h1>心理测评中心</h1><p class="subtitle">科学认知，探索自我</p></header>
@@ -245,6 +257,151 @@
         <div class="page" id="userPage">
             <div class="page-scroll">
                 <div class="user-profile" id="userProfile"></div>
+            </div>
+        </div>
+
+        <!-- 历史趋势页 -->
+        <div class="page" id="historyPage">
+            <div class="page-scroll">
+                <header class="page-header sticky-header">
+                    <div class="header-left">
+                        <button class="back-btn-simple" onclick="switchPage('home')"><i class="fas fa-chevron-left"></i></button>
+                        <h1>历史趋势</h1>
+                    </div>
+                </header>
+                
+                <div class="history-content">
+                    <div class="history-summary-card">
+                        <div class="summary-item">
+                            <span class="label">记录次数</span>
+                            <span class="value" id="historyCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">最高能量</span>
+                            <span class="value" id="maxEnergy">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">进步指数</span>
+                            <span class="value text-success">+15%</span>
+                        </div>
+                    </div>
+
+                    <div class="timeline-container" id="historyTimeline">
+                        <!-- 动态渲染时间轴 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 量表答题页 -->
+        <div class="page" id="quizPage">
+            <div class="quiz-container">
+                <header class="quiz-header">
+                    <button class="back-btn-simple" onclick="confirmExitQuiz()"><i class="fas fa-times"></i></button>
+                    <div class="quiz-progress-wrapper">
+                        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quizProgressFill"></div></div>
+                        <span id="quizProgressText">0/0</span>
+                    </div>
+                </header>
+                <div class="quiz-content">
+                    <h2 class="quiz-question" id="quizQuestion">加载中...</h2>
+                    <div class="quiz-options" id="quizOptions"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测评报告页 -->
+        <div class="page" id="quizResultPage">
+            <div class="page-scroll">
+                <header class="page-header result-header">
+                    <button class="back-btn-simple" onclick="switchPage('assess')"><i class="fas fa-arrow-left"></i></button>
+                    <h1>测评报告</h1>
+                </header>
+                <div class="result-container" id="quizResultDetail">
+                    <!-- 动态渲染报告内容 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- PM+ 系统介绍页 (Landing Page) -->
+        <div class="page" id="pmIntroPage">
+            <div class="page-scroll">
+                <header class="pm-intro-header">
+                    <button class="back-btn-simple" onclick="switchPage('home')"><i class="fas fa-chevron-left"></i></button>
+                    <div class="header-content">
+                        <div class="pm-badge-pill">WHO 推荐 · 循证心理干预</div>
+                        <h1>PM+ 问题管理系统</h1>
+                        <p>跨越心理困境的 5 周结构化旅程</p>
+                    </div>
+                </header>
+
+                <div class="pm-intro-content">
+                    <!-- 核心价值 -->
+                    <section class="pm-intro-section">
+                        <h3 class="intro-title">为什么选择 PM+？</h3>
+                        <div class="value-grid">
+                            <div class="value-item">
+                                <i class="fas fa-microscope"></i>
+                                <h4>科学严谨</h4>
+                                <p>基于世界卫生组织(WHO)开发的成熟心理干预协议</p>
+                            </div>
+                            <div class="value-item">
+                                <i class="fas fa-chess-knight"></i>
+                                <h4>技能导向</h4>
+                                <p>不只是倾听，更教你如何解决现实生活中的心理挑战</p>
+                            </div>
+                            <div class="value-item">
+                                <i class="fas fa-mobile-alt"></i>
+                                <h4>随时随地</h4>
+                                <p>AI 咨询师 24/7 陪伴，按你的节奏进行 5 周练习</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 课程大纲 -->
+                    <section class="pm-intro-section">
+                        <h3 class="intro-title">5 周成长蓝图</h3>
+                        <div class="roadmap">
+                            <div class="road-item">
+                                <div class="road-num">1</div>
+                                <div class="road-text"><h4>应对压力</h4><p>学习腹式呼吸，掌握即时放松技巧</p></div>
+                            </div>
+                            <div class="road-item">
+                                <div class="road-num">2</div>
+                                <div class="road-text"><h4>解决问题</h4><p>结构化拆解难题，找回掌控感</p></div>
+                            </div>
+                            <div class="road-item">
+                                <div class="road-num">3</div>
+                                <div class="road-text"><h4>行为激活</h4><p>打破抑郁循环，重新投入生活</p></div>
+                            </div>
+                            <div class="road-item">
+                                <div class="road-num">4</div>
+                                <div class="road-text"><h4>社交支持</h4><p>强化人际连接，建立情感缓冲带</p></div>
+                            </div>
+                            <div class="road-item">
+                                <div class="road-num">5</div>
+                                <div class="road-text"><h4>防止复发</h4><p>巩固技能，从容面对未来挑战</p></div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 信任背书 -->
+                    <section class="pm-intro-section quote-section">
+                        <div class="testimonial">
+                            <p>“这是我参与过最科学的心理训练，它给我的不仅仅是安慰，更是实实在在应对困难的‘武器’。”</p>
+                            <span class="author">—— 某匿名用户</span>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 悬浮底部支付 -->
+                <div class="pm-fixed-footer">
+                    <div class="price-info">
+                        <span class="old-price">原价 ¥199</span>
+                        <div class="now-price">立享优惠 <span>¥99</span></div>
+                    </div>
+                    <button class="pm-buy-btn" onclick="confirmPurchasePM()">立即开启 · 蜕变之旅</button>
+                </div>
             </div>
         </div>
     </div>
