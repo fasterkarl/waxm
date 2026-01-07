@@ -189,7 +189,7 @@ function completeHomework() {
 // ==================== PM+ 流程控制 ====================
 function enterPM() {
   // 商业闭环：检查是否已解锁课程
-  if (!PM_DATA.state.unlockedPM && !PM_DATA.state.isProMember) {
+  if (!PM_DATA.state.unlockedPM) {
     switchPage("pmIntro");
     return;
   }
@@ -1399,8 +1399,41 @@ function renderResultDetail(result, score, level, color, needsPay) {
 }
 
 function confirmPurchasePM() {
-  // 打开会员选择页面
-  showMemberPage();
+  // 直接购买PM+课程，不需要会员订阅
+  showModal(
+    "payment",
+    "💳",
+    "确认购买 PM+ 课程",
+    "您将支付 ¥99 解锁 PM+ 5周完整课程（原价 ¥199）",
+    () => {
+      // 模拟支付
+      const btn = document.querySelector(".modal .btn-primary");
+      if (btn) {
+        btn.innerText = "支付处理中...";
+        btn.disabled = true;
+      }
+
+      setTimeout(() => {
+        // 解锁PM+课程
+        PM_DATA.state.unlockedPM = true;
+        saveState();
+
+        showToast("支付成功！已解锁 PM+ 课程 ✨");
+
+        // 关闭弹窗
+        const modal = document.getElementById("modal");
+        const overlay = document.getElementById("overlay");
+        if (modal) modal.classList.remove("active");
+        if (overlay) overlay.classList.remove("active");
+
+        // 进入PM+课程
+        switchPage("home");
+        setTimeout(() => {
+          enterPM();
+        }, 300);
+      }, 1500);
+    }
+  );
 }
 
 function unlockQuizReport() {
