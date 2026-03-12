@@ -1,0 +1,1335 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>新华爱聆大模型 - 爱聆心理疏导</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+          "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica,
+          Arial, sans-serif;
+        background-color: #f0f2f5;
+        min-height: 100vh;
+      }
+
+      /* ========== 登录/注册 ========== */
+      .authContainer {
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        flex-direction: column;
+        top: 0;
+        left: 0;
+        z-index: 2000;
+      }
+      .authPageTitle {
+        font-size: 34px;
+        color: #fff;
+        margin-bottom: 60px;
+        font-weight: bold;
+      }
+      .authBox {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 400px;
+        padding: 40px;
+      }
+      .authTitle {
+        font-size: 24px;
+        font-weight: 600;
+        color: #303133;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      .formGroup {
+        margin-bottom: 20px;
+      }
+      .formLabel {
+        display: block;
+        font-size: 14px;
+        color: #606266;
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+      .formInput {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #dcdfe6;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.2s;
+      }
+      .formInput:focus {
+        outline: none;
+        border-color: #409eff;
+        box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+      }
+      .formInput::placeholder {
+        color: #c0c4cc;
+      }
+      .codeInputWrap {
+        display: flex;
+        gap: 10px;
+      }
+      .codeInputWrap .formInput {
+        flex: 1;
+      }
+      .codeBtn {
+        white-space: nowrap;
+        padding: 0 16px;
+        background-color: #409eff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .codeBtn:hover {
+        background-color: #66b1ff;
+      }
+      .codeBtn:disabled {
+        background-color: #c0c4cc;
+        cursor: not-allowed;
+      }
+      .authBtn {
+        width: 100%;
+        padding: 10px;
+        background-color: #409eff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 10px;
+      }
+      .authBtn:hover {
+        background-color: #66b1ff;
+      }
+      .authBtn:active {
+        background-color: #3c8ce4;
+      }
+      .authBtn:disabled {
+        background-color: #c0c4cc;
+        cursor: not-allowed;
+      }
+      .authToggle {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: #606266;
+      }
+      .authToggle a {
+        color: #409eff;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .authToggle a:hover {
+        text-decoration: underline;
+      }
+      .authLinks { text-align: center; margin-top: 12px; font-size: 12px; color: #909399; }
+      .authLinks a { color: #909399; cursor: pointer; text-decoration: none; margin: 0 4px; }
+      .authLinks a:hover { color: #409eff; text-decoration: underline; }
+      .errorMsg {
+        color: #f56c6c;
+        font-size: 12px;
+        margin-top: 4px;
+        display: none;
+      }
+      .errorMsg.show {
+        display: block;
+      }
+
+      /* 协议 */
+      .agreementWrap {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: #909399;
+        line-height: 1.6;
+      }
+      .agreementWrap input[type="checkbox"] {
+        margin-top: 3px;
+        cursor: pointer;
+      }
+      .agreementWrap a {
+        color: #409eff;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .agreementWrap a:hover {
+        text-decoration: underline;
+      }
+
+      /* 弹窗 */
+      .modalOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 3000;
+      }
+      .modalBox {
+        background: #fff;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 560px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+      .modalHeader {
+        padding: 16px 24px;
+        border-bottom: 1px solid #e4e7ed;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modalHeader h3 {
+        font-size: 16px;
+        color: #303133;
+      }
+      .modalClose {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #909399;
+      }
+      .modalClose:hover {
+        color: #303133;
+      }
+      .modalBody {
+        padding: 20px 24px;
+        overflow-y: auto;
+        font-size: 13px;
+        color: #606266;
+        line-height: 1.8;
+      }
+      .modalBody h4 {
+        margin: 12px 0 6px;
+        color: #303133;
+      }
+      .modalBody p {
+        margin-bottom: 8px;
+      }
+
+      /* ========== 聊天页面 ========== */
+      .chatContainer {
+        width: 100%;
+        height: 100vh;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .chatHeader {
+        background-color: #fff;
+        border-bottom: 1px solid #e4e7ed;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 60px;
+      }
+      .chatHeader h1 {
+        font-size: 16px;
+        font-weight: 500;
+        color: #303133;
+      }
+      .headerRight {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .status {
+        font-size: 12px;
+        color: #67c23a;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .status::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background-color: #67c23a;
+        border-radius: 50%;
+        display: inline-block;
+      }
+      .userInfo {
+        font-size: 12px;
+        color: #606266;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .username-link { cursor: pointer; color: #409eff; }
+      .username-link:hover { color: #66b1ff; text-decoration: underline; }
+      .logoutBtn {
+        background-color: #f56c6c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+      .logoutBtn:hover {
+        background-color: #dd001b;
+      }
+
+      .chatContent {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 0;
+        background-color: #f5f5f5;
+      }
+      .chatContent::-webkit-scrollbar {
+        width: 6px;
+      }
+      .chatContent::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .chatContent::-webkit-scrollbar-thumb {
+        background: #dcdfe6;
+        border-radius: 3px;
+      }
+
+      .messageList {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .welcomeMessage {
+        text-align: center;
+        padding: 40px 20px;
+        color: #606266;
+      }
+      .welcomeTitle {
+        font-size: 20px;
+        font-weight: 600;
+        color: #303133;
+        margin-bottom: 12px;
+      }
+      .welcomeText {
+        font-size: 14px;
+        line-height: 1.8;
+        color: #909399;
+      }
+      .messageItem {
+        display: flex;
+        flex-direction: column;
+      }
+      .timeWrap {
+        display: flex;
+        justify-content: center;
+        margin: 8px 0;
+      }
+      .timeText {
+        font-size: 12px;
+        color: #909399;
+        background-color: rgba(0, 0, 0, 0.05);
+        padding: 2px 10px;
+        border-radius: 3px;
+      }
+      .messageWrap {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .userMessage {
+        flex-direction: row-reverse;
+      }
+      .aiMessage {
+        flex-direction: row;
+      }
+      .avatarWrap {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+      }
+      .avatar {
+        width: 100%;
+        height: 100%;
+        border-radius: 4px;
+      }
+      .messageContent {
+        max-width: 500px;
+        font-size: 14px;
+        line-height: 1.6;
+        word-break: break-word;
+      }
+      .userText {
+        background-color: #95ec69;
+        color: #000;
+        padding: 10px 12px;
+        border-radius: 4px;
+      }
+      .aiText {
+        background-color: #fff;
+        color: #303133;
+        padding: 10px 12px;
+        border-radius: 4px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      /* 思考过程 */
+      .reasoningText {
+        background-color: #fdf6ec;
+        color: #e6a23c;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        line-height: 1.6;
+        border-left: 3px solid #e6a23c;
+        margin-bottom: 6px;
+      }
+      .reasoningLabel {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: block;
+        font-size: 11px;
+        color: #c0850a;
+      }
+
+      .chat-input {
+        padding: 16px 24px;
+        background-color: #fff;
+        border-top: 1px solid #e4e7ed;
+      }
+      .inputWrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        background-color: #fff;
+        border: 1px solid #dcdfe6;
+        border-radius: 4px;
+        padding: 8px 12px;
+        transition: border-color 0.2s;
+      }
+      .inputWrap:focus-within {
+        border-color: #409eff;
+      }
+      .inputField {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        padding: 4px 8px;
+        background: transparent;
+        color: #303133;
+      }
+      .inputField::placeholder {
+        color: #c0c4cc;
+      }
+      .sendBtn {
+        background-color: #07c160;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 20px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-left: 8px;
+      }
+      .sendBtn:hover {
+        background-color: #06ad56;
+      }
+      .sendBtn:disabled {
+        background-color: #c0c4cc;
+        cursor: not-allowed;
+      }
+      .tips {
+        font-size: 14px;
+        color: #333;
+        margin-top: 8px;
+        font-weight: bolder;
+        text-align: center;
+      }
+
+      .loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .loadingContent {
+        background-color: #fff;
+        padding: 24px 32px;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+      }
+      .loadingIcon {
+        width: 32px;
+        height: 32px;
+        border: 3px solid #f2f2f2;
+        border-top-color: #409eff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .loadingText {
+        font-size: 14px;
+        color: #606266;
+      }
+      .hidden {
+        display: none !important;
+      }
+
+      /* Toast 弹窗 */
+      .toast {
+        position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+        padding: 12px 24px; border-radius: 6px; font-size: 14px; color: #fff;
+        z-index: 9999; opacity: 0; transition: opacity 0.3s, top 0.3s;
+        pointer-events: none; max-width: 80%; text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      .toast.show { opacity: 1; top: 40px; }
+      .toast-success { background-color: #67c23a; }
+      .toast-error { background-color: #f56c6c; }
+      .toast-info { background-color: #409eff; }
+      .toast-warning { background-color: #e6a23c; }
+
+      @media (max-width: 768px) {
+        /* 登录注册页 */
+        .authContainer { padding: 20px; }
+        .authPageTitle { font-size: 20px; margin-bottom: 24px; padding: 0 16px; text-align: center; line-height: 1.4; }
+        .authBox { margin: 0; padding: 24px 20px; max-width: 100%; }
+        .authTitle { font-size: 20px; margin-bottom: 18px; }
+        .formGroup { margin-bottom: 14px; }
+        .formInput { padding: 10px; font-size: 16px; /* 防止iOS缩放 */ }
+        .codeInputWrap { gap: 8px; }
+        .codeBtn { padding: 0 12px; font-size: 12px; }
+        .authBtn { padding: 12px; font-size: 15px; }
+        .agreementWrap { font-size: 11px; }
+
+        /* 聊天头部 */
+        .chatHeader { padding: 12px 16px; height: auto; min-height: 50px; flex-wrap: wrap; gap: 8px; }
+        .chatHeader h1 { font-size: 14px; }
+        .headerRight { gap: 12px; }
+        .userInfo { font-size: 11px; gap: 6px; }
+        .logoutBtn { padding: 4px 8px; font-size: 11px; }
+
+        /* 聊天内容 */
+        .chatContent { padding: 12px 0; }
+        .messageList { padding: 0 12px; gap: 12px; }
+        .messageContent { max-width: 75%; font-size: 13px; }
+        .avatarWrap { width: 32px; height: 32px; }
+        .messageWrap { gap: 8px; }
+        .userText, .aiText { padding: 8px 10px; }
+        .reasoningText { padding: 6px 10px; font-size: 11px; }
+        .timeText { font-size: 11px; }
+        .welcomeMessage { padding: 24px 16px; }
+        .welcomeTitle { font-size: 17px; }
+        .welcomeText { font-size: 13px; }
+
+        /* 输入区 */
+        .chat-input { padding: 10px 12px; }
+        .inputWrap { padding: 6px 10px; }
+        .inputField { font-size: 16px; padding: 4px 6px; /* 防止iOS缩放 */ }
+        .sendBtn { padding: 8px 14px; font-size: 13px; margin-left: 6px; }
+        .tips { font-size: 11px; margin-top: 6px; }
+
+        /* 弹窗 */
+        .modalBox { width: 95%; max-height: 85vh; }
+        .modalHeader { padding: 12px 16px; }
+        .modalHeader h3 { font-size: 15px; }
+        .modalBody { padding: 16px; font-size: 12px; }
+        .modalBody h4 { font-size: 13px; }
+
+        /* Toast */
+        .toast { max-width: 90%; font-size: 13px; padding: 10px 18px; }
+      }
+
+      @media (max-width: 375px) {
+        .authPageTitle { font-size: 18px; }
+        .messageContent { max-width: 80%; }
+        .chatHeader h1 { font-size: 13px; }
+      }
+    </style>
+  </head>
+  <body></body>
+</html>
+
+<!-- 登录/注册页面 -->
+<div class="authContainer hidden" id="authContainer">
+  <div class="authPageTitle">新华爱聆大模型 - 爱聆心理疏导聊天系统</div>
+  <div class="authBox">
+    <!-- 登录表单 -->
+    <div id="loginForm">
+      <h2 class="authTitle">登录</h2>
+      <div class="formGroup">
+        <label class="formLabel">账户</label>
+        <input type="text" class="formInput" id="loginUsername" placeholder="请输入用户名（字母、数字和下划线）" />
+        <div class="errorMsg" id="loginUsernameError"></div>
+      </div>
+      <div class="formGroup">
+        <label class="formLabel">密码</label>
+        <input type="password" class="formInput" id="loginPassword" placeholder="请输入密码" />
+        <div class="errorMsg" id="loginPasswordError"></div>
+      </div>
+      <button class="authBtn" id="loginBtn">登录</button>
+      <div class="authToggle">没有账户？<a id="toRegister">立即注册</a></div>
+      <div class="authLinks"><a class="showUserAgreement">《用户服务协议》</a><a class="showPrivacyPolicy">《隐私政策》</a></div>
+    </div>
+
+    <!-- 注册表单 -->
+    <div id="registerForm" class="hidden">
+      <h2 class="authTitle">注册</h2>
+      <div class="formGroup">
+        <label class="formLabel">用户名</label>
+        <input type="text" class="formInput" id="registerUsername" placeholder="请输入用户名" />
+        <div class="errorMsg" id="registerUsernameError"></div>
+      </div>
+      <div class="formGroup">
+        <label class="formLabel">密码</label>
+        <input type="password" class="formInput" id="registerPassword" placeholder="请输入密码（至少6位）" />
+        <div class="errorMsg" id="registerPasswordError"></div>
+      </div>
+      <div class="formGroup">
+        <label class="formLabel">确认密码</label>
+        <input type="password" class="formInput" id="registerConfirmPassword" placeholder="请再次输入密码" />
+        <div class="errorMsg" id="registerConfirmPasswordError"></div>
+      </div>
+      <div class="formGroup">
+        <label class="formLabel">手机号</label>
+        <input type="tel" class="formInput" id="registerPhone" placeholder="请输入手机号" maxlength="11" />
+        <div class="errorMsg" id="registerPhoneError"></div>
+      </div>
+      <div class="formGroup">
+        <label class="formLabel">验证码</label>
+        <div class="codeInputWrap">
+          <input type="text" class="formInput" id="registerCode" placeholder="请输入验证码" maxlength="6" />
+          <button class="codeBtn" id="registerCodeBtn">获取验证码</button>
+        </div>
+        <div class="errorMsg" id="registerCodeError"></div>
+      </div>
+      <div class="agreementWrap">
+        <input type="checkbox" id="agreementCheck" />
+        <span>我已阅读并同意 <a id="showUserAgreement">《用户服务协议》</a>和<a id="showPrivacyPolicy">《隐私政策》</a></span>
+      </div>
+      <div class="errorMsg" id="agreementError"></div>
+      <button class="authBtn" id="registerBtn">注册</button>
+      <div class="authToggle">已有账户？<a id="toLogin">立即登录</a></div>
+      <div class="authLinks"><a class="showUserAgreement">《用户服务协议》</a><a class="showPrivacyPolicy">《隐私政策》</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- 用户服务协议弹窗 -->
+<div class="modalOverlay hidden" id="userAgreementModal">
+  <div class="modalBox">
+    <div class="modalHeader">
+      <h3>新华爱聆大模型用户协议</h3>
+      <button class="modalClose" data-close="userAgreementModal">&times;</button>
+    </div>
+    <div class="modalBody">
+      <p style="color:#909399;margin-bottom:12px">更新日期：2025年9月5日 &nbsp; 生效日期：2025年9月5日</p>
+      <p>亲爱的用户，欢迎您使用新华爱聆大模型产品及服务！新华爱聆大模型基于第三方通义千问大模型开发推出的生成式人工智能，以"心理咨询交互对话"为核心功能的一项服务。</p>
+      <p>新华爱聆大模型产品及服务由江苏卓顿信息科技有限公司及其关联公司（以下简称"我们"或"卓顿科技"）共同所有和负责运营。在使用本服务前，请您务必仔细阅读并理解本《新华爱聆大模型用户协议》（以下简称"本协议"）以及本平台的其他相关协议、政策或指引。</p>
+      <p>关于我们如何收集、保护和使用个人信息的具体规则，请您仔细阅读《隐私政策》。</p>
+      <p><strong>我们特别提醒您在使用本服务之前认真阅读（未满18周岁的未成年人应在法定监护人陪同下阅读）、充分理解以上协议的全部条款，尤其是加粗显示的条款。当您通过网络页面点击确认、勾选等方式同意本协议或实际使用本服务时，均表示您与我们已就全部协议达成一致。如果您不同意全部协议的任一内容，请点击不同意或停止使用本服务。</strong></p>
+
+      <h4>1. 服务内容</h4>
+      <p>1.1 我们的产品及服务包括我们以网页、小程序以及随技术发展出现的创新形态方式向您提供的产品与服务，包括但不限于以生成式人工智能服务为核心功能，专注于心理健康支持和情感陪伴的平台。</p>
+      <p>1.2 我们提供的生成式人工智能产品和服务以新华爱聆大模型为基础。新华爱聆大模型基于深度神经网络算法，经过大规模心理健康领域数据的预训练以及针对性的优化训练等阶段开发而成，该模型可以通过对输入信息进行编码和计算来预测下一个词元，从而具备心理健康支持、情感陪伴和心理咨询辅助等能力。</p>
+      <p>1.3 随着生成式人工智能的技术、模型和产品的不断迭代发展以及法律、法规的变化，我们可能对服务进行新增、升级、变更、中止或终止，或对服务的技术、方式、性能等进行必要的调整。</p>
+      <p>1.4 我们将采取不低于行业实践的必要措施，保障平台的网络安全和稳定运行，并努力提升和改进技术，保障您的产品和服务使用体验。</p>
+
+      <h4>2. 适用范围</h4>
+      <p>2.1 适用人群：新华爱聆大模型面向全年龄段人群，包括未成年人和学生，特别是有心理健康支持和情感陪伴需求的用户。对于未成年人，我们采取与风险程度以及心理咨询场景相适应的全面安全保护措施。</p>
+      <p>2.2 适用场合：新华爱聆大模型适用于个人生活场景、学习场景、工作场景、专业场景、社区和公共健康场景等多种日常生活和专业场景。</p>
+      <p>2.3 服务范围：包括心理健康支持、情感陪伴、心理健康知识普及、心理评估辅助、心理咨询辅助、心理健康干预建议、心理健康管理等。</p>
+
+      <h4>3. 账号管理</h4>
+      <p>3.1 本服务面向全年龄段人群。请监护人合理引导和约束未成年人用户对本服务的使用。</p>
+      <p>3.2 您在使用本服务前，应根据页面通过手机号码或第三方账号注册账号，按要求填写真实、准确、合法、有效的相关信息。您的账号是您登录及使用本服务的凭证，该账号不可转让、不可赠与、不可继承。</p>
+      <p>3.3 在您注册和使用账号时，您须承诺和保证：对注册信息的真实性、合法性、有效性承担全部责任；妥善保管账号及密码；不得恶意注册账号；不得以任何形式将账号转让、出借、出租或提供给他人使用。</p>
+      <p>3.4 如您丢失账号、遗忘密码或泄露验证码，您可及时申诉请求找回。对于用户因账号或密码泄露造成的各种损失，您将自行承担相应责任。</p>
+      <p>3.5 如用户向我们提出注销账户，经我们审核同意，由我们注销该注册用户。但我们仍有权按照法律法规的要求保留该用户的注册数据及以前的行为记录。</p>
+
+      <h4>4. 使用规范</h4>
+      <p>4.1 我们授予您一项可撤销的、不可转让的和非独占地合法使用本产品及相关服务的权利。如果您对外发布或传播本服务生成的输出，您应当主动核查输出内容的专业性、准确性，以显著方式标明该输出内容系由人工智能生成。</p>
+      <p>4.2 您在使用我们提供的服务时，应遵守法律法规的要求和本协议的约定，不利用本服务侵犯他人合法权益及谋取不正当利益。</p>
+      <p>4.3 您不得输入、利用本服务输出或传播违法不良信息，包括但不限于反对宪法基本原则、危害国家安全、损害国家荣誉和利益、宣扬恐怖主义、煽动民族仇恨、散布淫秽色情暴力等内容。</p>
+      <p>4.4 您不得通过恶意对抗行为、假扮身份、反向诱导、越狱攻击等方式恶意攻击本服务的信息内容安全管理和风险防范机制。</p>
+      <p>4.5 您不得对本服务以及支持本服务正常运行的系统、网络、模型以及其他组件等进行干扰、破坏或攻击。</p>
+      <p>4.6 您不得将本服务用于任何违反法律法规、可能对人身健康产生严重有害影响或违反科技伦理的目的。</p>
+
+      <h4>5. 输入与输出</h4>
+      <p>5.1 您对提交给我们服务的所有输入和对应的输出负责。您声明并保证您向我们的服务提交的输入不侵犯任何人的合法权益。</p>
+      <p>5.2 您保留在提交的输入中拥有的任何权利、所有权和利益；我们将本服务输出的内容的任何权利、所有权和利益归属于您。</p>
+      <p>5.3 为向您提供连续、高质量的服务，在经安全加密技术处理、严格去标识化且无法重新识别特定个人的前提下，我们可能会将服务所收集的输入及对应输出，用于模型训练和服务的优化。</p>
+      <p>5.4 基于大语言模型和人工智能的技术特性，本服务输出存在随机性并且无法保证唯一性。</p>
+
+      <h4>6. 关于输出的不准确性与标识规则</h4>
+      <p><strong>6.1 本服务提供的所有输出均由人工智能模型生成，不构成专业的心理咨询或治疗建议，不能替代专业的心理健康服务。若您需要专业的心理健康服务，应咨询持证的心理咨询师、心理治疗师或精神科医生。</strong></p>
+      <p>6.2 新华爱聆大模型已在平台内对人工智能模型生成内容添加标识。您不得删除、篡改、伪造、隐匿或试图规避此类生成内容标识。</p>
+
+      <h4>7. 知识产权和其他权利</h4>
+      <p>7.1 卓顿科技为本服务的开发、运营主体，对本服务享有法律法规允许范围内的全部权利。</p>
+      <p>7.2 未经我们许可，请不要擅自使用本产品相关的任何商标、服务标记、商号、域名等品牌特征。</p>
+
+      <h4>8. 投诉反馈</h4>
+      <p>如果您认为本服务涉及侵害您权利的，或者您发现任何违法、虚假信息以及违反本协议的使用行为，可以通过产品界面"联系我们"按钮进行提交，或通过联系邮箱 service@zd-psy.com 向我们进行反馈。</p>
+
+      <h4>9. 违约责任与责任限制</h4>
+      <p>9.1 针对您违反本协议的行为，我们有权采取警示提醒、限期改正、限制账号功能、暂停使用、关闭账号、禁止重新注册等处置措施。</p>
+      <p>9.2 本服务仅以"现状""当前功能"的状态提供。我们不保证本服务在操作上不会中断、没有错误，不保证生成内容的合法性、真实性、完整性、准确性。</p>
+      <p>9.3 不论在何种情况下，本服务均不对由于不可抗力等不能合理控制的原因而造成的服务中断承担责任。</p>
+
+      <h4>10. 法律适用和管辖</h4>
+      <p>10.1 本协议的订立、执行和解释及争议的解决均应适用中华人民共和国大陆地区法律。</p>
+      <p>10.2 如协商不成，任何一方均有权向江苏卓顿信息科技有限公司住所地有管辖权的人民法院提起诉讼。</p>
+
+      <h4>11. 其他</h4>
+      <p>11.1 我们会适时对本协议进行修订，更新后的协议将通过官方网站或服务页面等适当的方式进行公示，公示期不少于7个自然日。</p>
+      <p>11.2 联系方式：联系邮箱 service@zd-psy.com，联系地址：江苏省南京市六合雄州街道王桥路59号。</p>
+      <p style="margin-top:16px;color:#909399">江苏卓顿信息科技有限公司<br>2025年9月5日</p>
+    </div>
+  </div>
+</div>
+
+<!-- 隐私政策弹窗 -->
+<div class="modalOverlay hidden" id="privacyPolicyModal">
+  <div class="modalBox">
+    <div class="modalHeader">
+      <h3>新华爱聆大模型隐私政策</h3>
+      <button class="modalClose" data-close="privacyPolicyModal">&times;</button>
+    </div>
+    <div class="modalBody">
+      <p style="color:#909399;margin-bottom:12px">更新日期：2025年9月5日 &nbsp; 生效日期：2025年9月5日</p>
+      <p>《新华爱聆大模型隐私政策》（以下称"本政策"）适用于江苏卓顿信息科技有限公司及其关联公司（以下简称"我们"或"卓顿科技"）推出的新华爱聆大模型人工智能服务。您在使用本服务前，请仔细阅读本政策，以了解我们处理您个人信息的详情。</p>
+
+      <h4>一、我们如何收集和使用您的个人信息</h4>
+      <p><strong>1. 账号注册、登录、认证</strong></p>
+      <p>您需要注册并登录后方可正常使用相关服务。您在注册和登录时需要向我们提供您本人的手机号码并通过输入验证码，以便我们对您的用户身份进行核验。手机号码是履行国家法律法规关于网络实名制要求的必要信息。</p>
+      <p><strong>2. 心理支持与智能对话</strong></p>
+      <p>在您使用心理支持和智能对话功能服务时，我们将收集您与新华爱聆大模型进行交互过程中所输入的内容，以便于更好地理解您的问题和上下文语境，从而为您提供更具有相关性的心理支持内容。</p>
+      <p>为向您提供连续、高质量的服务，在经安全加密技术处理、严格去标识化且无法重新识别特定个人的前提下，我们可能会将服务所收集的输入及对应输出，用于新华爱聆大模型训练和服务的优化。如您拒绝将您的数据用于模型训练，可以在产品内通过关闭"数据用于优化体验"来选择退出。</p>
+      <p>我们特别建议您不要在智能对话中主动输入您的个人敏感信息，尤其是心理健康相关敏感信息。</p>
+      <p><strong>3. 开放平台服务</strong></p>
+      <p>在您使用新华爱聆大模型开放平台服务时，我们可能会收集您的真实身份信息以完成实名验证。以上个人信息的收集处理仅适用于新华爱聆大模型开放平台。</p>
+      <p><strong>4. 意见反馈</strong></p>
+      <p>如您使用意见反馈功能服务时，我们会收集您的问题描述信息、证明材料附件、手机号码、邮箱、联系人姓名，以了解您反馈的内容和需求。</p>
+      <p><strong>5. 消息通知</strong></p>
+      <p>对于您在使用产品及服务的过程中提供的联系方式，我们在运营中可能会向其发送多类通知，用于用户消息告知、身份验证、安全验证等用途。如您不愿接受商业性信息，您可以通过提供的退订方式进行退订。</p>
+      <p><strong>6. 运营与安全保障</strong></p>
+      <p>为了保障您的账号安全和更好地为您提供优质的服务，我们会自动收集您在使用服务过程中产生的网络日志，包括硬件型号、操作系统版本号、设备标识符、IP地址、软件版本号、网络接入方式等信息。</p>
+
+      <h4>二、我们如何使用Cookie和同类技术</h4>
+      <p>我们会通过cookies收集和使用您的信息，用于记住您的身份、保障服务的安全。大多数浏览器均为用户提供了清除浏览器缓存数据的功能，您可以在浏览器设置功能中进行相应的数据清除操作。</p>
+
+      <h4>三、我们如何委托处理、共享、转让、公开披露您的个人信息</h4>
+      <p>我们遵循合法原则、正当与最小必要原则、安全审慎原则处理数据共享。未经您的同意，我们不会公开您的个人信息，除非遵循国家法律法规规定。</p>
+
+      <h4>四、我们如何保护您的个人信息</h4>
+      <p>我们已采用符合业界标准的安全防护措施，包括建立合理的制度规范、安全技术来防止您的个人信息遭到未经授权的访问使用、修改，避免数据的损坏或丢失。在不幸发生个人信息安全事件后，我们将按照法律法规的要求，及时向您告知相关情况。</p>
+
+      <h4>五、我们如何存储您的个人信息</h4>
+      <p>我们依照法律法规的规定，将在境内运营过程中收集和产生的您的个人信息存储于中华人民共和国境内。我们仅在为提供新华爱聆大模型之目的所必需的期间内保留您的个人信息。</p>
+
+      <h4>六、您如何实现管理您个人信息的权利</h4>
+      <p>您对个人信息处理享有知情权、决定权，有权限制或者拒绝他人对您个人信息进行处理。您有权查阅、复制、更正、补充、删除您的个人信息。您可以通过产品内的相关功能进行操作，或通过本政策所述联系方式与我们联系。</p>
+      <p>您有权根据《新华爱聆大模型注销须知》注销您的账号。注销账号的行为是不可逆的行为，当您注销账号后，我们将删除有关您的相关信息或进行匿名化处理。</p>
+
+      <h4>七、我们如何保护未成年人的个人信息</h4>
+      <p>新华爱聆大模型可以服务全年龄段人群，对未成年人用户，我们会特别注重其个人信息的保护。若您是未满18周岁的未成年人，在使用本产品及相关服务前，请在您的父母或其他监护人的监护、指导下共同阅读并同意本隐私政策。</p>
+
+      <h4>八、我们如何更新本政策</h4>
+      <p>我们会适时对本政策进行修订，这些修订构成本政策的一部分。本政策更新后，我们会在新华爱聆大模型网站发出更新版本。您对新华爱聆大模型产品和服务的继续使用视为您知悉并同意我们的更新。</p>
+
+      <h4>九、如何联系我们</h4>
+      <p>如您对本政策或对您的个人信息有任何疑问或建议，请通过以下联系方式与我们联系：</p>
+      <p>联系邮箱：service@zd-psy.com</p>
+      <p>我们将尽快审核所涉问题，并在验证您的用户身份后的十五个工作日内回复。</p>
+
+      <h4>十、其他</h4>
+      <p>本政策的解释及争议解决均应适用中华人民共和国大陆地区法律。如就本政策内容或其执行发生任何争议，应尽量友好协商解决；协商不成时，则争议各方均应向江苏卓顿信息科技有限公司住所地有管辖权的法院提起诉讼。</p>
+      <p style="margin-top:16px;color:#909399">江苏卓顿信息科技有限公司<br>2025年9月5日</p>
+    </div>
+  </div>
+</div>
+
+    <!-- 聊天页面 -->
+    <div class="chatContainer hidden" id="chatContainer">
+      <div class="chatHeader">
+        <h1>新华爱聆大模型</h1>
+        <div class="headerRight">
+          <div class="status">在线</div>
+          <div class="userInfo">
+            <span id="currentUsername" class="username-link">用户</span>
+            <button class="logoutBtn" id="logoutBtn">退出登录</button>
+          </div>
+        </div>
+      </div>
+      <div class="chatContent" id="chatContent">
+        <div class="messageList" id="messageList"></div>
+      </div>
+      <div class="chat-input">
+        <div class="inputWrap">
+          <input id="inputField" type="text" placeholder="请输入您想问的问题..." class="inputField" />
+          <button class="sendBtn" id="sendBtn">发送</button>
+        </div>
+        <div class="tips">内容由AI生成，无法确保真实准确，仅供参考</div>
+      </div>
+    </div>
+
+    <!-- 信息完善弹窗 -->
+    <div class="modalOverlay hidden" id="profileModal">
+      <div class="modalBox" style="max-width:440px">
+        <div class="modalHeader">
+          <h3>完善个人信息</h3>
+          <button class="modalClose" data-close="profileModal">&times;</button>
+        </div>
+        <div class="modalBody" style="padding:24px">
+          <div class="formGroup">
+            <label class="formLabel">姓名</label>
+            <input type="text" class="formInput" id="profileName" placeholder="请输入真实姓名" />
+            <div class="errorMsg" id="profileNameError"></div>
+          </div>
+          <div class="formGroup">
+            <label class="formLabel">身份证号码</label>
+            <input type="text" class="formInput" id="profileIdCard" placeholder="请输入身份证号码" maxlength="18" />
+            <div class="errorMsg" id="profileIdCardError"></div>
+          </div>
+          <div class="formGroup">
+            <label class="formLabel">邮箱</label>
+            <input type="email" class="formInput" id="profileEmail" placeholder="请输入邮箱地址" />
+            <div class="errorMsg" id="profileEmailError"></div>
+          </div>
+          <button class="authBtn" id="profileSaveBtn" style="margin-top:16px">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast 容器 -->
+    <div id="toastContainer"></div>
+
+    <!-- Loading -->
+    <div class="loadingOverlay hidden" id="loadingOverlay">
+      <div class="loadingContent">
+        <div class="loadingIcon"></div>
+        <div class="loadingText">AI正在思考中...</div>
+      </div>
+    </div>
+
+    <script src="https://jszdoss.oss-cn-hangzhou.aliyuncs.com/jszd/jquery/jquery@2.2.3.min.js"></script>
+    <script>
+    $(function () {
+
+      var BASE_URL = 'http://106.12.80.178:28083/api/ai-chat';
+      var conversationId = null; // 当前会话ID
+      var isSending = false;     // 防止重复发送
+
+      // ========== 工具函数 ==========
+      function validatePhone(phone) { return /^1[3-9]\d{9}$/.test(phone); }
+
+      function getTimeStr() {
+        var now = new Date();
+        return ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+      }
+
+      function escapeHtml(text) { return $('<div>').text(text).html(); }
+
+      function showError(id, msg) { $('#' + id).text(msg).addClass('show'); }
+
+      function clearErrors() { $('.errorMsg').text('').removeClass('show'); }
+
+      function getToken() { return localStorage.getItem('authToken') || ''; }
+
+      function setToken(token) { localStorage.setItem('authToken', token); }
+
+      // Toast 弹窗
+      function toast(msg, type, duration) {
+        type = type || 'info';
+        duration = duration || 2500;
+        var $t = $('<div class="toast toast-' + type + '">').text(msg);
+        $('#toastContainer').append($t);
+        setTimeout(function () { $t.addClass('show'); }, 10);
+        setTimeout(function () {
+          $t.removeClass('show');
+          setTimeout(function () { $t.remove(); }, 300);
+        }, duration);
+      }
+
+      // 带认证的 AJAX 请求
+      function apiRequest(url, options) {
+        var opts = $.extend({
+          contentType: 'application/json',
+          dataType: 'json',
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        }, options);
+        if (opts.data && typeof opts.data === 'object' && opts.type && opts.type.toUpperCase() !== 'GET') {
+          opts.data = JSON.stringify(opts.data);
+        }
+        return $.ajax(BASE_URL + url, opts);
+      }
+
+      // ========== 验证码倒计时 ==========
+      function startCountdown($btn) {
+        var seconds = 60;
+        $btn.prop('disabled', true).text(seconds + 's');
+        var timer = setInterval(function () {
+          seconds--;
+          if (seconds <= 0) {
+            clearInterval(timer);
+            $btn.prop('disabled', false).text('获取验证码');
+          } else {
+            $btn.text(seconds + 's');
+          }
+        }, 1000);
+      }
+
+      // ========== 页面切换 ==========
+      function showChatPage(user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        $('#authContainer').addClass('hidden');
+        $('#chatContainer').removeClass('hidden');
+        $('#currentUsername').text(user.username || user.mobile);
+        conversationId = null;
+        showWelcome();
+        scrollToBottom();
+      }
+
+      function showAuthPage() {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('authToken');
+        conversationId = null;
+        $('#chatContainer').addClass('hidden');
+        $('#authContainer').removeClass('hidden');
+        $('#messageList').empty();
+        $('#inputField').val('');
+        $('#loginForm').removeClass('hidden');
+        $('#registerForm').addClass('hidden');
+        clearErrors();
+      }
+
+      // ========== 对话相关 ==========
+      function showWelcome() {
+        $('#messageList').empty().append(
+          '<div class="welcomeMessage">' +
+            '<div class="welcomeTitle">欢迎来到新华爱聆心理疏导</div>' +
+            '<div class="welcomeText">' +
+              '<p>你好，我是你的心理疏导助手。</p>' +
+              '<p style="margin-top:12px">无论你现在面临什么困扰或挑战，我都在这里倾听和支持你。</p>' +
+              '<p style="margin-top:12px">请随时分享你的想法和感受，让我们一起探索解决方案。</p>' +
+            '</div>' +
+          '</div>'
+        );
+      }
+
+      function appendUserMessage(text) {
+        var html =
+          '<div class="messageItem">' +
+            '<div class="timeWrap"><div class="timeText">' + getTimeStr() + '</div></div>' +
+            '<div class="messageWrap userMessage">' +
+              '<div class="avatarWrap"><img class="avatar" src="https://zd-testing.oss-cn-beijing.aliyuncs.com/nezha/user/default_avatar.png" alt=""></div>' +
+              '<div class="messageContent"><div class="userText">' + escapeHtml(text) + '</div></div>' +
+            '</div>' +
+          '</div>';
+        $('#messageList').append(html);
+      }
+
+      // 创建AI消息容器（用于流式填充）
+      function createAIMessageContainer() {
+        var id = 'ai-msg-' + Date.now();
+        var html =
+          '<div class="messageItem" id="' + id + '">' +
+            '<div class="timeWrap"><div class="timeText">' + getTimeStr() + '</div></div>' +
+            '<div class="messageWrap aiMessage">' +
+              '<div class="avatarWrap"><img class="avatar" src="https://zd-testing.oss-cn-beijing.aliyuncs.com/stu_pc/endbg/1/17.png" alt=""></div>' +
+              '<div class="messageContent">' +
+                '<div class="reasoningText" style="display:none"><span class="reasoningLabel">思考中...</span><span class="reasoning-content"></span></div>' +
+                '<div class="aiText"></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        $('#messageList').append(html);
+        return id;
+      }
+
+      function scrollToBottom() {
+        var el = $('#chatContent')[0];
+        if (el) el.scrollTop = el.scrollHeight;
+      }
+
+      // ========== 流式聊天 ==========
+      function sendMessage() {
+        var text = $.trim($('#inputField').val());
+        if (!text || isSending) return;
+
+        isSending = true;
+        $('#sendBtn').prop('disabled', true);
+        $('#messageList .welcomeMessage').remove();
+
+        appendUserMessage(text);
+        $('#inputField').val('');
+        scrollToBottom();
+
+        var containerId = createAIMessageContainer();
+        var $container = $('#' + containerId);
+        var $reasoning = $container.find('.reasoning-content');
+        var $reasoningWrap = $container.find('.reasoningText');
+        var $answer = $container.find('.aiText');
+
+        // 使用 fetch + ReadableStream 实现 SSE 流式读取
+        var token = getToken();
+        var body = JSON.stringify({
+          message: text,
+          conversation_id: conversationId,
+          stream: true
+        });
+
+        fetch(BASE_URL + '/chat/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: body
+        }).then(function (response) {
+          if (response.status === 401) {
+            toast('登录已过期，请重新登录', 'warning');
+            showAuthPage();
+            return;
+          }
+          if (!response.ok) {
+            throw new Error('请求失败: ' + response.status);
+          }
+
+          var reader = response.body.getReader();
+          var decoder = new TextDecoder();
+          var buffer = '';
+
+          function read() {
+            return reader.read().then(function (result) {
+              if (result.done) {
+                finishSending();
+                return;
+              }
+
+              buffer += decoder.decode(result.value, { stream: true });
+              var lines = buffer.split('\n');
+              buffer = lines.pop(); // 保留未完成的行
+
+              for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (line.indexOf('data: ') === 0) {
+                  try {
+                    var data = JSON.parse(line.substring(6));
+                    handleStreamData(data, $reasoningWrap, $reasoning, $answer);
+                  } catch (e) {
+                    // 忽略解析错误
+                  }
+                }
+              }
+
+              scrollToBottom();
+              return read();
+            });
+          }
+
+          return read();
+        }).catch(function (err) {
+          console.error('聊天请求失败:', err);
+          $answer.text('抱歉，请求出现了问题，请稍后重试。');
+          scrollToBottom();
+          finishSending();
+        });
+      }
+
+      function handleStreamData(data, $reasoningWrap, $reasoning, $answer) {
+        if (data.type === 'reasoning') {
+          $reasoningWrap.show();
+          $reasoning.append(escapeHtml(data.content));
+        } else if (data.type === 'answer') {
+          // 收到回答后，更新思考标签
+          if ($reasoningWrap.is(':visible')) {
+            $reasoningWrap.find('.reasoningLabel').text('思考过程');
+          }
+          $answer.append(escapeHtml(data.content));
+        } else if (data.type === 'done') {
+          if (data.conversation_id) {
+            conversationId = data.conversation_id;
+          }
+        } else if (data.type === 'error') {
+          $answer.text('错误: ' + (data.content || '未知错误'));
+        }
+      }
+
+      function finishSending() {
+        isSending = false;
+        $('#sendBtn').prop('disabled', false);
+        $('#inputField').focus();
+        scrollToBottom();
+      }
+
+      // ========== 事件绑定 ==========
+
+      // 登录/注册切换
+      $('#toRegister').on('click', function () {
+        clearErrors();
+        $('#loginForm').addClass('hidden');
+        $('#registerForm').removeClass('hidden');
+      });
+      $('#toLogin').on('click', function () {
+        clearErrors();
+        $('#registerForm').addClass('hidden');
+        $('#loginForm').removeClass('hidden');
+      });
+
+      // 发送验证码 - 注册
+      $('#registerCodeBtn').on('click', function () {
+        clearErrors();
+        var phone = $.trim($('#registerPhone').val());
+        if (!validatePhone(phone)) { showError('registerPhoneError', '请输入正确的手机号'); return; }
+        var $btn = $(this).prop('disabled', true).text('发送中...');
+        apiRequest('/sms/send/', {
+          type: 'POST',
+          data: { mobile: phone, purpose: 'register' }
+        }).done(function (res) {
+          if (res.success) {
+            startCountdown($btn);
+            if (res.code) {
+              toast('验证码: ' + res.code, 'success', 5000);
+            } else {
+              toast('验证码已发送', 'success');
+            }
+          } else {
+            $btn.prop('disabled', false).text('获取验证码');
+            showError('registerPhoneError', res.message || '发送失败');
+          }
+        }).fail(function (xhr) {
+          $btn.prop('disabled', false).text('获取验证码');
+          var msg = '发送失败';
+          try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
+          showError('registerPhoneError', msg);
+        });
+      });
+
+      // 登录（账户+密码）
+      $('#loginBtn').on('click', function () {
+        clearErrors();
+        var username = $.trim($('#loginUsername').val());
+        var password = $.trim($('#loginPassword').val());
+        if (!username) { showError('loginUsernameError', '请输入用户名或手机号'); return; }
+        if (!password) { showError('loginPasswordError', '请输入密码'); return; }
+
+        var $btn = $(this).prop('disabled', true).text('登录中...');
+        apiRequest('/login/', {
+          type: 'POST',
+          data: { username: username, password: password }
+        }).done(function (res) {
+          if (res.success) {
+            setToken(res.data.token);
+            showChatPage(res.data.user);
+          } else {
+            showError('loginPasswordError', res.message || '登录失败');
+          }
+        }).fail(function (xhr) {
+          var msg = '登录失败';
+          try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
+          showError('loginPasswordError', msg);
+        }).always(function () {
+          $btn.prop('disabled', false).text('登录');
+        });
+      });
+
+      // 注册（账户+密码+手机号验证码）
+      $('#registerBtn').on('click', function () {
+        clearErrors();
+        var username = $.trim($('#registerUsername').val());
+        var password = $.trim($('#registerPassword').val());
+        var confirmPassword = $.trim($('#registerConfirmPassword').val());
+        var phone = $.trim($('#registerPhone').val());
+        var code = $.trim($('#registerCode').val());
+        var agreed = $('#agreementCheck').is(':checked');
+
+        if (!username) { showError('registerUsernameError', '请输入用户名'); return; }
+        if (username.length < 3) { showError('registerUsernameError', '用户名至少3个字符'); return; }
+        if (!password) { showError('registerPasswordError', '请输入密码'); return; }
+        if (password.length < 6) { showError('registerPasswordError', '密码至少6个字符'); return; }
+        if (password !== confirmPassword) { showError('registerConfirmPasswordError', '两次输入的密码不一致'); return; }
+        if (!validatePhone(phone)) { showError('registerPhoneError', '请输入正确的手机号'); return; }
+        if (!code) { showError('registerCodeError', '请输入验证码'); return; }
+        if (!agreed) { showError('agreementError', '请先阅读并同意用户协议和隐私政策'); return; }
+
+        var $btn = $(this).prop('disabled', true).text('注册中...');
+        apiRequest('/register/', {
+          type: 'POST',
+          data: { mobile: phone, code: code, username: username, password: password, confirm_password: confirmPassword }
+        }).done(function (res) {
+          if (res.success) {
+            toast('注册成功，请登录', 'success');
+            $('#registerForm').addClass('hidden');
+            $('#loginForm').removeClass('hidden');
+            $('#loginUsername').val(username);
+          } else {
+            // 处理后端返回的详细错误
+            if (res.errors) {
+              if (res.errors.mobile) showError('registerPhoneError', res.errors.mobile[0]);
+              if (res.errors.username) showError('registerUsernameError', res.errors.username[0]);
+              if (res.errors.password) showError('registerPasswordError', res.errors.password[0]);
+              if (res.errors.confirm_password) showError('registerConfirmPasswordError', res.errors.confirm_password[0]);
+              if (res.errors.code) showError('registerCodeError', res.errors.code[0]);
+            } else {
+              showError('registerUsernameError', res.message || '注册失败');
+            }
+          }
+        }).fail(function (xhr) {
+          var msg = '注册失败';
+          try {
+            var resp = JSON.parse(xhr.responseText);
+            if (resp.errors) {
+              if (resp.errors.mobile) showError('registerPhoneError', resp.errors.mobile[0]);
+              if (resp.errors.username) showError('registerUsernameError', resp.errors.username[0]);
+              if (resp.errors.password) showError('registerPasswordError', resp.errors.password[0]);
+              if (resp.errors.confirm_password) showError('registerConfirmPasswordError', resp.errors.confirm_password[0]);
+              if (resp.errors.code) showError('registerCodeError', resp.errors.code[0]);
+              return;
+            }
+            msg = resp.message || msg;
+          } catch(e) {}
+          showError('registerUsernameError', msg);
+        }).always(function () {
+          $btn.prop('disabled', false).text('注册');
+        });
+      });
+
+      // 退出登录
+      $('#logoutBtn').on('click', function () { showAuthPage(); });
+
+      // 点击用户名 - 弹出信息完善
+      $('#currentUsername').on('click', function () {
+        clearErrors();
+        // 尝试加载已有信息
+        var user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        $('#profileName').val(user.real_name || '');
+        $('#profileIdCard').val(user.id_card || '');
+        $('#profileEmail').val(user.email || '');
+        $('#profileModal').removeClass('hidden');
+      });
+
+      // 保存个人信息
+      $('#profileSaveBtn').on('click', function () {
+        clearErrors();
+        var realname = $.trim($('#profileName').val());
+        var idCard = $.trim($('#profileIdCard').val());
+        var email = $.trim($('#profileEmail').val());
+
+        if (!realname) { showError('profileNameError', '请输入姓名'); return; }
+        if (idCard && !/^\d{17}[\dXx]$/.test(idCard)) { showError('profileIdCardError', '身份证号码格式不正确'); return; }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('profileEmailError', '邮箱格式不正确'); return; }
+
+        var $btn = $(this).prop('disabled', true).text('保存中...');
+        var putData = {};
+        if (realname) putData.real_name = realname;
+        if (idCard) putData.id_card = idCard;
+
+        apiRequest('/user/info/', {
+          type: 'PUT',
+          data: putData
+        }).done(function (res) {
+          if (res.success) {
+            var user = res.data || {};
+            user.email = email; // email 接口暂不支持，本地保存
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            $('#currentUsername').text(user.username || user.mobile);
+            toast('信息保存成功', 'success');
+            $('#profileModal').addClass('hidden');
+          } else {
+            toast(res.message || '保存失败', 'error');
+          }
+        }).fail(function (xhr) {
+          var msg = '保存失败';
+          try { msg = JSON.parse(xhr.responseText).message || msg; } catch(e) {}
+          toast(msg, 'error');
+        }).always(function () {
+          $btn.prop('disabled', false).text('保存');
+        });
+      });
+
+      // 协议弹窗
+      $('#showUserAgreement, .showUserAgreement').on('click', function (e) { e.preventDefault(); $('#userAgreementModal').removeClass('hidden'); });
+      $('#showPrivacyPolicy, .showPrivacyPolicy').on('click', function (e) { e.preventDefault(); $('#privacyPolicyModal').removeClass('hidden'); });
+      $('.modalClose').on('click', function () { $('#' + $(this).data('close')).addClass('hidden'); });
+      $('.modalOverlay').on('click', function (e) { if ($(e.target).hasClass('modalOverlay')) $(this).addClass('hidden'); });
+
+      // 发送消息
+      $('#sendBtn').on('click', sendMessage);
+      $('#inputField').on('keypress', function (e) { if (e.which === 13) sendMessage(); });
+
+      // 登录回车
+      $('#loginPassword').on('keypress', function (e) { if (e.which === 13) $('#loginBtn').click(); });
+      $('#registerCode').on('keypress', function (e) { if (e.which === 13) $('#registerBtn').click(); });
+
+      // ========== 初始化 ==========
+      var savedUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+      var savedToken = getToken();
+      if (savedUser && savedToken) {
+        apiRequest('/user/info/', { type: 'GET' })
+          .done(function (res) {
+            if (res.success) {
+              showChatPage(res.data);
+            } else {
+              showAuthPage();
+              $('#authContainer').removeClass('hidden');
+            }
+          })
+          .fail(function () {
+            showAuthPage();
+            $('#authContainer').removeClass('hidden');
+          });
+      } else {
+        $('#authContainer').removeClass('hidden');
+      }
+
+    });
+    </script>
+  </body>
+</html>
